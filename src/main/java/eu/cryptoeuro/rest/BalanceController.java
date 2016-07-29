@@ -34,6 +34,7 @@ public class BalanceController {
     public ResponseEntity<Balance> getBalance(
             @Valid @RequestParam(value = "account", required = false) Optional<String> account
     ){
+        log.info("Getting balance for account " + account.toString());
         return new ResponseEntity<Balance>(
                 balanceService.getBalance(account),
                 new HttpHeaders(), HttpStatus.OK);

@@ -28,7 +28,7 @@ public class BalanceService {
         String url = "http://54.194.239.231:8545";
 
         JsonRpcCall call = new JsonRpcCall(EthereumRpcMethod.getBalance,
-                Arrays.asList("0x65fa6548764C08C0DD77495B33ED302d0C212691","latest"));
+                Arrays.asList(account.orElse("0x65fa6548764C08C0DD77495B33ED302d0C212691"),"latest"));
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON_UTF8);
@@ -39,7 +39,9 @@ public class BalanceService {
 
     	log.info(response.getResult());
 
-        return new Balance(new BigDecimal(1000), "transferId");
+        return new Balance(new BigDecimal(
+                Long.parseLong(response.getResult().substring(2).trim(), 16 )
+        ), "transferId");
     }
 
 }

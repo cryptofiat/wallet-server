@@ -12,6 +12,7 @@ buildscript {
 
 apply plugin: 'java'
 apply plugin: 'eclipse'
+apply plugin: 'idea'
 apply plugin: 'spring-boot'
 
 jar {
@@ -34,8 +35,8 @@ dependencies {
 	compile('org.projectlombok:lombok')
 	compile('org.springframework.boot:spring-boot-starter-thymeleaf')
 	compile('org.springframework.boot:spring-boot-starter-web')
-	compile("io.springfox:springfox-swagger2:2.1.2")
-	compile("io.springfox:springfox-swagger-ui:2.1.2")
+	compile('io.springfox:springfox-swagger2:2.1.2')
+	compile('io.springfox:springfox-swagger-ui:2.1.2')
 	testCompile('org.springframework.boot:spring-boot-starter-test')
 	testCompile('org.springframework.cloud:spring-cloud-contract-wiremock')
 }

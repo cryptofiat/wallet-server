@@ -1,9 +1,11 @@
 package eu.cryptoeuro.rest;
 
 import eu.cryptoeuro.rest.model.Balance;
+import eu.cryptoeuro.service.BalanceService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
 import java.math.BigDecimal;
+import java.util.Optional;
 
 @Api(value="balances",
         description="This is an object representing your balance. You can retrieve it to see the balance currently on your account.\n" +
@@ -24,13 +27,16 @@ import java.math.BigDecimal;
 @Slf4j
 public class BalanceController {
 
+    @Autowired
+    BalanceService balanceService;
+
     @ApiOperation(value = "Get account balance.")
     @RequestMapping(method = RequestMethod.GET, value = "")
     public ResponseEntity<Balance> getBalance(
-            @Valid @RequestParam(value = "account", required = false) String account
+            @Valid @RequestParam(value = "account", required = false) Optional<String> account
     ){
         return new ResponseEntity<Balance>(
-                new Balance(new BigDecimal(1000), "transferId"),
+                balanceService.getBalance(account),
                 new HttpHeaders(), HttpStatus.OK);
     }
 }

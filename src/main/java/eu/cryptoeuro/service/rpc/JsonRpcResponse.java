@@ -1,4 +1,4 @@
-package eu.cryptoeuro.service;
+package eu.cryptoeuro.service.rpc;
 
 import lombok.Data;
 

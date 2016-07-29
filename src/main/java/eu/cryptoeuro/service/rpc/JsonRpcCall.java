@@ -9,11 +9,16 @@ import java.util.List;
 @Data
 public class JsonRpcCall {
     private String jsonrpc = "2.0";
+
     @NonNull
     private EthereumRpcMethod method;
     @NonNull
     private List<String> params;
     private Long id = new Long(1);
+
+    public String getMethod(){
+        return method.toString();
+    }
 
     public String toString() {
         return new JSONObject(this).toString();

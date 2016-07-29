@@ -10,10 +10,6 @@ public enum EthereumRpcMethod implements Serializable {
         this.method = method;
     }
 
-    public String getMethod() {
-        return this.method;
-    }
-
     public String toString() {
         return this.method;
     }

@@ -26,7 +26,6 @@ public class BalanceService {
 
     public Balance getBalance(Optional<String> account) {
         String url = "http://54.194.239.231:8545";
-//    	String body = "{\"jsonrpc\":\"2.0\",\"method\":\"eth_getBalance\",\"params\":[\"0x65fa6548764C08C0DD77495B33ED302d0C212691\", \"latest\"],\"id\":1}";
 
         JsonRpcCall call = new JsonRpcCall(EthereumRpcMethod.getBalance,
                 Arrays.asList("0x65fa6548764C08C0DD77495B33ED302d0C212691","latest"));

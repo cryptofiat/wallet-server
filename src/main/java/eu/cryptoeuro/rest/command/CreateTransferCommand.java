@@ -19,4 +19,7 @@ public class CreateTransferCommand {
     private Long amount;
     @Min(0)
     private Long reference;
+
+
+
 }

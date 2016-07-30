@@ -20,15 +20,12 @@ import java.math.BigDecimal;
 @RequestMapping("/v1/fees")
 @Slf4j
 public class FeeController {
-
-    BigDecimal FEE = new BigDecimal("1");
-
     @ApiOperation(value = "Get fee.")
     @RequestMapping(method = RequestMethod.GET, value = "")
     public ResponseEntity<Fee> getFee(){
-        log.info("Getting fee: " + FEE);
+        log.info("Getting fee: " + Fee.amount);
         return new ResponseEntity<>(
-                new Fee(FEE),
+                new Fee(),
                 new HttpHeaders(), HttpStatus.OK);
     }
 

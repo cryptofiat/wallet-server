@@ -10,6 +10,9 @@ import javax.validation.constraints.Size;
 public class CreateTransferCommand {
     @NotNull
     @Size(min = 1, max = 256)
+    private String sourceAccount;
+    @NotNull
+    @Size(min = 1, max = 256)
     private String targetAccount;
     @NotNull
     @Min(1)

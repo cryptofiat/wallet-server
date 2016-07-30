@@ -17,6 +17,9 @@ public class Transfer {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private long id;
+    @NotNull
+    @Size(min = 1, max = 256)
+    private String sourceAccount;
     @Size(min = 1, max = 256)
     private String targetAccount;
     private TransferStatus status;

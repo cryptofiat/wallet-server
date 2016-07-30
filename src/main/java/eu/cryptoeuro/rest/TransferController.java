@@ -67,6 +67,7 @@ public class TransferController {
         eu.cryptoeuro.domain.Transfer transfer = new eu.cryptoeuro.domain.Transfer();
 
         //TODO: extract
+        transfer.setSourceAccount(createTransferCommand.getSourceAccount());
         transfer.setTargetAccount(createTransferCommand.getTargetAccount());
         transfer.setAmount(createTransferCommand.getAmount());
         transfer.setReference(createTransferCommand.getReference());

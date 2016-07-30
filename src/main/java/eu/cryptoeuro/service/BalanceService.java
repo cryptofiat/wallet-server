@@ -46,7 +46,7 @@ public class BalanceService {
     }
 
     public String call(Optional<String> account) {
-        // DOCS: https://github.com/ethcore/parity/wiki/JSONRPC#eth_sendtransaction
+        // DOCS: https://github.com/ethcore/parity/wiki/JSONRPC#eth_call
         Map<String, String> params = new HashMap<>();
         //params.put("from", "0x4FfAaD6B04794a5911E2d4a4f7F5CcCEd0420291"); // erko main account
         params.put("to", "0xAF8ce136A244dB6f13a97e157AC39169F4E9E445"); // viimane 0.21 contract deploy
@@ -62,27 +62,6 @@ public class BalanceService {
 
         JsonRpcCallMap call = new JsonRpcCallMap(EthereumRpcMethod.call, Arrays.asList(params, "latest"));
 
-        /*
-{
-"method":"eth_call",
-"id":1,
-"params":[
-    {
-        "data":"0x06fdde03",
-        "to":"0xAF8ce136A244dB6f13a97e157AC39169F4E9E445"
-    },
-    "latest"
-]
-"params":{
-    "data":"0x06fdde03",
-    "to":"0xAF8ce136A244dB6f13a97e157AC39169F4E9E445"
-},
-"jsonrpc":"2.0"
-}
-
-0x000000000000000000000000000000000000000000000000000000000000002000000000000000000000000000000000000000000000000000000000000000114b72c3bc70746f204575726f20302e3231000000000000000000000000000000
-         */
-
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON_UTF8);
         HttpEntity<String> request = new HttpEntity<String>(call.toString(), headers);
@@ -94,7 +73,50 @@ public class BalanceService {
         String convertedResult = new String(bytes, StandardCharsets.UTF_8);
         log.info("Converted to string: " + convertedResult);
 
-        return convertedResult;
+        long longResult = Long.parseLong(response.getResult().substring(2), 16);
+        log.info("Converted to long: " + longResult);
+
+        return String.valueOf(longResult);
+    }
+
+    public String sendTransaction(Optional<String> account, Optional<Long> amount) {
+        // DOCS: https://github.com/ethcore/parity/wiki/JSONRPC#eth_sendtransaction
+        Map<String, String> params = new HashMap<>();
+        params.put("from", "0x4FfAaD6B04794a5911E2d4a4f7F5CcCEd0420291"); // erko main account
+        params.put("to", "0xAF8ce136A244dB6f13a97e157AC39169F4E9E445"); // viimane 0.21 contract deploy
+        //params.put("gas", "0x76c0"); // 30400
+        //params.put("gasPrice", "0x9184e72a000"); // 10000000000000
+        //params.put("value", "0x9184e72a"); // 2441406250
+
+        String targetArgument = "000000000000000000000000" + account.orElse("0x52C312631d5593D9164A257abcD5c58d14B96600").substring(2);
+        // TODO use amount variable
+        String amountArgument = "0000000000000000000000000000000000000000000000000000000000000064"; // 100 raha
+        String data = "0x" + HashUtils.keccak256("mintToken(address,uint256)").substring(0, 8) + targetArgument + amountArgument;
+
+        params.put("data", data);
+        //params.put("nonce", "");
+
+        JsonRpcCallMap call = new JsonRpcCallMap(EthereumRpcMethod.sendTransaction, Arrays.asList(params));
+
+        log.info("JSON:\n"+call.toString());
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON_UTF8);
+        HttpEntity<String> request = new HttpEntity<String>(call.toString(), headers);
+        JsonRpcResponse response = restTemplate.postForObject(URL, request, JsonRpcResponse.class);
+
+        log.info("Send transaction response: " + response.getResult());
+
+        /*
+        byte[] bytes = DatatypeConverter.parseHexBinary(response.getResult().substring(2));
+        String convertedResult = new String(bytes, StandardCharsets.UTF_8);
+        log.info("Converted to string: " + convertedResult);
+
+        long longResult = Long.parseLong(response.getResult().substring(2), 16);
+        log.info("Converted to long: " + longResult);
+        */
+
+        return response.getResult();
     }
 
 }

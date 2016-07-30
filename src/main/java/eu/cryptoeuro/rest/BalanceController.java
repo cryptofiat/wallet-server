@@ -45,13 +45,25 @@ public class BalanceController {
     }
 
     @ApiOperation(value = "Test call account balance.")
-    @RequestMapping(method = RequestMethod.GET, value = "/test")
+    @RequestMapping(method = RequestMethod.GET, value = "/testCall")
     public ResponseEntity<String> getTestCall(
             @Valid @RequestParam(value = "account", required = false) Optional<String> account
             ){
         log.info("Test call for account " + account.toString());
         return new ResponseEntity<String>(
                 balanceService.call(account),
+                new HttpHeaders(), HttpStatus.OK);
+    }
+
+    @ApiOperation(value = "Test call sent transaction.")
+    @RequestMapping(method = RequestMethod.POST, value = "/testSendTransaction")
+    public ResponseEntity<String> postTestSendTransaction(
+            @Valid @RequestParam(value = "account", required = false) Optional<String> account,
+            @Valid @RequestParam(value = "amount", required = false) Optional<Long> amount
+            ){
+        log.info("Test send transaction for account " + account.toString() + ", " + amount.toString());
+        return new ResponseEntity<String>(
+                balanceService.sendTransaction(account, amount),
                 new HttpHeaders(), HttpStatus.OK);
     }
 

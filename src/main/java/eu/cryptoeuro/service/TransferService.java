@@ -60,7 +60,7 @@ public class TransferService extends BaseService {
 
         String sponsor = String.format("%064d", SPONSOR.substring(2));
 
-        String v = "";
+        String v = String.format("%064X", transfer.getV() & 0xFFFFF);;
         String r = "";
         String s = "";
 

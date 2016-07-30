@@ -64,14 +64,6 @@ public class TransferController {
                     new HttpHeaders(), HttpStatus.BAD_REQUEST);
         }
 
-/*
-        eu.cryptoeuro.domain.Transfer transfer = new eu.cryptoeuro.domain.Transfer();
-        //TODO: extract
-        transfer.setSourceAccount(createTransferCommand.getSourceAccount());
-        transfer.setTargetAccount(createTransferCommand.getTargetAccount());
-        transfer.setAmount(createTransferCommand.getAmount());
-        transfer.setReference(createTransferCommand.getReference());
-*/
         return new ResponseEntity<>(
                 transferService.save(createTransferCommand),
                 new HttpHeaders(), HttpStatus.OK);

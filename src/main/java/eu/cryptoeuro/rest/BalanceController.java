@@ -33,25 +33,25 @@ public class BalanceController {
     @Autowired
     BalanceService balanceService;
 
-    @ApiOperation(value = "Get account balance.")
-    @RequestMapping(method = RequestMethod.GET, value = "")
-    public ResponseEntity<Balance> getBalance(
+    @ApiOperation(value = "Get account ether balance.")
+    @RequestMapping(method = RequestMethod.GET, value = "/ether")
+    public ResponseEntity<Balance> getEtherumBalance(
             @Valid @RequestParam(value = "account", required = false) Optional<String> account
     ){
-        log.info("Getting balance for account " + account.toString());
+        log.info("Getting Ether balance for account " + account.toString());
         return new ResponseEntity<Balance>(
-                balanceService.getBalance(account),
+                balanceService.getEtherBalance(account),
                 new HttpHeaders(), HttpStatus.OK);
     }
 
-    @ApiOperation(value = "Test call account balance.")
-    @RequestMapping(method = RequestMethod.GET, value = "/testCall")
-    public ResponseEntity<String> getTestCall(
-            @Valid @RequestParam(value = "account", required = false) Optional<String> account
+    @ApiOperation(value = "Get account balance.")
+    @RequestMapping(method = RequestMethod.GET, value = "/")
+    public ResponseEntity<Long> getBalance(
+            @Valid @RequestParam(value = "account", required = true) String account
             ){
-        log.info("Test call for account " + account.toString());
-        return new ResponseEntity<String>(
-                balanceService.call(account),
+        log.info("Getting balance for account " + account.toString());
+        return new ResponseEntity<>(
+                balanceService.getBalance(account),
                 new HttpHeaders(), HttpStatus.OK);
     }
 

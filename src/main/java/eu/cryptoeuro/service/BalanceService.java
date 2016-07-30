@@ -31,7 +31,7 @@ public class BalanceService {
 
     private RestTemplate restTemplate = new RestTemplate(); //new HttpComponentsClientHttpRequestFactory()
 
-    public Balance getBalance(Optional<String> account) {
+    public Balance getEtherBalance(Optional<String> account) {
         JsonRpcCall call = new JsonRpcCall(EthereumRpcMethod.getBalance, Arrays.asList(account.orElse("0x65fa6548764C08C0DD77495B33ED302d0C212691"), "latest"));
 
         HttpHeaders headers = new HttpHeaders();
@@ -45,7 +45,7 @@ public class BalanceService {
                 ), "transferId");
     }
 
-    public String call(Optional<String> account) {
+    public Long getBalance(String account) {
         // DOCS: https://github.com/ethcore/parity/wiki/JSONRPC#eth_call
         Map<String, String> params = new HashMap<>();
         //params.put("from", "0x4FfAaD6B04794a5911E2d4a4f7F5CcCEd0420291"); // erko main account
@@ -54,7 +54,7 @@ public class BalanceService {
         //params.put("gasPrice", "0x9184e72a000"); // 10000000000000
         //params.put("value", "0x9184e72a"); // 2441406250
 
-        String accountArgument = "000000000000000000000000" + account.orElse("0x65fa6548764C08C0DD77495B33ED302d0C212691").substring(2);
+        String accountArgument = "000000000000000000000000" + account.substring(2);
         String data = "0x" + HashUtils.keccak256("balanceOf(address)").substring(0, 8) + accountArgument;
 
         params.put("data", data);
@@ -76,7 +76,7 @@ public class BalanceService {
         long longResult = Long.parseLong(response.getResult().substring(2), 16);
         log.info("Converted to long: " + longResult);
 
-        return String.valueOf(longResult);
+        return longResult;
     }
 
     public String sendTransaction(Optional<String> account, Optional<Long> amount) {

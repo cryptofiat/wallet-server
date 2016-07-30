@@ -3,6 +3,7 @@ package eu.cryptoeuro.service;
 import eu.cryptoeuro.dao.TransferRepository;
 import eu.cryptoeuro.domain.Transfer;
 import eu.cryptoeuro.domain.TransferStatus;
+import eu.cryptoeuro.rest.command.CreateTransferCommand;
 import eu.cryptoeuro.rest.model.Fee;
 import eu.cryptoeuro.service.rpc.EthereumRpcMethod;
 import eu.cryptoeuro.service.rpc.JsonRpcCallMap;
@@ -31,8 +32,8 @@ public class TransferService extends BaseService {
     public final String SPONSOR = "0x65fa6548764C08C0DD77495B33ED302d0C212691";
     public final String CONTRACT = "0x640Da14959D6A6244f35471080BEBd960F15FDAe`"; //0.31
 
-    public Transfer save(Transfer transfer){
-        transfer.setStatus(TransferStatus.PENDING);
+    public Transfer save(CreateTransferCommand transfer){
+//        transfer.setStatus(TransferStatus.PENDING);
 //        transfer = transferRepository.save(transfer);
 //        final Long transferId = transfer.getId();
 
@@ -43,8 +44,6 @@ public class TransferService extends BaseService {
         params.put("gas", "0x249F0"); // 150000
         params.put("gasPrice", "0x4A817C800"); // 20000000000
         //params.put("value", "");
-
-
 
         String from = String.format("%064d", transfer.getSourceAccount().substring(2));
         String to = String.format("%064d", transfer.getTargetAccount().substring(2));
@@ -92,7 +91,7 @@ public class TransferService extends BaseService {
 
 
 
-        return transfer;
+        return null;
     }
 
     public Transfer get(Long id){

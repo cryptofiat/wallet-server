@@ -5,6 +5,7 @@ import lombok.Data;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+import java.util.Optional;
 
 @Data
 public class CreateTransferCommand {
@@ -20,6 +21,8 @@ public class CreateTransferCommand {
     @Min(0)
     private Long reference;
 
-
+    public Optional<Long> getReference() {
+        return Optional.ofNullable(reference);
+    }
 
 }

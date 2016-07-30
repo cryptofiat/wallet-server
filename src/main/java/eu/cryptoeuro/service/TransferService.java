@@ -2,6 +2,7 @@ package eu.cryptoeuro.service;
 
 import eu.cryptoeuro.dao.TransferRepository;
 import eu.cryptoeuro.domain.Transfer;
+import eu.cryptoeuro.domain.TransferStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -14,6 +15,7 @@ public class TransferService {
     TransferRepository transferRepository;
 
     public Transfer save(Transfer transfer){
+        transfer.setStatus(TransferStatus.PENDING);
         return transferRepository.save(transfer);
     }
 

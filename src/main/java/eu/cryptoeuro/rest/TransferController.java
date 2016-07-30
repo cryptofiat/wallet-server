@@ -43,6 +43,8 @@ public class TransferController {
     @RequestMapping(method = RequestMethod.POST, value = "")
     public ResponseEntity<Transfer> postWithTransferRequest(@Valid @RequestBody @ApiParam CreateTransferCommand createTransferCommand) {
         eu.cryptoeuro.domain.Transfer transfer = new eu.cryptoeuro.domain.Transfer();
+
+        //extract
         transfer.setTargetAccount(createTransferCommand.getTargetAccount());
 
         return new ResponseEntity<>(

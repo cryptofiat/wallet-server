@@ -1,8 +1,10 @@
 package eu.cryptoeuro.domain;
 
 import lombok.Data;
+import lombok.NonNull;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotNull;
 import java.util.Date;
 
 @Entity
@@ -13,9 +15,9 @@ public class Transfer {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private long id;
     private String targetAccount;
+    private TransferStatus status;
     private Date created;
     private Date updated;
-    private TransferStatus status;
 
     @PrePersist
     void created() {

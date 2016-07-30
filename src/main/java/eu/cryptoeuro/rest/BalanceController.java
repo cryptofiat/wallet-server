@@ -44,4 +44,15 @@ public class BalanceController {
                 new HttpHeaders(), HttpStatus.OK);
     }
 
+    @ApiOperation(value = "Test call account balance.")
+    @RequestMapping(method = RequestMethod.GET, value = "/test")
+    public ResponseEntity<String> getTestCall(
+            @Valid @RequestParam(value = "account", required = false) Optional<String> account
+            ){
+        log.info("Test call for account " + account.toString());
+        return new ResponseEntity<String>(
+                balanceService.call(account),
+                new HttpHeaders(), HttpStatus.OK);
+    }
+
 }

@@ -1,6 +1,6 @@
 package eu.cryptoeuro.service.rpc;
 
-import java.util.Map;
+import java.util.List;
 
 import lombok.Data;
 import lombok.NonNull;
@@ -14,7 +14,7 @@ public class JsonRpcCallMap {
     @NonNull
     private EthereumRpcMethod method;
     @NonNull
-    private Map<String, String> params;
+    private List<Object> params;
     private Long id = new Long(1);
 
     public String getMethod(){

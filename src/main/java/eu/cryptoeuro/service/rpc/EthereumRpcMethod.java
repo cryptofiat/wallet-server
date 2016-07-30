@@ -5,7 +5,8 @@ import java.io.Serializable;
 public enum EthereumRpcMethod implements Serializable {
 
     getBalance("eth_getBalance"),
-    sendTransaction("eth_sendTransaction");
+    sendTransaction("eth_sendTransaction"),
+    call("eth_call");
 
     private final String method;
 

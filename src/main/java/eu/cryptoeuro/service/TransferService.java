@@ -45,8 +45,8 @@ public class TransferService extends BaseService {
         params.put("gasPrice", "0x4A817C800"); // 20000000000
         //params.put("value", "");
 
-        String from = String.format("%064d", transfer.getSourceAccount().substring(2));
-        String to = String.format("%064d", transfer.getTargetAccount().substring(2));
+        String from = String.format("%64s", transfer.getSourceAccount().substring(2)).replace(" ", "0");
+        String to = String.format("%64s", transfer.getTargetAccount().substring(2)).replace(" ", "0");
         String amount = String.format("%064X", transfer.getAmount() & 0xFFFFF);
 
         String reference = null;
@@ -58,7 +58,7 @@ public class TransferService extends BaseService {
         String fee = String.format("%064X", Fee.amount & 0xFFFFF);
         String nounce = String.format("%064X", 0 & 0xFFFFF);
 
-        String sponsor = String.format("%064d", SPONSOR.substring(2));
+        String sponsor = String.format("%64s", SPONSOR.substring(2)).replace(" ", "0");
 
         String v = String.format("%016X", transfer.getV() & 0xFFFFF);;
         String r = "";

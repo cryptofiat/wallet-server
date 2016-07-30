@@ -36,8 +36,8 @@ repositories {
 	mavenCentral()
 	maven { url "https://repo.spring.io/snapshot" }
 	maven { url "https://repo.spring.io/milestone" }
+	maven { url "http://dl.bintray.com/ethereum/maven" }
 }
-
 
 dependencies {
 	compile('org.springframework.boot:spring-boot-starter-actuator')
@@ -52,6 +52,7 @@ dependencies {
 	compile('org.springframework.boot:spring-boot-starter-data-jpa')
 	compile('org.bouncycastle:bcprov-jdk15on:1.54')
 	compile('com.h2database:h2')
+	compile ('org.ethereum:ethereumj-core:1.1.0-RELEASE')
 
 	testCompile('org.springframework.boot:spring-boot-starter-test')
 	testCompile("org.spockframework:spock-spring:1.0-groovy-2.4")

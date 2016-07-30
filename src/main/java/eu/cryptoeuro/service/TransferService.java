@@ -19,8 +19,13 @@ public class TransferService {
         return transferRepository.save(transfer);
     }
 
-    public Transfer get(Optional<Long> id){
-        return transferRepository.findOne(id.orElse(null));
+    public Transfer get(Long id){
+        return transferRepository.findOne(id);
     }
+
+    public Iterable<Transfer> getAll(){
+        return transferRepository.findAll();
+    }
+
 
 }

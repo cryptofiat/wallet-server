@@ -14,7 +14,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.util.Optional;
 
 @Api(value="transfers",
         description="transfers desc",
@@ -27,10 +26,20 @@ public class TransferController {
     @Autowired
     TransferService transferService;
 
+    @ApiOperation(value = "Get all transfer.")
+    @RequestMapping(method = RequestMethod.GET, value = "")
+    public ResponseEntity<Iterable<Transfer>> getTransfer(){
+        log.info("Getting all transfers");
+
+        return new ResponseEntity<>(
+                transferService.getAll(),
+                new HttpHeaders(), HttpStatus.OK);
+    }
+
     @ApiOperation(value = "Get transfer.")
     @RequestMapping(method = RequestMethod.GET, value = "/{transferId}")
     public ResponseEntity<Transfer> getTransfer(
-            @PathVariable Optional<Long> transferId
+            @PathVariable Long transferId
     ){
         log.info("Getting a transfer " + transferId);
 

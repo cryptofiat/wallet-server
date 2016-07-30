@@ -25,9 +25,9 @@ public class CreateTransferCommand {
     @Size(min = 1, max = 8)
     Long v;
     @NotNull
-    Byte[] r;
+    String r;
     @NotNull
-    Byte[] s;
+    String s;
 
     public Optional<Long> getReference() {
         return Optional.ofNullable(reference);

@@ -21,7 +21,7 @@ import java.math.BigDecimal;
 @Slf4j
 public class FeeController {
 
-    BigDecimal FEE = new BigDecimal("0.001");
+    BigDecimal FEE = new BigDecimal("1");
 
     @ApiOperation(value = "Get fee.")
     @RequestMapping(method = RequestMethod.GET, value = "")

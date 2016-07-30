@@ -17,6 +17,6 @@ public class CreateTransferCommand {
     @NotNull
     @Min(1)
     private Long amount;
-    @Size(min = 1, max = 256)
-    private String reference;
+    @Min(0)
+    private Long reference;
 }

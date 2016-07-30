@@ -29,20 +29,51 @@ public class TransferService extends BaseService {
 
     public Transfer save(Transfer transfer){
         transfer.setStatus(TransferStatus.PENDING);
-        transfer = transferRepository.save(transfer);
-        final Long transferId = transfer.getId();
+//        transfer = transferRepository.save(transfer);
+//        final Long transferId = transfer.getId();
 
-        Runnable executeTransfer = () -> {
-            try {
-                executeTransfer(transferId);
-            }
-            catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        };
+        Map<String, String> params = new HashMap<>();
+        params.put("from", "0x4FfAaD6B04794a5911E2d4a4f7F5CcCEd0420291"); // erko main account
+        params.put("to", "0xAF8ce136A244dB6f13a97e157AC39169F4E9E445"); // viimane 0.21 contract deploy
+        //params.put("gas", "0x76c0"); // 30400, 21000
+        //params.put("gasPrice", "0x9184e72a000"); // 10000000000000
+        //params.put("value", "");
 
-        Thread thread = new Thread(executeTransfer);
-        thread.start();
+        String from = String.format("%040d", transfer.getSourceAccount().substring(2));
+        String to = String.format("%040d", transfer.getTargetAccount().substring(2));
+        String amount =    String.format("%040X", transfer.getAmount() & 0xFFFFF);
+
+        String reference = null;
+        if(transfer.getReference().isPresent()) {
+            reference =
+                    String.format("%040X", transfer.getReference().orElse(null) & 0xFFFFF);
+        }
+
+
+        String data = "0x" + HashUtils.keccak256(
+                "signedTransfer(address,address,uint256,uint256,uint256,uint256,\n" +
+                "address,\n" +
+                "uint8,bytes32,bytes32)").substring(0, 8)
+                + from + to + amount + reference;
+
+        params.put("data", data);
+        //params.put("nonce", "");
+
+        JsonRpcCallMap call = new JsonRpcCallMap(EthereumRpcMethod.sendTransaction, Arrays.asList(params));
+
+        log.info("JSON:\n"+call.toString());
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON_UTF8);
+        HttpEntity<String> request = new HttpEntity<String>(call.toString(), headers);
+        JsonRpcResponse response = restTemplate.postForObject(URL, request, JsonRpcResponse.class);
+
+        log.info("Send transaction response: " + response.getResult());
+
+        response.getResult();
+
+
+
 
         return transfer;
     }
@@ -54,8 +85,22 @@ public class TransferService extends BaseService {
     public Iterable<Transfer> getAll(){
         return transferRepository.findAll();
     }
+/*
+    private void startThread() {
+        Runnable executeTransfer = () -> {
+            try {
+                executeTransfer();
+            }
+            catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        };
 
-    private void executeTransfer(Long transferId) throws InterruptedException {
+        Thread thread = new Thread(executeTransfer);
+        thread.start();
+    }
+
+    private void executeTransfer() throws InterruptedException {
 
         //TODO: call transfer creation
 
@@ -67,7 +112,7 @@ public class TransferService extends BaseService {
         transfer.setStatus(TransferStatus.SUCCESSFUL);
         transferRepository.save(transfer);
     }
-
+*/
     public String sendTransaction(Optional<String> account, Optional<Long> amount) {
         // DOCS: https://github.com/ethcore/parity/wiki/JSONRPC#eth_sendtransaction
         Map<String, String> params = new HashMap<>();

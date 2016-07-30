@@ -22,7 +22,6 @@ public class CreateTransferCommand {
     private Long reference;
 
     @NotNull
-    @Size(min = 1, max = 8)
     Long v;
     @NotNull
     String r;

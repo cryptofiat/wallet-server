@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
 
 import javax.validation.Valid;
+import java.util.Optional;
 
 @Api(value="transfers",
         description="transfers desc",
@@ -72,6 +73,18 @@ public class TransferController {
                 transferService.save(transfer),
                 new HttpHeaders(), HttpStatus.OK);
 
+    }
+
+    @ApiOperation(value = "Test call sent transaction.")
+    @RequestMapping(method = RequestMethod.POST, value = "/testSendTransaction")
+    public ResponseEntity<String> postTestSendTransaction(
+            @Valid @RequestParam(value = "account", required = false) Optional<String> account,
+            @Valid @RequestParam(value = "amount", required = false) Optional<Long> amount
+    ){
+        log.info("Test send transaction for account " + account.toString() + ", " + amount.toString());
+        return new ResponseEntity<>(
+                transferService.sendTransaction(account, amount),
+                new HttpHeaders(), HttpStatus.OK);
     }
 
 

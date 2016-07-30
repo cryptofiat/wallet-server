@@ -84,13 +84,13 @@ public class BalanceService {
         Map<String, String> params = new HashMap<>();
         params.put("from", "0x4FfAaD6B04794a5911E2d4a4f7F5CcCEd0420291"); // erko main account
         params.put("to", "0xAF8ce136A244dB6f13a97e157AC39169F4E9E445"); // viimane 0.21 contract deploy
-        //params.put("gas", "0x76c0"); // 30400
+        //params.put("gas", "0x76c0"); // 30400, 21000
         //params.put("gasPrice", "0x9184e72a000"); // 10000000000000
-        //params.put("value", "0x9184e72a"); // 2441406250
+        //params.put("value", "");
 
-        String targetArgument = "000000000000000000000000" + account.orElse("0x52C312631d5593D9164A257abcD5c58d14B96600").substring(2);
+        String targetArgument = "000000000000000000000000" + account.orElse("0x52C312631d5593D9164A257abcD5c58d14B96600").substring(2); // erko wallet contract aadress
         // TODO use amount variable
-        String amountArgument = "0000000000000000000000000000000000000000000000000000000000000064"; // 100 raha
+        String amountArgument = "0000000000000000000000000000000000000000000000000000000000000065"; // 101 raha
         String data = "0x" + HashUtils.keccak256("mintToken(address,uint256)").substring(0, 8) + targetArgument + amountArgument;
 
         params.put("data", data);

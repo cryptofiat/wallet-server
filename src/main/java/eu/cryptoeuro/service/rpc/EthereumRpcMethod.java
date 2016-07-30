@@ -6,6 +6,7 @@ public enum EthereumRpcMethod implements Serializable {
 
     getBalance("eth_getBalance"),
     sendTransaction("eth_sendTransaction"),
+    sendRawTransaction("eth_sendRawTransaction"),
     call("eth_call");
 
     private final String method;

@@ -11,7 +11,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.*;
+import springfox.documentation.annotations.ApiIgnore;
 
 import javax.validation.Valid;
 
@@ -50,10 +52,21 @@ public class TransferController {
 
     @ApiOperation(value = "Creates a transfer")
     @RequestMapping(method = RequestMethod.POST, value = "")
-    public ResponseEntity<Transfer> postWithTransferRequest(@Valid @RequestBody @ApiParam CreateTransferCommand createTransferCommand) {
+    public ResponseEntity<Transfer> postWithTransferRequest(
+            @Valid @RequestBody @ApiParam CreateTransferCommand createTransferCommand,
+            @ApiIgnore Errors errors
+    ) {
+        if (errors.hasErrors()) {
+            //TODO: Exception handling
+            return new ResponseEntity<>(
+                    null,
+                    new HttpHeaders(), HttpStatus.BAD_REQUEST);
+        }
+
+
         eu.cryptoeuro.domain.Transfer transfer = new eu.cryptoeuro.domain.Transfer();
 
-        //extract
+        //TODO: extract
         transfer.setTargetAccount(createTransferCommand.getTargetAccount());
 
         return new ResponseEntity<>(

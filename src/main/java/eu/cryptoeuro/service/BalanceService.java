@@ -1,10 +1,13 @@
 package eu.cryptoeuro.service;
 
 import java.math.BigDecimal;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+
+import javax.xml.bind.DatatypeConverter;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -42,18 +45,43 @@ public class BalanceService {
                 ), "transferId");
     }
 
-    public String sendTransaction(Optional<String> account) {
+    public String call(Optional<String> account) {
         // DOCS: https://github.com/ethcore/parity/wiki/JSONRPC#eth_sendtransaction
         Map<String, String> params = new HashMap<>();
-        params.put("from", "0x4FfAaD6B04794a5911E2d4a4f7F5CcCEd0420291"); // erko main account
+        //params.put("from", "0x4FfAaD6B04794a5911E2d4a4f7F5CcCEd0420291"); // erko main account
         params.put("to", "0xAF8ce136A244dB6f13a97e157AC39169F4E9E445"); // viimane 0.21 contract deploy
         //params.put("gas", "0x76c0"); // 30400
         //params.put("gasPrice", "0x9184e72a000"); // 10000000000000
         //params.put("value", "0x9184e72a"); // 2441406250
-        params.put("data", "0xd46e8dd67c5d32be8d46e8dd67c5d32be8058bb8eb970870f072445675058bb8eb970870f072445675"); // TODO
+
+        String accountArgument = "000000000000000000000000" + account.orElse("0x65fa6548764C08C0DD77495B33ED302d0C212691").substring(2);
+        String data = "0x" + HashUtils.keccak256("balanceOf(address)").substring(0, 8) + accountArgument;
+
+        params.put("data", data);
         //params.put("nonce", "");
 
-        JsonRpcCallMap call = new JsonRpcCallMap(EthereumRpcMethod.sendTransaction, params);
+        JsonRpcCallMap call = new JsonRpcCallMap(EthereumRpcMethod.call, Arrays.asList(params, "latest"));
+
+        /*
+{
+"method":"eth_call",
+"id":1,
+"params":[
+    {
+        "data":"0x06fdde03",
+        "to":"0xAF8ce136A244dB6f13a97e157AC39169F4E9E445"
+    },
+    "latest"
+]
+"params":{
+    "data":"0x06fdde03",
+    "to":"0xAF8ce136A244dB6f13a97e157AC39169F4E9E445"
+},
+"jsonrpc":"2.0"
+}
+
+0x000000000000000000000000000000000000000000000000000000000000002000000000000000000000000000000000000000000000000000000000000000114b72c3bc70746f204575726f20302e3231000000000000000000000000000000
+         */
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON_UTF8);
@@ -61,7 +89,12 @@ public class BalanceService {
         JsonRpcResponse response = restTemplate.postForObject(URL, request, JsonRpcResponse.class);
 
         log.info("Send transaction response: " + response.getResult());
-        return response.getResult();
+
+        byte[] bytes = DatatypeConverter.parseHexBinary(response.getResult().substring(2));
+        String convertedResult = new String(bytes, StandardCharsets.UTF_8);
+        log.info("Converted to string: " + convertedResult);
+
+        return convertedResult;
     }
 
 }

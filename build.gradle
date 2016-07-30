@@ -50,6 +50,7 @@ dependencies {
 	compile('cglib:cglib-nodep:3.2.0')
 	compile('org.json:json:20160212')
 	compile('org.springframework.boot:spring-boot-starter-data-jpa')
+	compile('org.bouncycastle:bcprov-jdk15on:1.54')
 	compile('com.h2database:h2')
 
 	testCompile('org.springframework.boot:spring-boot-starter-test')

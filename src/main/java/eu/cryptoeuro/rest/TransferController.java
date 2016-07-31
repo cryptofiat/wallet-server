@@ -25,6 +25,7 @@ import java.util.Optional;
 @RestController
 @RequestMapping("/v1/transfers")
 @Slf4j
+@CrossOrigin(origins = "*")
 public class TransferController {
 
     @Autowired

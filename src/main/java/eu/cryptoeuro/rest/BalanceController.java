@@ -25,6 +25,7 @@ import eu.cryptoeuro.service.BalanceService;
 @RestController
 @RequestMapping("/v1/balances")
 @Slf4j
+@CrossOrigin(origins = "*")
 public class BalanceController {
 
     @Autowired

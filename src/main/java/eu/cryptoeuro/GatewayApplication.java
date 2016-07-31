@@ -8,7 +8,6 @@ import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 
 @SpringBootApplication
 @EnableAutoConfiguration
-@CrossOrigin(origins = "*")
 public class GatewayApplication {
 
 	public static void main(String[] args) {

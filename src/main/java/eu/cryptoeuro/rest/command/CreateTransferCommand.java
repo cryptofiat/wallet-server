@@ -20,7 +20,7 @@ public class CreateTransferCommand {
     @NotNull
     @Min(1)
     private Long amount;
-    @Min(1) //TODO: externalize
+    @Min(1) //TODO: externalize.. FeeConstant.FEE
     @Max(1)
     private Long fee;
     @NotNull

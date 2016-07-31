@@ -1,5 +1,6 @@
 package eu.cryptoeuro.rest;
 
+import eu.cryptoeuro.FeeConstant;
 import eu.cryptoeuro.rest.model.Fee;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -23,7 +24,7 @@ public class FeeController {
     @ApiOperation(value = "Get fee.")
     @RequestMapping(method = RequestMethod.GET, value = "")
     public ResponseEntity<Fee> getFee(){
-        log.info("Getting fee: " + Fee.amount);
+        log.info("Getting fee: " + FeeConstant.FEE);
         return new ResponseEntity<>(
                 new Fee(),
                 new HttpHeaders(), HttpStatus.OK);

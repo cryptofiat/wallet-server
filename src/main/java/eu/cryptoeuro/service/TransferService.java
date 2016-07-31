@@ -1,5 +1,6 @@
 package eu.cryptoeuro.service;
 
+import eu.cryptoeuro.FeeConstant;
 import eu.cryptoeuro.dao.TransferRepository;
 import eu.cryptoeuro.rest.model.Transfer;
 import eu.cryptoeuro.rest.command.CreateTransferCommand;
@@ -43,7 +44,7 @@ public class TransferService extends BaseService {
         String to = String.format("%64s", transfer.getTargetAccount().substring(2)).replace(" ", "0");
         String amount = String.format("%064X", transfer.getAmount() & 0xFFFFF);
 
-        String fee = String.format("%064X", Fee.amount & 0xFFFFF);
+        String fee = String.format("%064X", FeeConstant.FEE & 0xFFFFF);
         String nounce = String.format("%064X", 0 & 0xFFFFF);
 
         String sponsor = String.format("%64s", SPONSOR.substring(2)).replace(" ", "0");

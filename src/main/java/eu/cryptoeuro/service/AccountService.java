@@ -43,7 +43,13 @@ public class AccountService extends BaseService {
 
         log.info("Approved account response: " + response.getResult());
 
-        boolean result = Integer.parseInt(response.getResult().substring(2)) == 1;
+        String resp = response.getResult().substring(2);
+        if(resp.length() == 0) {
+            log.info("No response: " + response.getResult());
+            return false;
+        }
+
+        boolean result = Integer.parseInt(resp) == 1;
         log.info("Converted to bool: " + result);
 
         return result;

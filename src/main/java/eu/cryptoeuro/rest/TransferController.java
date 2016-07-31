@@ -1,5 +1,6 @@
 package eu.cryptoeuro.rest;
 
+import eu.cryptoeuro.rest.exception.ValidationException;
 import eu.cryptoeuro.rest.model.Transfer;
 import eu.cryptoeuro.rest.command.CreateTransferCommand;
 import eu.cryptoeuro.service.TransferService;

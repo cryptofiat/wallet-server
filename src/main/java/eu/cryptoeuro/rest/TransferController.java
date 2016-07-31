@@ -58,10 +58,7 @@ public class TransferController {
             @ApiIgnore Errors errors
     ) {
         if (errors.hasErrors()) {
-            //TODO: Exception handling
-            return new ResponseEntity<>(
-                    null,
-                    new HttpHeaders(), HttpStatus.BAD_REQUEST);
+            throw new ValidationException(errors);
         }
 
         return new ResponseEntity<>(

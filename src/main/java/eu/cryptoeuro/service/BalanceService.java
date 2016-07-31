@@ -9,6 +9,7 @@ import java.util.Optional;
 
 import javax.xml.bind.DatatypeConverter;
 
+import eu.cryptoeuro.rest.model.Currency;
 import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.http.HttpEntity;
@@ -35,13 +36,13 @@ public class BalanceService extends BaseService {
         HttpEntity<String> request = new HttpEntity<String>(call.toString(), headers);
         JsonRpcResponse response = restTemplate.postForObject(URL, request, JsonRpcResponse.class);
 
-        log.info("Response balance: " + response.getResult());
-        return new Balance(new BigDecimal(
+        log.info("Response ether balance: " + response.getResult());
+        return new Balance(
                 Long.parseLong(response.getResult().substring(2).trim(), 16)
-                ), "transferId");
+                , Currency.ETH);
     }
 
-    public Long getBalance(String account) {
+    public Balance getBalance(String account) {
         // DOCS: https://github.com/ethcore/parity/wiki/JSONRPC#eth_call
         Map<String, String> params = new HashMap<>();
         params.put("to", CONTRACT);
@@ -73,7 +74,9 @@ public class BalanceService extends BaseService {
         long longResult = Long.parseLong(response.getResult().substring(2), 16);
         log.info("Converted to long: " + longResult);
 
-        return longResult;
+        return new Balance(
+                longResult
+                , Currency.EUR);
     }
 
 }

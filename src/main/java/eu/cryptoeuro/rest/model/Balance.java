@@ -8,7 +8,7 @@ import java.math.BigDecimal;
 @Data
 public class Balance {
     @NonNull
-    private BigDecimal amount;
+    private Long amount;
     @NonNull
-    private String transfer;
+    private Currency currency;
 }

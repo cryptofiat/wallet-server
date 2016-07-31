@@ -1,5 +1,6 @@
 package eu.cryptoeuro.rest;
 
+import eu.cryptoeuro.rest.model.Currency;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 
@@ -34,24 +35,30 @@ public class BalanceController {
     BalanceService balanceService;
 
     @ApiOperation(value = "Get account ether balance.")
-    @RequestMapping(method = RequestMethod.GET, value = "/ether")
+    @RequestMapping(method = RequestMethod.GET, value = "/eth")
     public ResponseEntity<Balance> getEtherumBalance(
-            @Valid @RequestParam(value = "account", required = false) Optional<String> account
+            @Valid @RequestParam(value = "account", required = true) Optional<String> account
     ){
-        log.info("Getting Ether balance for account " + account.toString());
-        return new ResponseEntity<Balance>(
-                balanceService.getEtherBalance(account),
+        log.info("Getting balance for ETH account " + account.toString());
+        Balance balance= balanceService.getEtherBalance(account);
+        log.info("Getting balance for ETH account " + account.toString() + " " + balance);
+
+        return new ResponseEntity<>(
+                balance,
                 new HttpHeaders(), HttpStatus.OK);
     }
 
     @ApiOperation(value = "Get account balance.")
     @RequestMapping(method = RequestMethod.GET, value = "/")
-    public ResponseEntity<Long> getBalance(
+    public ResponseEntity<Balance> getBalance(
             @Valid @RequestParam(value = "account", required = true) String account
             ){
-        log.info("Getting balance for account " + account.toString());
+        log.info("Getting balance for EUR account " + account.toString());
+        Balance balance= balanceService.getBalance(account);
+        log.info("Getting balance for EUR account " + account.toString() + " " + balance);
+
         return new ResponseEntity<>(
-                balanceService.getBalance(account),
+                balance,
                 new HttpHeaders(), HttpStatus.OK);
     }
 

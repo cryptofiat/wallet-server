@@ -33,6 +33,7 @@ public class BalanceService extends BaseService {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON_UTF8);
         HttpEntity<String> request = new HttpEntity<String>(call.toString(), headers);
+        log.info("Sending request to: " + URL);
         JsonRpcResponse response = restTemplate.postForObject(URL, request, JsonRpcResponse.class);
 
         log.info("Response ether balance: " + response.getResult());
@@ -62,6 +63,7 @@ public class BalanceService extends BaseService {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON_UTF8);
         HttpEntity<String> request = new HttpEntity<String>(call.toString(), headers);
+        log.info("Sending request to: " + URL);
         JsonRpcResponse response = restTemplate.postForObject(URL, request, JsonRpcResponse.class);
 
         log.info("Send transaction response: " + response.getResult());

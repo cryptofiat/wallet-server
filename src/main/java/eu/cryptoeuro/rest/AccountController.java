@@ -33,7 +33,6 @@ public class AccountController {
     public ResponseEntity<Account> getAccount(@PathVariable String accountAddress){
         log.info("Getting account " + accountAddress.toString());
         Account account = new Account(accountService.isApproved(accountAddress));
-        account.setBalance(balanceService.getBalance(accountAddress));
 
         log.info("Getting account " + account.toString() + " " + account);
 

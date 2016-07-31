@@ -5,6 +5,7 @@ import eu.cryptoeuro.rest.model.Transfer;
 import eu.cryptoeuro.rest.command.CreateTransferCommand;
 import eu.cryptoeuro.rest.model.Fee;
 import eu.cryptoeuro.rest.model.TransferStatus;
+import eu.cryptoeuro.service.exception.AccountNotApprovedException;
 import eu.cryptoeuro.service.rpc.EthereumRpcMethod;
 import eu.cryptoeuro.service.rpc.JsonRpcCallMap;
 import eu.cryptoeuro.service.rpc.JsonRpcResponse;
@@ -25,9 +26,12 @@ import java.util.Optional;
 public class TransferService extends BaseService {
 
     @Autowired
-    TransferRepository transferRepository;
+    AccountService accountService;
 
-    public Transfer save(CreateTransferCommand transfer){
+    public Transfer transfer(CreateTransferCommand transfer){
+
+        checkSourceAccountApproved(transfer.getSourceAccount());
+
         Map<String, String> params = new HashMap<>();
         params.put("from", SPONSOR);
         params.put("to", CONTRACT);
@@ -84,40 +88,19 @@ public class TransferService extends BaseService {
     }
 
     public Transfer get(Long id){
-        return transferRepository.findOne(id);
+        return null;
     }
 
     public Iterable<Transfer> getAll(){
-        return transferRepository.findAll();
-    }
-/*
-    private void startThread() {
-        Runnable executeTransfer = () -> {
-            try {
-                executeTransfer();
-            }
-            catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        };
-
-        Thread thread = new Thread(executeTransfer);
-        thread.start();
+        return null;
     }
 
-    private void executeTransfer() throws InterruptedException {
-
-        //TODO: call transfer creation
-
-        String name = Thread.currentThread().getName();
-        TimeUnit.SECONDS.sleep(10);
-        log.info("Bar " + name);
-
-        Transfer transfer = transferRepository.findOne(transferId);
-        transfer.setStatus(TransferStatus.SUCCESSFUL);
-        transferRepository.save(transfer);
+    private void checkSourceAccountApproved(String account) {
+        if(!accountService.isApproved(account)) {
+            throw new AccountNotApprovedException();
+        }
     }
-*/
+
     public String sendTransaction(Optional<String> account, Optional<Long> amount) {
         // DOCS: https://github.com/ethcore/parity/wiki/JSONRPC#eth_sendtransaction
         Map<String, String> params = new HashMap<>();

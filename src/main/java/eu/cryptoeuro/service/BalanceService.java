@@ -16,7 +16,6 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
-import org.springframework.web.client.RestTemplate;
 
 import eu.cryptoeuro.rest.model.Balance;
 import eu.cryptoeuro.service.rpc.EthereumRpcMethod;

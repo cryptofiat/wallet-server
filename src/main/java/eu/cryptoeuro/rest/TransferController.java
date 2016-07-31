@@ -63,7 +63,7 @@ public class TransferController {
         }
 
         return new ResponseEntity<>(
-                transferService.save(createTransferCommand),
+                transferService.transfer(createTransferCommand),
                 new HttpHeaders(), HttpStatus.OK);
 
     }

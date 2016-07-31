@@ -29,9 +29,6 @@ public class TransferService extends BaseService {
     @Autowired
     TransferRepository transferRepository;
 
-    public final String SPONSOR = "0x65fa6548764C08C0DD77495B33ED302d0C212691";
-    public final String CONTRACT = "0x640Da14959D6A6244f35471080BEBd960F15FDAe`"; //0.31
-
     public Transfer save(CreateTransferCommand transfer){
 //        transfer.setStatus(TransferStatus.PENDING);
 //        transfer = transferRepository.save(transfer);

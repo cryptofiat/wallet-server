@@ -25,7 +25,7 @@ import eu.cryptoeuro.service.rpc.JsonRpcResponse;
 
 @Component
 @Slf4j
-public class BalanceService extends BaseService{
+public class BalanceService extends BaseService {
 
     public Balance getEtherBalance(Optional<String> account) {
         JsonRpcCall call = new JsonRpcCall(EthereumRpcMethod.getBalance, Arrays.asList(account.orElse("0x65fa6548764C08C0DD77495B33ED302d0C212691"), "latest"));
@@ -44,14 +44,15 @@ public class BalanceService extends BaseService{
     public Long getBalance(String account) {
         // DOCS: https://github.com/ethcore/parity/wiki/JSONRPC#eth_call
         Map<String, String> params = new HashMap<>();
-        //params.put("from", "0x4FfAaD6B04794a5911E2d4a4f7F5CcCEd0420291"); // erko main account
-        params.put("to", "0xAF8ce136A244dB6f13a97e157AC39169F4E9E445"); // viimane 0.21 contract deploy
+        params.put("to", CONTRACT);
         //params.put("gas", "0x76c0"); // 30400
         //params.put("gasPrice", "0x9184e72a000"); // 10000000000000
         //params.put("value", "0x9184e72a"); // 2441406250
 
         String accountArgument = "000000000000000000000000" + account.substring(2);
         String data = "0x" + HashUtils.keccak256("balanceOf(address)").substring(0, 8) + accountArgument;
+
+        log.info("Data: " + data);
 
         params.put("data", data);
         //params.put("nonce", "");

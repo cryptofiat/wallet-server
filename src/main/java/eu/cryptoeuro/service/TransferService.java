@@ -1,10 +1,10 @@
 package eu.cryptoeuro.service;
 
 import eu.cryptoeuro.dao.TransferRepository;
-import eu.cryptoeuro.domain.Transfer;
-import eu.cryptoeuro.domain.TransferStatus;
+import eu.cryptoeuro.rest.model.Transfer;
 import eu.cryptoeuro.rest.command.CreateTransferCommand;
 import eu.cryptoeuro.rest.model.Fee;
+import eu.cryptoeuro.rest.model.TransferStatus;
 import eu.cryptoeuro.service.rpc.EthereumRpcMethod;
 import eu.cryptoeuro.service.rpc.JsonRpcCallMap;
 import eu.cryptoeuro.service.rpc.JsonRpcResponse;
@@ -14,13 +14,11 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
-import org.springframework.web.client.RestTemplate;
 
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
-import java.util.concurrent.TimeUnit;
 
 @Component
 @Slf4j
@@ -30,10 +28,6 @@ public class TransferService extends BaseService {
     TransferRepository transferRepository;
 
     public Transfer save(CreateTransferCommand transfer){
-//        transfer.setStatus(TransferStatus.PENDING);
-//        transfer = transferRepository.save(transfer);
-//        final Long transferId = transfer.getId();
-
         Map<String, String> params = new HashMap<>();
         params.put("from", SPONSOR);
         params.put("to", CONTRACT);
@@ -42,15 +36,8 @@ public class TransferService extends BaseService {
         params.put("gasPrice", "0x4A817C800"); // 20000000000
         //params.put("value", "");
 
-        String from = String.format("%64s", transfer.getSourceAccount().substring(2)).replace(" ", "0");
         String to = String.format("%64s", transfer.getTargetAccount().substring(2)).replace(" ", "0");
         String amount = String.format("%064X", transfer.getAmount() & 0xFFFFF);
-
-        String reference = null;
-        if(transfer.getReference().isPresent()) {
-            reference =
-                    String.format("%064X", transfer.getReference().orElse(null) & 0xFFFFF);
-        }
 
         String fee = String.format("%064X", Fee.amount & 0xFFFFF);
         String nounce = String.format("%064X", 0 & 0xFFFFF);
@@ -62,10 +49,10 @@ public class TransferService extends BaseService {
         String s = "";
 
         String data = "0x" + HashUtils.keccak256(
-                "signedTransfer(address,address,uint256,uint256,uint256,uint256,\n" +
+                "signedTransfer(address,uint256,uint256,uint256,\n" +
                 "address,\n" +
                 "uint8,bytes32,bytes32)").substring(0, 8)
-                + from + to + amount + reference + fee +
+                + to + amount + fee +
                 nounce + sponsor +
                 v + r + s;
 
@@ -85,10 +72,14 @@ public class TransferService extends BaseService {
 
         response.getResult();
 
+        Transfer transferResponse = new Transfer();
+        transferResponse.setId(response.getResult());
+        transferResponse.setStatus(TransferStatus.PENDING);
+        transferResponse.setAmount(transfer.getAmount());
+        transferResponse.setTargetAccount(transfer.getTargetAccount());
+        transferResponse.setSourceAccount(transfer.getSourceAccount());
 
-
-
-        return null;
+        return transferResponse;
     }
 
     public Transfer get(Long id){

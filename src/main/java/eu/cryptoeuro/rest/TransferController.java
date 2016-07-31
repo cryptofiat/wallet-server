@@ -1,6 +1,6 @@
 package eu.cryptoeuro.rest;
 
-import eu.cryptoeuro.domain.Transfer;
+import eu.cryptoeuro.rest.model.Transfer;
 import eu.cryptoeuro.rest.command.CreateTransferCommand;
 import eu.cryptoeuro.service.TransferService;
 import io.swagger.annotations.Api;

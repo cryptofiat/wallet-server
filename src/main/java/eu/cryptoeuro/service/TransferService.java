@@ -78,6 +78,7 @@ public class TransferService extends BaseService {
         transferResponse.setAmount(transfer.getAmount());
         transferResponse.setTargetAccount(transfer.getTargetAccount());
         transferResponse.setSourceAccount(transfer.getSourceAccount());
+        transferResponse.setFee(transfer.getFee());
 
         return transferResponse;
     }

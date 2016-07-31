@@ -21,4 +21,5 @@ public class Transfer {
     @NotNull
     @Min(1)
     private Long amount;
+    private Long fee;
 }

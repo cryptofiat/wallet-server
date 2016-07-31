@@ -1,5 +1,5 @@
 package eu.cryptoeuro.rest.model;
 
 public enum Currency {
-    ETH, EUR
+    ETH, EUR_CENT
 }

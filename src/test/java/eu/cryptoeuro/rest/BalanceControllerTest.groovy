@@ -5,7 +5,6 @@ import eu.cryptoeuro.rest.model.Balance
 import eu.cryptoeuro.rest.model.Currency
 import eu.cryptoeuro.service.BalanceService
 import org.springframework.http.HttpStatus
-import org.springframework.http.ResponseEntity
 import org.springframework.mock.web.MockHttpServletResponse
 import org.springframework.test.web.servlet.MockMvc
 import spock.lang.Specification
@@ -15,7 +14,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 class BalanceControllerTest extends Specification {
 
     private BalanceController controller = new BalanceController()
-    private sampleBalance = new Balance(1000, Currency.EUR)
+    private sampleBalance = new Balance(1000, Currency.EUR_CENT)
     private sampleAccountAddress = "0x65fa6548764C08C0DD77495B33ED302d0C212691";
     private MockMvc mockMvc
 
@@ -32,7 +31,7 @@ class BalanceControllerTest extends Specification {
         MockHttpServletResponse response = mockMvc.perform(get("/v1/balances/"+sampleAccountAddress)).andReturn().response
         then:
         response.status == HttpStatus.OK.value()
-        response.contentAsString == '{"amount":1000,"currency":"EUR"}'
+        response.contentAsString == '{"amount":1000,"currency":"EUR_CENT"}'
     }
 
 }

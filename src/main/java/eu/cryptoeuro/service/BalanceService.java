@@ -1,11 +1,9 @@
 package eu.cryptoeuro.service;
 
-import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
 
 import javax.xml.bind.DatatypeConverter;
 
@@ -77,7 +75,7 @@ public class BalanceService extends BaseService {
 
         return new Balance(
                 longResult
-                , Currency.EUR);
+                , Currency.EUR_CENT);
     }
 
 }

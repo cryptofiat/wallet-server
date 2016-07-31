@@ -46,9 +46,9 @@ public class BalanceController {
     @ApiOperation(value = "Get account balance.")
     @RequestMapping(method = RequestMethod.GET, value = "/{accountAddress}")
     public ResponseEntity<Balance> getBalance(@PathVariable String accountAddress){
-        log.info("Getting balance for EUR account " + accountAddress.toString());
+        log.info("Getting balance for EUR_CENT account " + accountAddress.toString());
         Balance balance= balanceService.getBalance(accountAddress);
-        log.info("Getting balance for EUR account " + accountAddress.toString() + " " + balance);
+        log.info("Getting balance for EUR_CENT account " + accountAddress.toString() + " " + balance);
 
         return new ResponseEntity<>(
                 balance,

@@ -8,6 +8,7 @@ import javax.validation.constraints.NotNull;
 public class Account {
     @NotNull
     boolean approved;
+    Balance balance;
 
     public Account(boolean approved) {
         this.approved = approved;

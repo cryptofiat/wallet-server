@@ -27,8 +27,8 @@ import eu.cryptoeuro.service.rpc.JsonRpcResponse;
 @Slf4j
 public class BalanceService extends BaseService {
 
-    public Balance getEtherBalance(Optional<String> account) {
-        JsonRpcCall call = new JsonRpcCall(EthereumRpcMethod.getBalance, Arrays.asList(account.orElse("0x65fa6548764C08C0DD77495B33ED302d0C212691"), "latest"));
+    public Balance getEtherBalance(String account) {
+        JsonRpcCall call = new JsonRpcCall(EthereumRpcMethod.getBalance, Arrays.asList(account, "latest"));
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON_UTF8);

@@ -1,6 +1,5 @@
 package eu.cryptoeuro.rest;
 
-import eu.cryptoeuro.rest.model.Currency;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 
@@ -14,10 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import eu.cryptoeuro.rest.model.Balance;
 import eu.cryptoeuro.service.BalanceService;
@@ -35,13 +31,11 @@ public class BalanceController {
     BalanceService balanceService;
 
     @ApiOperation(value = "Get account ether balance.")
-    @RequestMapping(method = RequestMethod.GET, value = "/eth")
-    public ResponseEntity<Balance> getEtherumBalance(
-            @Valid @RequestParam(value = "account", required = true) Optional<String> account
-    ){
-        log.info("Getting balance for ETH account " + account.toString());
-        Balance balance= balanceService.getEtherBalance(account);
-        log.info("Getting balance for ETH account " + account.toString() + " " + balance);
+    @RequestMapping(method = RequestMethod.GET, value = "/{accountAddress}/eth")
+    public ResponseEntity<Balance> getEthBalance(@PathVariable String accountAddress){
+        log.info("Getting balance for ETH account " + accountAddress.toString());
+        Balance balance= balanceService.getEtherBalance(accountAddress);
+        log.info("Getting balance for ETH account " + accountAddress.toString() + " " + balance);
 
         return new ResponseEntity<>(
                 balance,
@@ -49,13 +43,11 @@ public class BalanceController {
     }
 
     @ApiOperation(value = "Get account balance.")
-    @RequestMapping(method = RequestMethod.GET, value = "/")
-    public ResponseEntity<Balance> getBalance(
-            @Valid @RequestParam(value = "account", required = true) String account
-            ){
-        log.info("Getting balance for EUR account " + account.toString());
-        Balance balance= balanceService.getBalance(account);
-        log.info("Getting balance for EUR account " + account.toString() + " " + balance);
+    @RequestMapping(method = RequestMethod.GET, value = "/{accountAddress}")
+    public ResponseEntity<Balance> getBalance(@PathVariable String accountAddress){
+        log.info("Getting balance for EUR account " + accountAddress.toString());
+        Balance balance= balanceService.getBalance(accountAddress);
+        log.info("Getting balance for EUR account " + accountAddress.toString() + " " + balance);
 
         return new ResponseEntity<>(
                 balance,

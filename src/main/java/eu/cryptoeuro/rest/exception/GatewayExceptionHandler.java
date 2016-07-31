@@ -12,7 +12,6 @@ import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import java.util.HashMap;
 import java.util.Map;
 
-@EnableWebMvc
 @ControllerAdvice
 @Slf4j
 public class GatewayExceptionHandler {

@@ -27,7 +27,7 @@ public class AccountService extends BaseService {
         //params.put("value", "0x9184e72a"); // 2441406250
 
         String accountArgument = "000000000000000000000000" + account.substring(2);
-        String data = "0x" + HashUtils.keccak256("approvedAccount(address)").substring(0, 8) + accountArgument;
+        String data = "0x" + HashUtils.keccak256("approved(address)").substring(0, 8) + accountArgument;
 
         log.info("Data: " + data);
 

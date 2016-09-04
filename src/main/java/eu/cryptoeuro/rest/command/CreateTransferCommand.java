@@ -21,12 +21,15 @@ public class CreateTransferCommand {
     @Min(1)
     private Long amount;
     @Min(1) //TODO: externalize.. FeeConstant.FEE
-    @Max(1)
     private Long fee;
     @NotNull
-    Long v;
+    @Min(1)
+    private Long nonce;
+    private String reference;
     @NotNull
-    String r;
+    private Long sigV;
     @NotNull
-    String s;
+    private String sigR;
+    @NotNull
+    private String sigS;
 }

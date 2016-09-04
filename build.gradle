@@ -26,8 +26,8 @@ bootRun {
 jar.dependsOn(generateRebel)
 
 jar {
-	baseName = 'gateway'
-	version = '0.0.1-SNAPSHOT'
+	baseName = 'wallet-server'
+	version = '0.0.2-SNAPSHOT'
 }
 sourceCompatibility = 1.8
 targetCompatibility = 1.8

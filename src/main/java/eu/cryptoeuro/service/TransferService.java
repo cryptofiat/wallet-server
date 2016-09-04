@@ -7,6 +7,7 @@ import eu.cryptoeuro.rest.command.CreateTransferCommand;
 import eu.cryptoeuro.rest.model.Fee;
 import eu.cryptoeuro.rest.model.TransferStatus;
 import eu.cryptoeuro.service.exception.AccountNotApprovedException;
+import eu.cryptoeuro.service.exception.FeeMismatchException;
 import eu.cryptoeuro.service.rpc.EthereumRpcMethod;
 import eu.cryptoeuro.service.rpc.JsonRpcCallMap;
 import eu.cryptoeuro.service.rpc.JsonRpcResponse;
@@ -32,37 +33,49 @@ public class TransferService extends BaseService {
     public Transfer transfer(CreateTransferCommand transfer){
 
         checkSourceAccountApproved(transfer.getSourceAccount());
+	//TODO: check that Target account not closed
+	//TODO: check that Source has sufficient EUR balance
+	//TODO: check nonce is high enough, probably good to return nonce in /accounts/0x123...
+	//TODO: check that we have enough ETH to submit
 
         Map<String, String> params = new HashMap<>();
         params.put("from", SPONSOR);
         params.put("to", CONTRACT);
-        params.put("nounce", "1"); // TODO: changeme
-        params.put("gas", "0x249F0"); // 150000
+        //params.put("nonce", "1"); // TODO: changeme
+        //params.put("gas", "0x249F0"); // 150000
+        params.put("gas", "0x13880"); // 80000
         params.put("gasPrice", "0x4A817C800"); // 20000000000
         //params.put("value", "");
 
+        String _from = String.format("%64s", transfer.getSourceAccount().substring(2)).replace(" ", "0");
         String to = String.format("%64s", transfer.getTargetAccount().substring(2)).replace(" ", "0");
-        String amount = String.format("%064X", transfer.getAmount() & 0xFFFFF);
+        String amount = String.format("%064x", transfer.getAmount() & 0xFFFFF);
 
-        String fee = String.format("%064X", FeeConstant.FEE & 0xFFFFF);
-        String nounce = String.format("%064X", 0 & 0xFFFFF);
+        //String fee = String.format("%064x", FeeConstant.FEE & 0xFFFFF);
+	//TODO: that's better to validate in TransferCommand, no ?
+	if (FeeConstant.FEE.compareTo(transfer.getFee()) != 0) {
+            throw new FeeMismatchException(transfer.getFee(),FeeConstant.FEE);
+	}
+
+        String fee = String.format("%064x", transfer.getFee() & 0xFFFFF);
+        String nonce = String.format("%064x", transfer.getNonce() & 0xFFFFF);
 
         String sponsor = String.format("%64s", SPONSOR.substring(2)).replace(" ", "0");
 
-        String v = String.format("%016X", transfer.getV() & 0xFFFFF);;
-        String r = "";
-        String s = "";
+        String v = String.format("%064x", transfer.getSigV() & 0xFFFFF);;
+        String r = transfer.getSigR().substring(2);
+        String s = transfer.getSigS().substring(2);
 
         String data = "0x" + HashUtils.keccak256(
-                "signedTransfer(address,uint256,uint256,uint256,\n" +
-                "address,\n" +
-                "uint8,bytes32,bytes32)").substring(0, 8)
-                + to + amount + fee +
-                nounce + sponsor +
-                v + r + s;
+                "delegatedTransfer(address,address,uint256,uint256,uint256," +
+                "uint8,bytes32,bytes32,address)").substring(0, 8)
+                + _from + to + amount + fee +
+                nonce +
+                v + r + s + sponsor;
 
         params.put("data", data);
         //params.put("nonce", "");
+	log.info("data: " + data);
 
         JsonRpcCallMap call = new JsonRpcCallMap(EthereumRpcMethod.sendTransaction, Arrays.asList(params));
 
@@ -74,7 +87,7 @@ public class TransferService extends BaseService {
         log.info("Sending request to: " + URL);
         JsonRpcResponse response = restTemplate.postForObject(URL, request, JsonRpcResponse.class);
 
-        log.info("Send transaction response: " + response.getResult());
+        log.info("Received transaction response: " + response.getResult());
 
         response.getResult();
 
@@ -85,6 +98,12 @@ public class TransferService extends BaseService {
         transferResponse.setTargetAccount(transfer.getTargetAccount());
         transferResponse.setSourceAccount(transfer.getSourceAccount());
         transferResponse.setFee(transfer.getFee());
+        transferResponse.setNonce(transfer.getNonce());
+        transferResponse.setReference(transfer.getReference());
+
+        transferResponse.setSigV(transfer.getSigV());
+        transferResponse.setSigR(transfer.getSigR());
+        transferResponse.setSigS(transfer.getSigS());
 
         return transferResponse;
     }

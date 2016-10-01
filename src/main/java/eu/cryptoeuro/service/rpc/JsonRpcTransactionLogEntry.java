@@ -10,4 +10,6 @@ public class JsonRpcTransactionLogEntry {
     List<String> topics;
 
     String data;
+
+    String blockHash;
 }

@@ -170,25 +170,18 @@ public class TransferService extends BaseService {
 
         JsonRpcTransactionLogResponse response = getCallResponseForObject(call, JsonRpcTransactionLogResponse.class);
 
+        //todo filter delegated transfers which have fee and those that don't
         log.info(response.getResult().toString());
         return response.getResult().stream().map(logEntry -> {
             Transfer transfer = new Transfer();
 
-            transfer.setSourceAccount(logEntry.getTopics().get(1));
-            transfer.setTargetAccount(logEntry.getTopics().get(2));
+            transfer.setId(logEntry.getBlockHash());
+            transfer.setSourceAccount(HashUtils.unpadAddress(logEntry.getTopics().get(1)));
+            transfer.setTargetAccount(HashUtils.unpadAddress(logEntry.getTopics().get(2)));
             transfer.setAmount(Long.parseLong(logEntry.getData().substring(2), 16));
 
             return transfer;
         } ).collect(Collectors.toList());
-
-//        List jsonObjects = response.getResult().stream().map(JSONObject::new).collect(Collectors.toList());
-//        jsonObjects.stream().map(logEntry -> logEntry.getJSONObject("topics"));
-
-
-
-        //todo response for log
-
-//        return response.getResult().toString();
     }
 
 }

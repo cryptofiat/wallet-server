@@ -21,6 +21,10 @@ public class HashUtils {
         return String.format("%064x", n & 0xFFFFF);
     }
 
+    public static String unpadAddress(String address) {
+        return "0x" + address.substring(2).replaceFirst("^0+(?!$)", "");
+    }
+
     ///// PRIVATE METHODS /////
 
     private static String hashToString(MessageDigest hash) {

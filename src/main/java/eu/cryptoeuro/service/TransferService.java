@@ -1,95 +1,87 @@
 package eu.cryptoeuro.service;
 
-import eu.cryptoeuro.FeeConstant;
-import eu.cryptoeuro.dao.TransferRepository;
-import eu.cryptoeuro.rest.model.Transfer;
-import eu.cryptoeuro.rest.command.CreateTransferCommand;
-import eu.cryptoeuro.rest.model.Fee;
-import eu.cryptoeuro.rest.model.TransferStatus;
-import eu.cryptoeuro.service.exception.AccountNotApprovedException;
-import eu.cryptoeuro.service.exception.FeeMismatchException;
-import eu.cryptoeuro.service.rpc.EthereumRpcMethod;
-import eu.cryptoeuro.service.rpc.JsonRpcCallMap;
-import eu.cryptoeuro.service.rpc.JsonRpcResponse;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
+
 import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
+import eu.cryptoeuro.FeeConstant;
+import eu.cryptoeuro.rest.command.CreateTransferCommand;
+import eu.cryptoeuro.rest.model.Transfer;
+import eu.cryptoeuro.rest.model.TransferStatus;
+import eu.cryptoeuro.service.exception.AccountNotApprovedException;
+import eu.cryptoeuro.service.exception.FeeMismatchException;
+import eu.cryptoeuro.service.rpc.EthereumRpcMethod;
+import eu.cryptoeuro.service.rpc.JsonRpcCallMap;
+import eu.cryptoeuro.service.rpc.JsonRpcResponse;
 
 @Component
 @Slf4j
 public class TransferService extends BaseService {
 
     @Autowired
-    AccountService accountService;
+    private AccountService accountService;
 
-    public Transfer transfer(CreateTransferCommand transfer){
+    public Transfer delegatedTransfer(CreateTransferCommand transfer){
 
         checkSourceAccountApproved(transfer.getSourceAccount());
-	//TODO: check that Target account not closed
-	//TODO: check that Source has sufficient EUR balance
-	//TODO: check nonce is high enough, probably good to return nonce in /accounts/0x123...
-	//TODO: check that we have enough ETH to submit
+    	//TODO: check that Target account not closed
+    	//TODO: check that Source has sufficient EUR balance
+    	//TODO: check nonce is high enough, probably good to return nonce in /accounts/0x123...
+    	//TODO: check that we have enough ETH to submit
+
+        //TODO: that's better to validate in TransferCommand, no ?
+        if (FeeConstant.FEE.compareTo(transfer.getFee()) != 0) {
+            throw new FeeMismatchException(transfer.getFee(),FeeConstant.FEE);
+        }
+
+        String from = String.format("%64s", transfer.getSourceAccount().substring(2)).replace(" ", "0");
+        String to = String.format("%64s", transfer.getTargetAccount().substring(2)).replace(" ", "0");
+        String amount = String.format("%064x", transfer.getAmount() & 0xFFFFF);
+        String fee = String.format("%064x", transfer.getFee() & 0xFFFFF);
+        String nonce = String.format("%064x", transfer.getNonce() & 0xFFFFF);
+        String v = String.format("%064x", transfer.getSigV() & 0xFFFFF);
+        String r = transfer.getSigR().substring(2);
+        String s = transfer.getSigS().substring(2);
+        String sponsor = String.format("%64s", SPONSOR.substring(2)).replace(" ", "0");
+        String data = "0x"
+                + HashUtils.keccak256("delegatedTransfer(address,address,uint256,uint256,uint256,uint8,bytes32,bytes32,address)").substring(0, 8)
+                + from
+                + to
+                + amount
+                + fee
+                + nonce
+                + v
+                + r
+                + s
+                + sponsor;
 
         Map<String, String> params = new HashMap<>();
         params.put("from", SPONSOR);
         params.put("to", CONTRACT);
-        //params.put("nonce", "1"); // TODO: changeme
-        //params.put("gas", "0x249F0"); // 150000
         params.put("gas", "0x13880"); // 80000
         params.put("gasPrice", "0x4A817C800"); // 20000000000
-        //params.put("value", "");
-
-        String _from = String.format("%64s", transfer.getSourceAccount().substring(2)).replace(" ", "0");
-        String to = String.format("%64s", transfer.getTargetAccount().substring(2)).replace(" ", "0");
-        String amount = String.format("%064x", transfer.getAmount() & 0xFFFFF);
-
-        //String fee = String.format("%064x", FeeConstant.FEE & 0xFFFFF);
-	//TODO: that's better to validate in TransferCommand, no ?
-	if (FeeConstant.FEE.compareTo(transfer.getFee()) != 0) {
-            throw new FeeMismatchException(transfer.getFee(),FeeConstant.FEE);
-	}
-
-        String fee = String.format("%064x", transfer.getFee() & 0xFFFFF);
-        String nonce = String.format("%064x", transfer.getNonce() & 0xFFFFF);
-
-        String sponsor = String.format("%64s", SPONSOR.substring(2)).replace(" ", "0");
-
-        String v = String.format("%064x", transfer.getSigV() & 0xFFFFF);;
-        String r = transfer.getSigR().substring(2);
-        String s = transfer.getSigS().substring(2);
-
-        String data = "0x" + HashUtils.keccak256(
-                "delegatedTransfer(address,address,uint256,uint256,uint256," +
-                "uint8,bytes32,bytes32,address)").substring(0, 8)
-                + _from + to + amount + fee +
-                nonce +
-                v + r + s + sponsor;
-
         params.put("data", data);
-        //params.put("nonce", "");
-	log.info("data: " + data);
+        //params.put("value", "");
+        //params.put("nonce", "1"); // TODO: changeme
 
         JsonRpcCallMap call = new JsonRpcCallMap(EthereumRpcMethod.sendTransaction, Arrays.asList(params));
-
-        log.info("JSON:\n"+call.toString());
+        log.info("JSON:\n" + call.toString());
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON_UTF8);
         HttpEntity<String> request = new HttpEntity<String>(call.toString(), headers);
-        log.info("Sending request to: " + URL);
+
         JsonRpcResponse response = restTemplate.postForObject(URL, request, JsonRpcResponse.class);
 
         log.info("Received transaction response: " + response.getResult());
-
-        response.getResult();
 
         Transfer transferResponse = new Transfer();
         transferResponse.setId(response.getResult());
@@ -100,7 +92,6 @@ public class TransferService extends BaseService {
         transferResponse.setFee(transfer.getFee());
         transferResponse.setNonce(transfer.getNonce());
         transferResponse.setReference(transfer.getReference());
-
         transferResponse.setSigV(transfer.getSigV());
         transferResponse.setSigR(transfer.getSigR());
         transferResponse.setSigS(transfer.getSigS());
@@ -122,7 +113,8 @@ public class TransferService extends BaseService {
         }
     }
 
-    public String sendTransaction(Optional<String> account, Optional<Long> amount) {
+    /*
+    public String mintToken(Optional<String> account, Optional<Long> amount) {
         // DOCS: https://github.com/ethcore/parity/wiki/JSONRPC#eth_sendtransaction
         Map<String, String> params = new HashMap<>();
         params.put("from", "0x4FfAaD6B04794a5911E2d4a4f7F5CcCEd0420291"); // erko main account
@@ -151,16 +143,17 @@ public class TransferService extends BaseService {
 
         log.info("Send transaction response: " + response.getResult());
 
-        /*
+        / *
         byte[] bytes = DatatypeConverter.parseHexBinary(response.getResult().substring(2));
         String convertedResult = new String(bytes, StandardCharsets.UTF_8);
         log.info("Converted to string: " + convertedResult);
 
         long longResult = Long.parseLong(response.getResult().substring(2), 16);
         log.info("Converted to long: " + longResult);
-        */
+        * /
 
         return response.getResult();
     }
+    */
 
 }

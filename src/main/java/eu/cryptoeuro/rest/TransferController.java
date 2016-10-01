@@ -1,23 +1,30 @@
 package eu.cryptoeuro.rest;
 
-import eu.cryptoeuro.rest.exception.ValidationException;
-import eu.cryptoeuro.rest.model.Transfer;
-import eu.cryptoeuro.rest.command.CreateTransferCommand;
-import eu.cryptoeuro.service.TransferService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+
+import javax.validation.Valid;
+
 import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.Errors;
-import org.springframework.web.bind.annotation.*;
-import springfox.documentation.annotations.ApiIgnore;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
 
-import javax.validation.Valid;
-import java.util.Optional;
+import springfox.documentation.annotations.ApiIgnore;
+import eu.cryptoeuro.rest.command.CreateTransferCommand;
+import eu.cryptoeuro.rest.exception.ValidationException;
+import eu.cryptoeuro.rest.model.Transfer;
+import eu.cryptoeuro.service.TransferService;
 
 @Api(value="transfers",
         description="transfers desc",
@@ -29,7 +36,7 @@ import java.util.Optional;
 public class TransferController {
 
     @Autowired
-    TransferService transferService;
+    private TransferService transferService;
 
     @ApiOperation(value = "Get all transfer.")
     @RequestMapping(method = RequestMethod.GET, value = "")
@@ -64,11 +71,12 @@ public class TransferController {
         }
 
         return new ResponseEntity<>(
-                transferService.transfer(createTransferCommand),
+                transferService.delegatedTransfer(createTransferCommand),
                 new HttpHeaders(), HttpStatus.OK);
 
     }
 
+    /*
     @ApiOperation(value = "Test call sent transaction.")
     @RequestMapping(method = RequestMethod.POST, value = "/testSendTransaction")
     public ResponseEntity<String> postTestSendTransaction(
@@ -77,9 +85,9 @@ public class TransferController {
     ){
         log.info("Test send transaction for account " + account.toString() + ", " + amount.toString());
         return new ResponseEntity<>(
-                transferService.sendTransaction(account, amount),
+                transferService.mintToken(account, amount),
                 new HttpHeaders(), HttpStatus.OK);
     }
-
+    */
 
 }

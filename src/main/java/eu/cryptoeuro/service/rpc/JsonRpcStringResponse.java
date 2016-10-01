@@ -3,7 +3,7 @@ package eu.cryptoeuro.service.rpc;
 import lombok.Data;
 
 @Data
-public class JsonRpcResponse {
+public class JsonRpcStringResponse {
 
     private String result;
 

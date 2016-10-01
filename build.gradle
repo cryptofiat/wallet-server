@@ -52,6 +52,7 @@ dependencies {
 	compile('org.springframework.boot:spring-boot-starter-data-jpa')
 	compile('org.bouncycastle:bcprov-jdk15on:1.54')
 	compile('com.h2database:h2')
+	compile('org.apache.httpcomponents:httpclient:4.5.2')
 
 	testCompile('org.springframework.boot:spring-boot-starter-test')
 	testCompile("org.spockframework:spock-spring:1.0-groovy-2.4")

@@ -13,7 +13,7 @@ import org.springframework.stereotype.Component;
 
 import eu.cryptoeuro.service.rpc.EthereumRpcMethod;
 import eu.cryptoeuro.service.rpc.JsonRpcCallMap;
-import eu.cryptoeuro.service.rpc.JsonRpcResponse;
+import eu.cryptoeuro.service.rpc.JsonRpcStringResponse;
 
 @Component
 @Slf4j
@@ -39,7 +39,7 @@ public class AccountService extends BaseService {
         headers.setContentType(MediaType.APPLICATION_JSON_UTF8);
         HttpEntity<String> request = new HttpEntity<String>(call.toString(), headers);
 
-        JsonRpcResponse response = restTemplate.postForObject(URL, request, JsonRpcResponse.class);
+        JsonRpcStringResponse response = restTemplate.postForObject(URL, request, JsonRpcStringResponse.class);
 
         String resp = response.getResult().substring(2);
         if (resp.length() == 0) {

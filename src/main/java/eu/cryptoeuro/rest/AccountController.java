@@ -1,5 +1,6 @@
 package eu.cryptoeuro.rest;
 
+import eu.cryptoeuro.service.TransferService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
@@ -28,6 +29,8 @@ public class AccountController {
 
     @Autowired
     private AccountService accountService;
+    @Autowired
+    private TransferService transferService;
 
     @ApiOperation(value = "Get account.")
     @RequestMapping(method = RequestMethod.GET, value = "/{accountAddress}")
@@ -41,5 +44,19 @@ public class AccountController {
                 account,
                 new HttpHeaders(), HttpStatus.OK);
     }
+
+    @ApiOperation(value = "Get account.")
+    @RequestMapping(method = RequestMethod.GET, value = "/{accountAddress}/transfers")
+    public ResponseEntity<Object> getAccountTransfers(@PathVariable String accountAddress){
+        log.info("Getting account transfers " + accountAddress.toString());
+        String transfers = transferService.getTransfersForAccount(accountAddress);
+
+        log.info("Getting account transfers " + transfers.toString());
+
+        return new ResponseEntity<>(
+                transfers,
+                new HttpHeaders(), HttpStatus.OK);
+    }
+
 
 }

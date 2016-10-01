@@ -16,7 +16,7 @@ import eu.cryptoeuro.rest.model.Currency;
 import eu.cryptoeuro.service.rpc.EthereumRpcMethod;
 import eu.cryptoeuro.service.rpc.JsonRpcCall;
 import eu.cryptoeuro.service.rpc.JsonRpcCallMap;
-import eu.cryptoeuro.service.rpc.JsonRpcResponse;
+import eu.cryptoeuro.service.rpc.JsonRpcStringResponse;
 
 @Component
 @Slf4j
@@ -29,7 +29,7 @@ public class BalanceService extends BaseService {
         headers.setContentType(MediaType.APPLICATION_JSON_UTF8);
         HttpEntity<String> request = new HttpEntity<String>(call.toString(), headers);
 
-        JsonRpcResponse response = restTemplate.postForObject(URL, request, JsonRpcResponse.class);
+        JsonRpcStringResponse response = restTemplate.postForObject(URL, request, JsonRpcStringResponse.class);
         long responseToLong = Long.parseLong(response.getResult().substring(2).trim(), 16);
         log.info("Ether balance for " + account + ": " + responseToLong);
 
@@ -56,7 +56,7 @@ public class BalanceService extends BaseService {
         headers.setContentType(MediaType.APPLICATION_JSON_UTF8);
         HttpEntity<String> request = new HttpEntity<String>(call.toString(), headers);
 
-        JsonRpcResponse response = restTemplate.postForObject(URL, request, JsonRpcResponse.class);
+        JsonRpcStringResponse response = restTemplate.postForObject(URL, request, JsonRpcStringResponse.class);
         long responseToLong = Long.parseLong(response.getResult().substring(2).trim(), 16);
         log.info("EUR_CENT balance for " + account + ": " + responseToLong);
 

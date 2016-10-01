@@ -73,7 +73,6 @@ public class TransferController {
         return new ResponseEntity<>(
                 transferService.delegatedTransfer(createTransferCommand),
                 new HttpHeaders(), HttpStatus.OK);
-
     }
 
     /*

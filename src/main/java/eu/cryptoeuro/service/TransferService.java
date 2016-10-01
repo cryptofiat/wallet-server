@@ -1,10 +1,25 @@
 package eu.cryptoeuro.service;
 
-import java.util.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Scanner;
 
-import eu.cryptoeuro.service.rpc.JsonRpcListResponse;
+import javax.xml.bind.DatatypeConverter;
+
 import lombok.extern.slf4j.Slf4j;
 
+import org.ethereum.core.CallTransaction.Function;
+import org.ethereum.core.Transaction;
+import org.ethereum.crypto.ECKey;
+import org.ethereum.util.ByteUtil;
+import org.spongycastle.util.encoders.Hex;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -18,7 +33,9 @@ import eu.cryptoeuro.rest.model.TransferStatus;
 import eu.cryptoeuro.service.exception.AccountNotApprovedException;
 import eu.cryptoeuro.service.exception.FeeMismatchException;
 import eu.cryptoeuro.service.rpc.EthereumRpcMethod;
+import eu.cryptoeuro.service.rpc.JsonRpcCall;
 import eu.cryptoeuro.service.rpc.JsonRpcCallMap;
+import eu.cryptoeuro.service.rpc.JsonRpcListResponse;
 import eu.cryptoeuro.service.rpc.JsonRpcStringResponse;
 
 @Component
@@ -28,17 +45,51 @@ public class TransferService extends BaseService {
     @Autowired
     private AccountService accountService;
 
-    public Transfer delegatedTransfer(CreateTransferCommand transfer){
+    // CONTRACT function: delegatedTransfer(uint256 nonce, address destination, uint256 amount, uint256 fee, bytes signature, address delegate)
+    private static Function delegatedTransferFunction = Function.fromSignature("delegatedTransfer", "uint256", "address", "uint256", "uint256", "bytes", "address");
 
+    public Transfer delegatedTransfer(CreateTransferCommand transfer){
+        checkSourceAccountApproved(transfer.getSourceAccount());
+        checkSourceAccountApproved(transfer.getTargetAccount());
+        //TODO check that Target account not closed
+        //TODO check that Source has sufficient EUR balance (for amount + fee)
+        //TODO check that we have enough ETH to submit
+        //TODO currently "reference" field is ignored, what to do with that?
+
+        //TODO that's better to validate in TransferCommand, no ?
+        if (FeeConstant.FEE.compareTo(transfer.getFee()) != 0) {
+            throw new FeeMismatchException(transfer.getFee(), FeeConstant.FEE);
+        }
+
+        ECKey sponsorKey = getWalletServerSponsorKey();
+        byte[] signatureArg = DatatypeConverter.parseHexBinary(transfer.getSignature());
+        byte[] callData = delegatedTransferFunction.encode(transfer.getNonce(), transfer.getTargetAccount(), transfer.getAmount(), transfer.getFee(), signatureArg, SPONSOR);
+
+        String txHash = sendRawTransaction(sponsorKey, callData);
+
+        Transfer result = new Transfer();
+        result.setId(txHash);
+        result.setStatus(TransferStatus.PENDING);
+        result.setAmount(transfer.getAmount());
+        result.setTargetAccount(transfer.getTargetAccount());
+        result.setSourceAccount(transfer.getSourceAccount());
+        result.setFee(transfer.getFee());
+        result.setNonce(transfer.getNonce());
+        result.setReference(transfer.getReference());
+        result.setSignature(transfer.getSignature());
+        return result;
+    }
+
+    /*
+    public Transfer delegatedTransfer041(CreateTransferCommand transfer){
         checkSourceAccountApproved(transfer.getSourceAccount());
     	//TODO: check that Target account not closed
     	//TODO: check that Source has sufficient EUR balance
     	//TODO: check nonce is high enough, probably good to return nonce in /accounts/0x123...
     	//TODO: check that we have enough ETH to submit
-
         //TODO: that's better to validate in TransferCommand, no ?
         if (FeeConstant.FEE.compareTo(transfer.getFee()) != 0) {
-            throw new FeeMismatchException(transfer.getFee(),FeeConstant.FEE);
+            throw new FeeMismatchException(transfer.getFee(), FeeConstant.FEE);
         }
 
         String from = String.format("%64s", transfer.getSourceAccount().substring(2)).replace(" ", "0");
@@ -82,34 +133,30 @@ public class TransferService extends BaseService {
 
         log.info("Received transaction response: " + response.getResult());
 
-        Transfer transferResponse = new Transfer();
-        transferResponse.setId(response.getResult());
-        transferResponse.setStatus(TransferStatus.PENDING);
-        transferResponse.setAmount(transfer.getAmount());
-        transferResponse.setTargetAccount(transfer.getTargetAccount());
-        transferResponse.setSourceAccount(transfer.getSourceAccount());
-        transferResponse.setFee(transfer.getFee());
-        transferResponse.setNonce(transfer.getNonce());
-        transferResponse.setReference(transfer.getReference());
-        transferResponse.setSigV(transfer.getSigV());
-        transferResponse.setSigR(transfer.getSigR());
-        transferResponse.setSigS(transfer.getSigS());
-
-        return transferResponse;
+        Transfer result = new Transfer();
+        result.setId(response.getResult());
+        result.setStatus(TransferStatus.PENDING);
+        result.setAmount(transfer.getAmount());
+        result.setTargetAccount(transfer.getTargetAccount());
+        result.setSourceAccount(transfer.getSourceAccount());
+        result.setFee(transfer.getFee());
+        result.setNonce(transfer.getNonce());
+        result.setReference(transfer.getReference());
+        result.setSigV(transfer.getSigV());
+        result.setSigR(transfer.getSigR());
+        result.setSigS(transfer.getSigS());
+        return result;
     }
+    */
 
+    // TODO cleanup
     public Transfer get(Long id){
         return null;
     }
 
+    // TODO cleanup
     public Iterable<Transfer> getAll(){
         return null;
-    }
-
-    private void checkSourceAccountApproved(String account) {
-        if(!accountService.isApproved(account)) {
-            throw new AccountNotApprovedException();
-        }
     }
 
     /*
@@ -175,6 +222,82 @@ public class TransferService extends BaseService {
         log.info(response.getResult().toString());
 
         return response.getResult().toString();
+    }
+
+    ///// PRIVATE METHODS /////
+
+    private static String hex(byte[] bytes) {
+        return with0x(Hex.toHexString(bytes));
+    }
+
+    private static String without0x(String hex) {
+        return hex.startsWith("0x") ? hex.substring(2) : hex;
+    }
+
+    private static String with0x(String hex) {
+        return hex.startsWith("0x") ? hex : "0x" + hex;
+    }
+
+    private static ECKey getWalletServerSponsorKey() {
+        File file = new File(System.getProperty("user.home"), ".WalletServerSponsor.key");
+        try {
+            String keyHex = toString(new FileInputStream(file));
+            return ECKey.fromPrivate(Hex.decode(keyHex));
+        }
+        catch (IOException e) {
+            throw new RuntimeException("Cannot load wallet-server sponsor account key. Make sure " + file.toString() + " exists and contains the private key in hex format.\n" + e.toString());
+        }
+    }
+
+    private static String toString(InputStream stream) throws IOException {
+        try (InputStream is = stream) {
+            return new Scanner(is).useDelimiter("\\A").next();
+        }
+    }
+
+    private void checkSourceAccountApproved(String account) {
+        if(!accountService.isApproved(account)) {
+            throw new AccountNotApprovedException();
+        }
+    }
+
+    private String sendRawTransaction(ECKey signer, byte[] callData) {
+        long transactionCount = getTransactionCount(SPONSOR);
+        byte[] nonce = ByteUtil.longToBytesNoLeadZeroes(transactionCount);
+        byte[] gasPrice = ByteUtil.longToBytesNoLeadZeroes(20000000000L);
+        byte[] gasLimit = ByteUtil.longToBytesNoLeadZeroes(100000);
+        byte[] toAddress = Hex.decode(without0x(CONTRACT));
+
+        Transaction transaction = new Transaction(nonce, gasPrice, gasLimit, toAddress, null, callData);
+        transaction.sign(signer.getPrivKeyBytes());
+        String params = hex(transaction.getEncoded());
+
+        JsonRpcCall call = new JsonRpcCall(EthereumRpcMethod.sendRawTransaction, Arrays.asList(params));
+        log.info("JSON:\n" + call.toString());
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON_UTF8);
+        HttpEntity<String> request = new HttpEntity<String>(call.toString(), headers);
+
+        JsonRpcStringResponse response = restTemplate.postForObject(URL, request, JsonRpcStringResponse.class);
+        String txHash = response.getResult();
+        log.info("Received transaction response: " + txHash);
+
+        return txHash;
+    }
+
+    private long getTransactionCount(String account) {
+        JsonRpcCall call = new JsonRpcCall(EthereumRpcMethod.getTransactionCount, Arrays.asList(account, "latest"));
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON_UTF8);
+        HttpEntity<String> request = new HttpEntity<String>(call.toString(), headers);
+
+        JsonRpcStringResponse response = restTemplate.postForObject(URL, request, JsonRpcStringResponse.class);
+        long responseToLong = Long.parseLong(without0x(response.getResult()), 16);
+        log.info("Transaction count for " + account + ": " + responseToLong);
+
+        return responseToLong;
     }
 
 }

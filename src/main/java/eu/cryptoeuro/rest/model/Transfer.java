@@ -28,10 +28,6 @@ public class Transfer {
     private Long nonce;
     private String reference;
     @NotNull
-    private Long sigV;
-    @NotNull
-    private String sigR;
-    @NotNull
-    private String sigS;
+    private String signature;
 
 }

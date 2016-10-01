@@ -10,10 +10,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
+import java.util.stream.Collectors;
 
 import javax.xml.bind.DatatypeConverter;
 
-import eu.cryptoeuro.service.rpc.*;
 import lombok.extern.slf4j.Slf4j;
 
 import org.ethereum.core.CallTransaction.Function;
@@ -33,8 +33,11 @@ import eu.cryptoeuro.rest.model.Transfer;
 import eu.cryptoeuro.rest.model.TransferStatus;
 import eu.cryptoeuro.service.exception.AccountNotApprovedException;
 import eu.cryptoeuro.service.exception.FeeMismatchException;
+import eu.cryptoeuro.service.rpc.EthereumRpcMethod;
 import eu.cryptoeuro.service.rpc.JsonRpcCall;
-import eu.cryptoeuro.service.rpc.JsonRpcListResponse;
+import eu.cryptoeuro.service.rpc.JsonRpcCallMap;
+import eu.cryptoeuro.service.rpc.JsonRpcStringResponse;
+import eu.cryptoeuro.service.rpc.JsonRpcTransactionLogResponse;
 
 @Component
 @Slf4j

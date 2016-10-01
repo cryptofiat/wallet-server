@@ -211,6 +211,27 @@ public class TransferService extends BaseService {
         topicsToFind.add(transferMethodSignatureHash);
         topicsToFind.add(paddedAddress);
 
+/*
+
+        find a workaround for:
+        List<List> topicsToFind = new ArrayList<>();
+        List<String> topicsToFindBySource = new ArrayList<>();
+        topicsToFindBySource.add(transferMethodSignatureHash);
+        topicsToFindBySource.add(paddedAddress);
+
+        List<String> topicsToFindByTarget = new ArrayList<>();
+        topicsToFindByTarget.add(transferMethodSignatureHash);
+        topicsToFindByTarget.add(null);
+        topicsToFindByTarget.add(paddedAddress);
+
+        topicsToFind.add(topicsToFindBySource);
+        topicsToFind.add(topicsToFindByTarget);
+
+
+
+
+         */
+
         Map<String, Object> params = new HashMap<>();
         params.put("address", CONTRACT);
         params.put("fromBlock", CONTRACT_FROM_BLOCK);

@@ -1,9 +1,10 @@
 package eu.cryptoeuro.rest;
 
-import eu.cryptoeuro.rest.model.Transfer;
-import eu.cryptoeuro.service.TransferService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+
+import java.util.List;
+
 import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,9 +18,13 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import eu.cryptoeuro.rest.model.Account;
+import eu.cryptoeuro.rest.model.Balance;
+import eu.cryptoeuro.rest.model.Nonce;
+import eu.cryptoeuro.rest.model.Transfer;
 import eu.cryptoeuro.service.AccountService;
-
-import java.util.List;
+import eu.cryptoeuro.service.BalanceService;
+import eu.cryptoeuro.service.NonceService;
+import eu.cryptoeuro.service.TransferService;
 
 @Api(value="accounts",
         description="Accounts info.",
@@ -32,6 +37,10 @@ public class AccountController {
 
     @Autowired
     private AccountService accountService;
+    @Autowired
+    private BalanceService balanceService;
+    @Autowired
+    private NonceService nonceService;
     @Autowired
     private TransferService transferService;
 
@@ -61,5 +70,35 @@ public class AccountController {
                 new HttpHeaders(), HttpStatus.OK);
     }
 
+    @ApiOperation(value = "Get account ether balance.")
+    @RequestMapping(method = RequestMethod.GET, value = "/{accountAddress}/balance/eth")
+    public ResponseEntity<Balance> getAccountEthBalance(@PathVariable String accountAddress){
+        log.info("Getting Ether balance for account " + accountAddress.toString());
+        Balance balance = balanceService.getEtherBalance(accountAddress);
+
+        return new ResponseEntity<>(
+                balance,
+                new HttpHeaders(), HttpStatus.OK);
+    }
+
+    @ApiOperation(value = "Get account EUR_CENT balance.")
+    @RequestMapping(method = RequestMethod.GET, value = "/{accountAddress}/balance")
+    public ResponseEntity<Balance> getAccountBalance(@PathVariable String accountAddress){
+        log.info("Getting EUR_CENT balance for account " + accountAddress.toString());
+        Balance balance = balanceService.getBalance(accountAddress);
+
+        return new ResponseEntity<>(
+                balance,
+                new HttpHeaders(), HttpStatus.OK);
+    }
+
+    @ApiOperation(value = "Get account's current delegatedTransferNonce value (you need to increment it yourself for the next transfer).")
+    @RequestMapping(method = RequestMethod.GET, value = "/{accountAddress}/nonce")
+    public ResponseEntity<Nonce> getNonce(@PathVariable String accountAddress){
+        log.info("Getting delegatedTransferNonce for account " + accountAddress.toString());
+        Nonce nonce = nonceService.getDelegatedTransferNonce(accountAddress);
+
+        return new ResponseEntity<>(nonce, new HttpHeaders(), HttpStatus.OK);
+    }
 
 }

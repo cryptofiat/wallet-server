@@ -16,8 +16,8 @@ public class ApplicationConfig {
 
     private ClientHttpRequestFactory clientHttpRequestFactory() {
         HttpComponentsClientHttpRequestFactory factory = new HttpComponentsClientHttpRequestFactory();
-        factory.setReadTimeout(50000);
-        factory.setConnectTimeout(50000);
+        factory.setReadTimeout(5000);
+        factory.setConnectTimeout(5000);
         return factory;
     }
 }

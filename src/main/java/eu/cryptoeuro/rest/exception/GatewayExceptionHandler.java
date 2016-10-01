@@ -1,16 +1,17 @@
 package eu.cryptoeuro.rest.exception;
 
-import eu.cryptoeuro.service.exception.AccountNotApprovedException;
+import java.util.HashMap;
+import java.util.Map;
+
 import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 
-import java.util.HashMap;
-import java.util.Map;
+import eu.cryptoeuro.service.exception.AccountNotApprovedException;
 
 @ControllerAdvice
 @Slf4j
@@ -28,7 +29,7 @@ public class GatewayExceptionHandler {
         return new ResponseEntity<>(errorMap(ex.getMessage()), new HttpHeaders(), HttpStatus.CONFLICT);
     }
 
-    private Map errorMap(String message) {
+    private Map<String, String> errorMap(String message) {
         Map<String, String> errorMap = new HashMap<>();
         errorMap.put("error", message);
         return errorMap;

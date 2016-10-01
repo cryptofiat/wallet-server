@@ -33,9 +33,8 @@ public class BalanceController {
     @ApiOperation(value = "Get account ether balance.")
     @RequestMapping(method = RequestMethod.GET, value = "/{accountAddress}/eth")
     public ResponseEntity<Balance> getEthBalance(@PathVariable String accountAddress){
-        log.info("Getting balance for ETH account " + accountAddress.toString());
+        log.info("Getting Ether balance for account " + accountAddress.toString());
         Balance balance = balanceService.getEtherBalance(accountAddress);
-        log.info("Getting balance for ETH account " + accountAddress.toString() + " " + balance);
 
         return new ResponseEntity<>(
                 balance,
@@ -45,9 +44,8 @@ public class BalanceController {
     @ApiOperation(value = "Get account balance.")
     @RequestMapping(method = RequestMethod.GET, value = "/{accountAddress}")
     public ResponseEntity<Balance> getBalance(@PathVariable String accountAddress){
-        log.info("Getting balance for EUR_CENT account " + accountAddress.toString());
+        log.info("Getting EUR_CENT balance for account " + accountAddress.toString());
         Balance balance = balanceService.getBalance(accountAddress);
-        log.info("Getting balance for EUR_CENT account " + accountAddress.toString() + " " + balance);
 
         return new ResponseEntity<>(
                 balance,

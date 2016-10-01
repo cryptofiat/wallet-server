@@ -1,18 +1,21 @@
 package eu.cryptoeuro.rest;
 
-import eu.cryptoeuro.rest.model.Account;
-import eu.cryptoeuro.service.AccountService;
-import eu.cryptoeuro.service.BalanceService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
 
-import javax.validation.Valid;
+import eu.cryptoeuro.rest.model.Account;
+import eu.cryptoeuro.service.AccountService;
 
 @Api(value="accounts",
         description="Accounts info.",
@@ -24,9 +27,7 @@ import javax.validation.Valid;
 public class AccountController {
 
     @Autowired
-    AccountService accountService;
-    @Autowired
-    BalanceService balanceService;
+    private AccountService accountService;
 
     @ApiOperation(value = "Get account.")
     @RequestMapping(method = RequestMethod.GET, value = "/{accountAddress}")

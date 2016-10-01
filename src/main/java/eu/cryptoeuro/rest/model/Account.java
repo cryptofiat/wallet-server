@@ -1,15 +1,15 @@
 package eu.cryptoeuro.rest.model;
 
-import lombok.Data;
-
 import javax.validation.constraints.NotNull;
 
-@Data
-public class Account {
-    @NotNull
-    boolean approved;
+import lombok.AllArgsConstructor;
+import lombok.Data;
 
-    public Account(boolean approved) {
-        this.approved = approved;
-    }
+@Data
+@AllArgsConstructor
+public class Account {
+
+    @NotNull
+    private boolean approved;
+
 }

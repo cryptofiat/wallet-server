@@ -12,4 +12,5 @@ public abstract class BaseService {
     @Value("${contract.ethereum.address}")
     protected String CONTRACT;
     protected RestTemplate restTemplate = new RestTemplate();
+
 }

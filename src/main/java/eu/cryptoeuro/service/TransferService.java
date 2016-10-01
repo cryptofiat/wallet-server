@@ -1,9 +1,8 @@
 package eu.cryptoeuro.service;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
+import eu.cryptoeuro.service.rpc.JsonRpcListResponse;
 import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,7 +19,7 @@ import eu.cryptoeuro.service.exception.AccountNotApprovedException;
 import eu.cryptoeuro.service.exception.FeeMismatchException;
 import eu.cryptoeuro.service.rpc.EthereumRpcMethod;
 import eu.cryptoeuro.service.rpc.JsonRpcCallMap;
-import eu.cryptoeuro.service.rpc.JsonRpcResponse;
+import eu.cryptoeuro.service.rpc.JsonRpcStringResponse;
 
 @Component
 @Slf4j
@@ -79,7 +78,7 @@ public class TransferService extends BaseService {
         headers.setContentType(MediaType.APPLICATION_JSON_UTF8);
         HttpEntity<String> request = new HttpEntity<String>(call.toString(), headers);
 
-        JsonRpcResponse response = restTemplate.postForObject(URL, request, JsonRpcResponse.class);
+        JsonRpcStringResponse response = restTemplate.postForObject(URL, request, JsonRpcStringResponse.class);
 
         log.info("Received transaction response: " + response.getResult());
 
@@ -139,7 +138,7 @@ public class TransferService extends BaseService {
         headers.setContentType(MediaType.APPLICATION_JSON_UTF8);
         HttpEntity<String> request = new HttpEntity<String>(call.toString(), headers);
         log.info("Sending request to: " + URL);
-        JsonRpcResponse response = restTemplate.postForObject(URL, request, JsonRpcResponse.class);
+        JsonRpcStringResponse response = restTemplate.postForObject(URL, request, JsonRpcStringResponse.class);
 
         log.info("Send transaction response: " + response.getResult());
 
@@ -155,5 +154,27 @@ public class TransferService extends BaseService {
         return response.getResult();
     }
     */
+
+    public String getTransfersForAccount(String address) {
+        String transferMethodSignatureHash = HashUtils.keccak256("Transfer(address,address,uint256)");
+        String paddedAddress = String.format("%64s", address.substring(2)).replace(" ", "0");
+
+        List<String> topicsToFind = new ArrayList<>();
+        topicsToFind.add(transferMethodSignatureHash);
+        topicsToFind.add(paddedAddress);
+
+        Map<String, Object> params = new HashMap<>();
+        params.put("address", CONTRACT);
+        params.put("fromBlock", CONTRACT_FROM_BLOCK);
+        params.put("topics", topicsToFind);
+
+        JsonRpcCallMap call = new JsonRpcCallMap(EthereumRpcMethod.logs, Arrays.asList(params));
+
+        JsonRpcListResponse response = getCallResponse(call);
+        //todo response for log
+        log.info(response.getResult().toString());
+
+        return response.getResult().toString();
+    }
 
 }

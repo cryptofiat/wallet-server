@@ -1,13 +1,11 @@
 package eu.cryptoeuro.service;
 
 import java.util.*;
-import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 import eu.cryptoeuro.service.rpc.*;
 import lombok.extern.slf4j.Slf4j;
 
-import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -41,15 +39,15 @@ public class TransferService extends BaseService {
             throw new FeeMismatchException(transfer.getFee(),FeeConstant.FEE);
         }
 
-        String from = String.format("%64s", transfer.getSourceAccount().substring(2)).replace(" ", "0");
-        String to = String.format("%64s", transfer.getTargetAccount().substring(2)).replace(" ", "0");
-        String amount = String.format("%064x", transfer.getAmount() & 0xFFFFF);
-        String fee = String.format("%064x", transfer.getFee() & 0xFFFFF);
-        String nonce = String.format("%064x", transfer.getNonce() & 0xFFFFF);
-        String v = String.format("%064x", transfer.getSigV() & 0xFFFFF);
+        String from = HashUtils.padAddress(transfer.getSourceAccount());
+        String to = HashUtils.padAddress(transfer.getTargetAccount());
+        String amount = HashUtils.padLong(transfer.getAmount());
+        String fee = HashUtils.padLong(transfer.getFee());
+        String nonce = HashUtils.padLong(transfer.getNonce());
+        String v =  HashUtils.padLong(transfer.getSigV());
         String r = transfer.getSigR().substring(2);
         String s = transfer.getSigS().substring(2);
-        String sponsor = String.format("%64s", SPONSOR.substring(2)).replace(" ", "0");
+        String sponsor = HashUtils.padAddress(SPONSOR);
         String data = "0x"
                 + HashUtils.keccak256("delegatedTransfer(address,address,uint256,uint256,uint256,uint8,bytes32,bytes32,address)").substring(0, 8)
                 + from
@@ -157,7 +155,7 @@ public class TransferService extends BaseService {
 
     public List<Transfer> getTransfersForAccount(String address) {
         String transferMethodSignatureHash = HashUtils.keccak256("Transfer(address,address,uint256)");
-        String paddedAddress = String.format("%64s", address.substring(2)).replace(" ", "0");
+        String paddedAddress = HashUtils.padAddress(address);
 
         List<String> topicsToFind = new ArrayList<>();
         topicsToFind.add(transferMethodSignatureHash);

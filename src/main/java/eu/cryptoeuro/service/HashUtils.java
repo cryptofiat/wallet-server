@@ -13,6 +13,14 @@ public class HashUtils {
         return hashToString(keccak256);
     }
 
+    public static String padAddress(String address){
+        return String.format("%64s", address.substring(2)).replace(" ", "0");
+    }
+
+    public static String padLong(Long n) {
+        return String.format("%064x", n & 0xFFFFF);
+    }
+
     ///// PRIVATE METHODS /////
 
     private static String hashToString(MessageDigest hash) {

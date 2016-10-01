@@ -1,5 +1,6 @@
 package eu.cryptoeuro.rest;
 
+import eu.cryptoeuro.rest.model.Transfer;
 import eu.cryptoeuro.service.TransferService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -17,6 +18,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import eu.cryptoeuro.rest.model.Account;
 import eu.cryptoeuro.service.AccountService;
+
+import java.util.List;
 
 @Api(value="accounts",
         description="Accounts info.",
@@ -47,9 +50,9 @@ public class AccountController {
 
     @ApiOperation(value = "Get account.")
     @RequestMapping(method = RequestMethod.GET, value = "/{accountAddress}/transfers")
-    public ResponseEntity<Object> getAccountTransfers(@PathVariable String accountAddress){
+    public ResponseEntity<List> getAccountTransfers(@PathVariable String accountAddress){
         log.info("Getting account transfers " + accountAddress.toString());
-        String transfers = transferService.getTransfersForAccount(accountAddress);
+        List<Transfer> transfers = transferService.getTransfersForAccount(accountAddress);
 
         log.info("Getting account transfers " + transfers.toString());
 

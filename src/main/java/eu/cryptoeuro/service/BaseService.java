@@ -1,7 +1,6 @@
 package eu.cryptoeuro.service;
 
 import eu.cryptoeuro.service.rpc.JsonRpcCallMap;
-import eu.cryptoeuro.service.rpc.JsonRpcListResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
@@ -31,7 +30,7 @@ public abstract class BaseService {
         log.info("Sending call to: " + URL);
         log.info("JSON:\n"+call.toString());
         T response = restTemplate.postForObject(URL, request, responseType);
-        log.info("Call response: " + (String) response);
+        log.info("Call response: " + response.toString());
 
         return response;
     }

@@ -5,8 +5,9 @@ import lombok.Data;
 import java.util.List;
 
 @Data
-public class JsonRpcListResponse {
+public class JsonRpcTransactionLogEntry {
 
-    private List result;
+    List<String> topics;
 
+    String data;
 }

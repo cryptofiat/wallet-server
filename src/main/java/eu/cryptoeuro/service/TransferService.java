@@ -1,10 +1,13 @@
 package eu.cryptoeuro.service;
 
 import java.util.*;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
 
-import eu.cryptoeuro.service.rpc.JsonRpcListResponse;
+import eu.cryptoeuro.service.rpc.*;
 import lombok.extern.slf4j.Slf4j;
 
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -17,9 +20,6 @@ import eu.cryptoeuro.rest.model.Transfer;
 import eu.cryptoeuro.rest.model.TransferStatus;
 import eu.cryptoeuro.service.exception.AccountNotApprovedException;
 import eu.cryptoeuro.service.exception.FeeMismatchException;
-import eu.cryptoeuro.service.rpc.EthereumRpcMethod;
-import eu.cryptoeuro.service.rpc.JsonRpcCallMap;
-import eu.cryptoeuro.service.rpc.JsonRpcStringResponse;
 
 @Component
 @Slf4j
@@ -155,7 +155,7 @@ public class TransferService extends BaseService {
     }
     */
 
-    public String getTransfersForAccount(String address) {
+    public List<Transfer> getTransfersForAccount(String address) {
         String transferMethodSignatureHash = HashUtils.keccak256("Transfer(address,address,uint256)");
         String paddedAddress = String.format("%64s", address.substring(2)).replace(" ", "0");
 
@@ -170,11 +170,27 @@ public class TransferService extends BaseService {
 
         JsonRpcCallMap call = new JsonRpcCallMap(EthereumRpcMethod.logs, Arrays.asList(params));
 
-        JsonRpcListResponse response = getCallResponseForObject(call, JsonRpcListResponse.class);
-        //todo response for log
-        log.info(response.getResult().toString());
+        JsonRpcTransactionLogResponse response = getCallResponseForObject(call, JsonRpcTransactionLogResponse.class);
 
-        return response.getResult().toString();
+        log.info(response.getResult().toString());
+        return response.getResult().stream().map(logEntry -> {
+            Transfer transfer = new Transfer();
+
+            transfer.setSourceAccount(logEntry.getTopics().get(1));
+            transfer.setTargetAccount(logEntry.getTopics().get(2));
+            transfer.setAmount(Long.parseLong(logEntry.getData().substring(2), 16));
+
+            return transfer;
+        } ).collect(Collectors.toList());
+
+//        List jsonObjects = response.getResult().stream().map(JSONObject::new).collect(Collectors.toList());
+//        jsonObjects.stream().map(logEntry -> logEntry.getJSONObject("topics"));
+
+
+
+        //todo response for log
+
+//        return response.getResult().toString();
     }
 
 }

@@ -23,15 +23,15 @@ public abstract class BaseService {
 
     protected RestTemplate restTemplate = new RestTemplate();
 
-    protected JsonRpcListResponse getCallResponse(JsonRpcCallMap call) {
+    protected <T> T getCallResponseForObject(JsonRpcCallMap call, Class<T> responseType) {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON_UTF8);
         HttpEntity<String> request = new HttpEntity<String>(call.toString(), headers);
 
         log.info("Sending call to: " + URL);
         log.info("JSON:\n"+call.toString());
-        JsonRpcListResponse response = restTemplate.postForObject(URL, request, JsonRpcListResponse.class);
-        log.info("Call response: " + response.getResult());
+        T response = restTemplate.postForObject(URL, request, responseType);
+        log.info("Call response: " + (String) response);
 
         return response;
     }

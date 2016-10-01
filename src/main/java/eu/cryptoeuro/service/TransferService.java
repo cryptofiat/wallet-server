@@ -170,7 +170,7 @@ public class TransferService extends BaseService {
 
         JsonRpcCallMap call = new JsonRpcCallMap(EthereumRpcMethod.logs, Arrays.asList(params));
 
-        JsonRpcListResponse response = getCallResponse(call);
+        JsonRpcListResponse response = getCallResponseForObject(call, JsonRpcListResponse.class);
         //todo response for log
         log.info(response.getResult().toString());
 

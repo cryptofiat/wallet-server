@@ -216,7 +216,7 @@ public class TransferService extends BaseService {
         params.put("fromBlock", CONTRACT_FROM_BLOCK);
         params.put("topics", topicsToFind);
 
-        JsonRpcCallMap call = new JsonRpcCallMap(EthereumRpcMethod.logs, Arrays.asList(params));
+        JsonRpcCallMap call = new JsonRpcCallMap(EthereumRpcMethod.getLogs, Arrays.asList(params));
 
         JsonRpcTransactionLogResponse response = getCallResponseForObject(call, JsonRpcTransactionLogResponse.class);
 

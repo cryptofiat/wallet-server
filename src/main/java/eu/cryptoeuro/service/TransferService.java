@@ -204,7 +204,7 @@ public class TransferService extends BaseService {
     */
 
     public List<Transfer> getTransfersForAccount(String address) {
-        String transferMethodSignatureHash = HashUtils.keccak256("Transfer(address,address,uint256)");
+        String transferMethodSignatureHash = "0x" + HashUtils.keccak256("Transfer(address,address,uint256)");
         String paddedAddress = HashUtils.padAddress(address);
 
         List<String> topicsToFind = new ArrayList<>();

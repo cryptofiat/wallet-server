@@ -14,7 +14,7 @@ public class HashUtils {
     }
 
     public static String padAddress(String address){
-        return String.format("%64s", address.substring(2)).replace(" ", "0");
+        return "0x" + String.format("%64s", address.substring(2)).replace(" ", "0");
     }
 
     public static String padLong(Long n) {

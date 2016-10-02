@@ -22,7 +22,10 @@ public class HashUtils {
     }
 
     public static String padLongToUint(Long n) {
-        return String.format("%064x", n & 0xFFFFF);
+        if (n < 0) {
+            throw new IllegalArgumentException("Must be positive");
+        }
+        return String.format("%064x", n);
     }
 
     public static String unpadAddress(String address) {

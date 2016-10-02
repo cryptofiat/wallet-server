@@ -29,12 +29,12 @@ public class ContractConfig {
     }
 
     public String getAccountContractAddress() {
-        ACCOUNT_CONTRACT_ADDRESS = getContractAddress(ACCOUNT_CONTRACT_ADDRESS, 1);
+        ACCOUNT_CONTRACT_ADDRESS = getContractAddress(ACCOUNT_CONTRACT_ADDRESS, 2);
         return ACCOUNT_CONTRACT_ADDRESS.orElseThrow(() -> new RuntimeException("Can't fetch account contract address"));
     }
 
     public String getDelegationContractAddress() {
-        DELEGATION_CONTRACT_ADDRESS = getContractAddress(DELEGATION_CONTRACT_ADDRESS, 6);
+        DELEGATION_CONTRACT_ADDRESS = getContractAddress(DELEGATION_CONTRACT_ADDRESS, 7);
         return DELEGATION_CONTRACT_ADDRESS.orElseThrow(() -> new RuntimeException("Can't fetch delegation contract address"));
     }
 

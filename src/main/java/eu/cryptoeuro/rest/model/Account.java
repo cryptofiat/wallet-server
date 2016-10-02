@@ -18,6 +18,8 @@ public class Account {
     @NotNull
     private boolean frozen;
     @NotNull
-    private Balance balance;
+    private Long nonce;
+    @NotNull
+    private Long balance;
 
 }

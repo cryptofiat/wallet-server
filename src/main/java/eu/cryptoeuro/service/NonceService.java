@@ -37,10 +37,14 @@ public class NonceService extends BaseService {
         JsonRpcCallMap call = new JsonRpcCallMap(EthereumRpcMethod.call, Arrays.asList(params, "latest"));
         JsonRpcStringResponse response = getCallResponseForObject(call, JsonRpcStringResponse.class);
 
-        long responseToLong = Long.parseLong(response.getResult().substring(2).trim(), 16);
-        log.info("delegatedNonceOf for " + account + ": " + responseToLong);
+        String trimResponse = response.getResult().substring(2).trim();
+        Long responseLong = new Long(0);
+        if(!trimResponse.isEmpty()) {
+            responseLong = Long.parseLong(trimResponse, 16);
+        }
+        log.info("delegatedNonceOf for " + account + ": " + responseLong);
 
-        return new Nonce(responseToLong);
+        return new Nonce(responseLong);
     }
 
 }

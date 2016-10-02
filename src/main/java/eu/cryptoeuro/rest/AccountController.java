@@ -53,7 +53,8 @@ public class AccountController {
                 accountService.isApproved(accountAddress),
                 accountService.isClosed(accountAddress),
                 accountService.isFrozen(accountAddress),
-                balanceService.getBalance(accountAddress)
+                nonceService.getDelegatedNonceOf(accountAddress).getNonce(),
+                balanceService.getBalance(accountAddress).getAmount()
                 );
         log.info("Statuses for account " + accountAddress + " -> " + account);
 

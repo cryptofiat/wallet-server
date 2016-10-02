@@ -18,7 +18,7 @@ public class ContractService extends BaseService {
 
     public String getContract(long contractNumber) {
         String contractNumberArgument = HashUtils.padLongToUint(contractNumber);
-        String signatureAndArgumentHash = "0x" + HashUtils.keccak256("contractAddress(uint)").substring(0, 8) + contractNumberArgument;
+        String signatureAndArgumentHash = "0x" + HashUtils.getContractSignatureHash("contractAddress(uint256)")  + contractNumberArgument;
 
         Map<String, String> params = new HashMap<>();
         params.put("to", CONTRACT);

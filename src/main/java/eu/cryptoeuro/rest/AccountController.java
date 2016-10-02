@@ -92,11 +92,11 @@ public class AccountController {
                 new HttpHeaders(), HttpStatus.OK);
     }
 
-    @ApiOperation(value = "Get account's current delegatedTransferNonce value (you need to increment it yourself for the next transfer).")
+    @ApiOperation(value = "Get account's current delegatedNonceOf value (you need to increment it yourself for the next transfer).")
     @RequestMapping(method = RequestMethod.GET, value = "/{accountAddress}/nonce")
     public ResponseEntity<Nonce> getNonce(@PathVariable String accountAddress){
-        log.info("Getting delegatedTransferNonce for account " + accountAddress.toString());
-        Nonce nonce = nonceService.getDelegatedTransferNonce(accountAddress);
+        log.info("Getting DelegatedNonceOf for account " + accountAddress.toString());
+        Nonce nonce = nonceService.getDelegatedNonceOf(accountAddress);
 
         return new ResponseEntity<>(nonce, new HttpHeaders(), HttpStatus.OK);
     }

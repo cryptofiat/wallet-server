@@ -1,22 +1,27 @@
 package eu.cryptoeuro.service;
 
-import eu.cryptoeuro.service.rpc.JsonRpcCallMap;
 import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.web.client.RestTemplate;
 
+import eu.cryptoeuro.service.rpc.JsonRpcCallMap;
+
 @Slf4j
 public abstract class BaseService {
 
     @Value("${ethereum.node.url}")
     protected String URL;
+
     @Value("${sponsor.ethereum.address}")
     protected String SPONSOR;
+
     @Value("${contract.ethereum.address}")
     protected String CONTRACT;
+
     @Value("${contract.ethereum.block}")
     protected String CONTRACT_FROM_BLOCK;
 

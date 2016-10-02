@@ -4,8 +4,10 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
+import eu.cryptoeuro.config.ContractConfig;
 import lombok.extern.slf4j.Slf4j;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -22,6 +24,13 @@ import eu.cryptoeuro.service.rpc.JsonRpcStringResponse;
 @Slf4j
 public class BalanceService extends BaseService {
 
+    ContractConfig contractConfig;
+
+    @Autowired
+    public BalanceService(ContractConfig contractConfig) {
+        this.contractConfig = contractConfig;
+    }
+
     public Balance getEtherBalance(String account) {
         JsonRpcCall call = new JsonRpcCall(EthereumRpcMethod.getBalance, Arrays.asList(account, "latest"));
 
@@ -29,7 +38,7 @@ public class BalanceService extends BaseService {
         headers.setContentType(MediaType.APPLICATION_JSON_UTF8);
         HttpEntity<String> request = new HttpEntity<String>(call.toString(), headers);
 
-        JsonRpcStringResponse response = restTemplate.postForObject(URL, request, JsonRpcStringResponse.class);
+        JsonRpcStringResponse response = restTemplate.postForObject(contractConfig.getAccountContractAddress(), request, JsonRpcStringResponse.class);
         long responseToLong = Long.parseLong(response.getResult().substring(2).trim(), 16);
         log.info("Ether balance for " + account + ": " + responseToLong);
 
@@ -43,7 +52,7 @@ public class BalanceService extends BaseService {
         String data = "0x" + HashUtils.keccak256("balanceOf(address)").substring(0, 8) + accountArgument;
 
         Map<String, String> params = new HashMap<>();
-        params.put("to", CONTRACT);
+        params.put("to", contractConfig.getAccountContractAddress());
         params.put("data", data);
         //params.put("gas", "0x76c0"); // 30400
         //params.put("gasPrice", "0x9184e72a000"); // 10000000000000
@@ -51,12 +60,8 @@ public class BalanceService extends BaseService {
         //params.put("nonce", "");
 
         JsonRpcCallMap call = new JsonRpcCallMap(EthereumRpcMethod.call, Arrays.asList(params, "latest"));
+        JsonRpcStringResponse response = getCallResponseForObject(call, JsonRpcStringResponse.class);
 
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON_UTF8);
-        HttpEntity<String> request = new HttpEntity<String>(call.toString(), headers);
-
-        JsonRpcStringResponse response = restTemplate.postForObject(URL, request, JsonRpcStringResponse.class);
         long responseToLong = Long.parseLong(response.getResult().substring(2).trim(), 16);
         log.info("EUR_CENT balance for " + account + ": " + responseToLong);
 

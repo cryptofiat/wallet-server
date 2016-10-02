@@ -17,7 +17,7 @@ public class HashUtils {
         return "0x" + String.format("%64s", address.substring(2)).replace(" ", "0");
     }
 
-    public static String padLong(Long n) {
+    public static String padLongToUint(Long n) {
         return String.format("%064x", n & 0xFFFFF);
     }
 

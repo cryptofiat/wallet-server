@@ -14,6 +14,7 @@ import java.util.stream.Collectors;
 
 import javax.xml.bind.DatatypeConverter;
 
+import eu.cryptoeuro.config.ContractConfig;
 import lombok.extern.slf4j.Slf4j;
 
 import org.ethereum.core.CallTransaction.Function;
@@ -43,8 +44,14 @@ import eu.cryptoeuro.service.rpc.JsonRpcTransactionLogResponse;
 @Slf4j
 public class TransferService extends BaseService {
 
-    @Autowired
     private AccountService accountService;
+    private ContractConfig contractConfig;
+
+    @Autowired
+    public TransferService(ContractConfig contractConfig, AccountService accountService) {
+        this.contractConfig = contractConfig;
+        this.accountService = accountService;
+    }
 
     // CONTRACT function: delegatedTransfer(uint256 nonce, address destination, uint256 amount, uint256 fee, bytes signature, address delegate)
     private static Function delegatedTransferFunction = Function.fromSignature("delegatedTransfer", "uint256", "address", "uint256", "uint256", "bytes", "address");
@@ -95,10 +102,10 @@ public class TransferService extends BaseService {
 
         String from = HashUtils.padAddress(transfer.getSourceAccount());
         String to = HashUtils.padAddress(transfer.getTargetAccount());
-        String amount = HashUtils.padLong(transfer.getAmount());
-        String fee = HashUtils.padLong(transfer.getFee());
-        String nonce = HashUtils.padLong(transfer.getNonce());
-        String v =  HashUtils.padLong(transfer.getSigV());
+        String amount = HashUtils.padLongToUint(transfer.getAmount());
+        String fee = HashUtils.padLongToUint(transfer.getFee());
+        String nonce = HashUtils.padLongToUint(transfer.getNonce());
+        String v =  HashUtils.padLongToUint(transfer.getSigV());
         String r = transfer.getSigR().substring(2);
         String s = transfer.getSigS().substring(2);
         String sponsor = HashUtils.padAddress(SPONSOR);

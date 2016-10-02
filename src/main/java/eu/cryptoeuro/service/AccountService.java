@@ -4,8 +4,10 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
+import eu.cryptoeuro.config.ContractConfig;
 import lombok.extern.slf4j.Slf4j;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -18,6 +20,13 @@ import eu.cryptoeuro.service.rpc.JsonRpcStringResponse;
 @Component
 @Slf4j
 public class AccountService extends BaseService {
+
+    ContractConfig contractConfig;
+
+    @Autowired
+    public AccountService(ContractConfig contractConfig) {
+        this.contractConfig = contractConfig;
+    }
 
     public Boolean isApproved(String account) {
         // DOCS: https://github.com/ethcore/parity/wiki/JSONRPC#eth_call
@@ -39,7 +48,7 @@ public class AccountService extends BaseService {
         headers.setContentType(MediaType.APPLICATION_JSON_UTF8);
         HttpEntity<String> request = new HttpEntity<String>(call.toString(), headers);
 
-        JsonRpcStringResponse response = restTemplate.postForObject(URL, request, JsonRpcStringResponse.class);
+        JsonRpcStringResponse response = restTemplate.postForObject(contractConfig.getAccountContractAddress(), request, JsonRpcStringResponse.class);
 
         String resp = response.getResult().substring(2);
         if (resp.length() == 0) {

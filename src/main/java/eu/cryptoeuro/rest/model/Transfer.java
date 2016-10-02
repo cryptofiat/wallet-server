@@ -29,6 +29,6 @@ public class Transfer {
     private String reference;
     @NotNull
     private String signature;
-    private String transactionHash;
+    private String blockHash;
 
 }

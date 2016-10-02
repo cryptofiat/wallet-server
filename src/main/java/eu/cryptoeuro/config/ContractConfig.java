@@ -1,12 +1,12 @@
 package eu.cryptoeuro.config;
 
-import eu.cryptoeuro.service.ContractService;
+import java.util.Optional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.stereotype.Component;
 
-import java.util.Optional;
+import eu.cryptoeuro.service.ContractService;
 
 @Component
 public class ContractConfig {

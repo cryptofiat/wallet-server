@@ -47,10 +47,12 @@ public class AccountController {
     @ApiOperation(value = "Get account.")
     @RequestMapping(method = RequestMethod.GET, value = "/{accountAddress}")
     public ResponseEntity<Account> getAccount(@PathVariable String accountAddress){
-        log.info("Getting account " + accountAddress.toString());
-        Account account = new Account(accountService.isApproved(accountAddress));
-
-        log.info("Getting account " + account.toString() + " " + account);
+        log.info("Getting account " + accountAddress);
+        Account account = new Account(
+                accountService.isApproved(accountAddress),
+                accountService.isClosed(accountAddress),
+                accountService.isFrozen(accountAddress));
+        log.info("Statuses for account " + accountAddress + " -> " + account);
 
         return new ResponseEntity<>(
                 account,

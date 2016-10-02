@@ -11,5 +11,9 @@ public class Account {
 
     @NotNull
     private boolean approved;
+    @NotNull
+    private boolean closed;
+    @NotNull
+    private boolean frozen;
 
 }

@@ -14,6 +14,10 @@ public class HashUtils {
         return hashToString(keccak256);
     }
 
+    public static String getContractSignatureHash(String signature) {
+        return HashUtils.keccak256(signature).substring(0, 8);
+    }
+
     public static String padAddressTo64(String address){
         return "0x" + String.format("%64s", address.substring(2)).replace(" ", "0");
     }

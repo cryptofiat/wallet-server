@@ -49,9 +49,12 @@ public class AccountController {
     public ResponseEntity<Account> getAccount(@PathVariable String accountAddress){
         log.info("Getting account " + accountAddress);
         Account account = new Account(
+                accountAddress,
                 accountService.isApproved(accountAddress),
                 accountService.isClosed(accountAddress),
-                accountService.isFrozen(accountAddress));
+                accountService.isFrozen(accountAddress),
+                balanceService.getBalance(accountAddress)
+                );
         log.info("Statuses for account " + accountAddress + " -> " + account);
 
         return new ResponseEntity<>(
@@ -77,17 +80,6 @@ public class AccountController {
     public ResponseEntity<Balance> getAccountEthBalance(@PathVariable String accountAddress){
         log.info("Getting Ether balance for account " + accountAddress.toString());
         Balance balance = balanceService.getEtherBalance(accountAddress);
-
-        return new ResponseEntity<>(
-                balance,
-                new HttpHeaders(), HttpStatus.OK);
-    }
-
-    @ApiOperation(value = "Get account EUR_CENT balance.")
-    @RequestMapping(method = RequestMethod.GET, value = "/{accountAddress}/balance")
-    public ResponseEntity<Balance> getAccountBalance(@PathVariable String accountAddress){
-        log.info("Getting EUR_CENT balance for account " + accountAddress.toString());
-        Balance balance = balanceService.getBalance(accountAddress);
 
         return new ResponseEntity<>(
                 balance,

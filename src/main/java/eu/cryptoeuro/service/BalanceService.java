@@ -38,7 +38,7 @@ public class BalanceService extends BaseService {
         headers.setContentType(MediaType.APPLICATION_JSON_UTF8);
         HttpEntity<String> request = new HttpEntity<String>(call.toString(), headers);
 
-        JsonRpcStringResponse response = restTemplate.postForObject(contractConfig.getAccountContractAddress(), request, JsonRpcStringResponse.class);
+        JsonRpcStringResponse response = restTemplate.postForObject(URL, request, JsonRpcStringResponse.class);
         long responseToLong = Long.parseLong(response.getResult().substring(2).trim(), 16);
         log.info("Ether balance for " + account + ": " + responseToLong);
 

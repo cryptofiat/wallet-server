@@ -254,7 +254,7 @@ public class TransferService extends BaseService {
         return response.getResult().stream().map(logEntry -> {
             Transfer transfer = new Transfer();
 
-            transfer.setTransactionHash(logEntry.getBlockHash()); // todo check if corect
+            transfer.setBlockHash(logEntry.getBlockHash()); // todo check if corect
             transfer.setSourceAccount(HashUtils.unpadAddress(logEntry.getTopics().get(1)));
             transfer.setTargetAccount(HashUtils.unpadAddress(logEntry.getTopics().get(2)));
             transfer.setAmount(Long.parseLong(logEntry.getData().substring(2), 16));

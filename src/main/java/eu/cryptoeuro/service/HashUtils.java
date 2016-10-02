@@ -4,6 +4,7 @@ import java.security.MessageDigest;
 
 import org.bouncycastle.jcajce.provider.digest.Keccak.Digest256;
 import org.bouncycastle.jcajce.provider.digest.Keccak.DigestKeccak;
+import org.spongycastle.util.encoders.Hex;
 
 public class HashUtils {
 
@@ -30,6 +31,18 @@ public class HashUtils {
 
     public static String unpadAddress(String address) {
         return "0x" + address.substring(2).replaceFirst("^0+(?!$)", "");
+    }
+
+    public static String hex(byte[] bytes) {
+        return HashUtils.with0x(Hex.toHexString(bytes));
+    }
+
+    public static String without0x(String hex) {
+        return hex.startsWith("0x") ? hex.substring(2) : hex;
+    }
+
+    public static String with0x(String hex) {
+        return hex.startsWith("0x") ? hex : "0x" + hex;
     }
 
     ///// PRIVATE METHODS /////

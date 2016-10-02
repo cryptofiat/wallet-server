@@ -14,7 +14,6 @@ import java.util.stream.Collectors;
 
 import javax.xml.bind.DatatypeConverter;
 
-import eu.cryptoeuro.config.ContractConfig;
 import lombok.extern.slf4j.Slf4j;
 
 import org.ethereum.core.CallTransaction.Function;
@@ -29,6 +28,7 @@ import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 
 import eu.cryptoeuro.FeeConstant;
+import eu.cryptoeuro.config.ContractConfig;
 import eu.cryptoeuro.rest.command.CreateTransferCommand;
 import eu.cryptoeuro.rest.model.Transfer;
 import eu.cryptoeuro.rest.model.TransferStatus;
@@ -264,18 +264,6 @@ public class TransferService extends BaseService {
 
     ///// PRIVATE METHODS /////
 
-    private static String hex(byte[] bytes) {
-        return with0x(Hex.toHexString(bytes));
-    }
-
-    private static String without0x(String hex) {
-        return hex.startsWith("0x") ? hex.substring(2) : hex;
-    }
-
-    private static String with0x(String hex) {
-        return hex.startsWith("0x") ? hex : "0x" + hex;
-    }
-
     private static ECKey getWalletServerSponsorKey() {
         File file = new File(System.getProperty("user.home"), ".WalletServerSponsor.key");
         try {
@@ -304,11 +292,11 @@ public class TransferService extends BaseService {
         byte[] nonce = ByteUtil.longToBytesNoLeadZeroes(transactionCount);
         byte[] gasPrice = ByteUtil.longToBytesNoLeadZeroes(20000000000L);
         byte[] gasLimit = ByteUtil.longToBytesNoLeadZeroes(100000);
-        byte[] toAddress = Hex.decode(without0x(CONTRACT));
+        byte[] toAddress = Hex.decode(HashUtils.without0x(CONTRACT));
 
         Transaction transaction = new Transaction(nonce, gasPrice, gasLimit, toAddress, null, callData);
         transaction.sign(signer.getPrivKeyBytes());
-        String params = hex(transaction.getEncoded());
+        String params = HashUtils.hex(transaction.getEncoded());
 
         JsonRpcCall call = new JsonRpcCall(EthereumRpcMethod.sendRawTransaction, Arrays.asList(params));
         log.info("JSON:\n" + call.toString());
@@ -332,7 +320,7 @@ public class TransferService extends BaseService {
         HttpEntity<String> request = new HttpEntity<String>(call.toString(), headers);
 
         JsonRpcStringResponse response = restTemplate.postForObject(URL, request, JsonRpcStringResponse.class);
-        long responseToLong = Long.parseLong(without0x(response.getResult()), 16);
+        long responseToLong = Long.parseLong(HashUtils.without0x(response.getResult()), 16);
         log.info("Transaction count for " + account + ": " + responseToLong);
 
         return responseToLong;

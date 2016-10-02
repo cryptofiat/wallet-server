@@ -33,7 +33,7 @@ public class ContractService extends BaseService {
 
         log.info(response.getResult().toString());
 
-        return response.getResult().toString();
+        return HashUtils.padAddressTo40(response.getResult().toString());
     }
 
 }

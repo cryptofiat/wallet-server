@@ -100,15 +100,15 @@ public class TransferService extends BaseService {
             throw new FeeMismatchException(transfer.getFee(), FeeConstant.FEE);
         }
 
-        String from = HashUtils.padAddress(transfer.getSourceAccount());
-        String to = HashUtils.padAddress(transfer.getTargetAccount());
+        String from = HashUtils.padAddressTo64(transfer.getSourceAccount());
+        String to = HashUtils.padAddressTo64(transfer.getTargetAccount());
         String amount = HashUtils.padLongToUint(transfer.getAmount());
         String fee = HashUtils.padLongToUint(transfer.getFee());
         String nonce = HashUtils.padLongToUint(transfer.getNonce());
         String v =  HashUtils.padLongToUint(transfer.getSigV());
         String r = transfer.getSigR().substring(2);
         String s = transfer.getSigS().substring(2);
-        String sponsor = HashUtils.padAddress(SPONSOR);
+        String sponsor = HashUtils.padAddressTo64(SPONSOR);
         String data = "0x"
                 + HashUtils.keccak256("delegatedTransfer(address,address,uint256,uint256,uint256,uint8,bytes32,bytes32,address)").substring(0, 8)
                 + from
@@ -212,7 +212,7 @@ public class TransferService extends BaseService {
 
     public List<Transfer> getTransfersForAccount(String address) {
         String transferMethodSignatureHash = "0x" + HashUtils.keccak256("Transfer(address,address,uint256)");
-        String paddedAddress = HashUtils.padAddress(address);
+        String paddedAddress = HashUtils.padAddressTo64(address);
 
         List<String> topicsToFind = new ArrayList<>();
         topicsToFind.add(transferMethodSignatureHash);

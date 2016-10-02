@@ -13,8 +13,12 @@ public class HashUtils {
         return hashToString(keccak256);
     }
 
-    public static String padAddress(String address){
+    public static String padAddressTo64(String address){
         return "0x" + String.format("%64s", address.substring(2)).replace(" ", "0");
+    }
+
+    public static String padAddressTo40(String address){
+        return "0x" + String.format("%40s", address.substring(2).replaceFirst("^0+(?!$)", "")).replace(" ", "0");
     }
 
     public static String padLongToUint(Long n) {

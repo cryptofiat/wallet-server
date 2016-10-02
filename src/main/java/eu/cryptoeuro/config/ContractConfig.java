@@ -29,11 +29,13 @@ public class ContractConfig {
     }
 
     public String getAccountContractAddress() {
-        return ACCOUNT_CONTRACT_ADDRESS.orElse(contractService.getContract(1));
+        ACCOUNT_CONTRACT_ADDRESS = Optional.of(ACCOUNT_CONTRACT_ADDRESS.orElse(contractService.getContract(1)));
+        return ACCOUNT_CONTRACT_ADDRESS.orElseThrow(() -> new RuntimeException("Can't fetch account contract address"));
     }
 
     public String getDelegationContractAddress() {
-        return DELEGATION_CONTRACT_ADDRESS.orElse(contractService.getContract(6));
+        DELEGATION_CONTRACT_ADDRESS = Optional.of(DELEGATION_CONTRACT_ADDRESS.orElse(contractService.getContract(6)));
+        return DELEGATION_CONTRACT_ADDRESS.orElseThrow(() -> new RuntimeException("Can't fetch delegation contract address"));
     }
 
 }

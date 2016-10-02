@@ -240,7 +240,8 @@ public class TransferService extends BaseService {
          */
 
         Map<String, Object> params = new HashMap<>();
-        params.put("address", CONTRACT);
+//        params.put("address", CONTRACT);
+        params.put("address", contractConfig.getAllContracts());
         params.put("fromBlock", CONTRACT_FROM_BLOCK);
         params.put("topics", topicsToFind);
 

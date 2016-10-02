@@ -53,8 +53,8 @@ public class TransferService extends BaseService {
         this.accountService = accountService;
     }
 
-    // CONTRACT function: delegatedTransfer(uint256 nonce, address destination, uint256 amount, uint256 fee, bytes signature, address delegate)
-    private static Function delegatedTransferFunction = Function.fromSignature("delegatedTransfer", "uint256", "address", "uint256", "uint256", "bytes", "address");
+    // Function definition: transfer(uint256 nonce, address destination, uint256 amount, uint256 fee, bytes signature, address delegate)
+    private static Function transferFunction = Function.fromSignature("transfer", "uint256", "address", "uint256", "uint256", "bytes", "address");
 
     public Transfer delegatedTransfer(CreateTransferCommand transfer){
         checkSourceAccountApproved(transfer.getSourceAccount());
@@ -71,7 +71,7 @@ public class TransferService extends BaseService {
 
         ECKey sponsorKey = getWalletServerSponsorKey();
         byte[] signatureArg = DatatypeConverter.parseHexBinary(transfer.getSignature());
-        byte[] callData = delegatedTransferFunction.encode(transfer.getNonce(), transfer.getTargetAccount(), transfer.getAmount(), transfer.getFee(), signatureArg, SPONSOR);
+        byte[] callData = transferFunction.encode(transfer.getNonce(), transfer.getTargetAccount(), transfer.getAmount(), transfer.getFee(), signatureArg, SPONSOR);
 
         String txHash = sendRawTransaction(sponsorKey, callData);
 
@@ -218,8 +218,7 @@ public class TransferService extends BaseService {
         topicsToFind.add(transferMethodSignatureHash);
         topicsToFind.add(paddedAddress);
 
-/*
-
+        /*
         find a workaround for:
         List<List> topicsToFind = new ArrayList<>();
         List<String> topicsToFindBySource = new ArrayList<>();
@@ -233,14 +232,9 @@ public class TransferService extends BaseService {
 
         topicsToFind.add(topicsToFindBySource);
         topicsToFind.add(topicsToFindByTarget);
-
-
-
-
          */
 
         Map<String, Object> params = new HashMap<>();
-//        params.put("address", CONTRACT);
         params.put("address", contractConfig.getAllContracts());
         params.put("fromBlock", CONTRACT_FROM_BLOCK);
         params.put("topics", topicsToFind);
@@ -293,7 +287,7 @@ public class TransferService extends BaseService {
         byte[] nonce = ByteUtil.longToBytesNoLeadZeroes(transactionCount);
         byte[] gasPrice = ByteUtil.longToBytesNoLeadZeroes(20000000000L);
         byte[] gasLimit = ByteUtil.longToBytesNoLeadZeroes(100000);
-        byte[] toAddress = Hex.decode(HashUtils.without0x(CONTRACT));
+        byte[] toAddress = Hex.decode(HashUtils.without0x(contractConfig.getDelegationContractAddress()));
 
         Transaction transaction = new Transaction(nonce, gasPrice, gasLimit, toAddress, null, callData);
         transaction.sign(signer.getPrivKeyBytes());

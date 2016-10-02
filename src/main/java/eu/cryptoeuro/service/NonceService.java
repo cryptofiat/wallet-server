@@ -28,7 +28,7 @@ public class NonceService extends BaseService {
 
     public Nonce getDelegatedNonceOf(String account) {
         String accountArgument = "000000000000000000000000" + account.substring(2);
-        String data = "0x" + HashUtils.keccak256("delegatedNonceOf(address)").substring(0, 8) + accountArgument;
+        String data = "0x" + HashUtils.keccak256("nonceOf(address)").substring(0, 8) + accountArgument;
 
         Map<String, String> params = new HashMap<>();
         params.put("to", contractConfig.getDelegationContractAddress());

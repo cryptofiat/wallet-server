@@ -4,6 +4,7 @@ import java.io.Serializable;
 
 public enum EthereumRpcMethod implements Serializable {
 
+    gasPrice("eth_gasPrice"),
     getBalance("eth_getBalance"),
     getTransactionCount("eth_getTransactionCount"),
     sendTransaction("eth_sendTransaction"),

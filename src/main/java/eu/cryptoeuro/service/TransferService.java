@@ -285,8 +285,9 @@ public class TransferService extends BaseService {
     private String sendRawTransaction(ECKey signer, byte[] callData) {
         long transactionCount = getTransactionCount(SPONSOR);
         byte[] nonce = ByteUtil.longToBytesNoLeadZeroes(transactionCount);
-        byte[] gasPrice = ByteUtil.longToBytesNoLeadZeroes(20000000000L);
-        byte[] gasLimit = ByteUtil.longToBytesNoLeadZeroes(100000);
+        long gasPriceLong = Math.round(getGasPrice() * 1.1); // KK: not sure if increasing gas price by 10% is necessary
+        byte[] gasPrice = ByteUtil.longToBytesNoLeadZeroes(gasPriceLong);
+        byte[] gasLimit = ByteUtil.longToBytesNoLeadZeroes(350000);
         byte[] toAddress = Hex.decode(HashUtils.without0x(contractConfig.getDelegationContractAddress()));
 
         Transaction transaction = new Transaction(nonce, gasPrice, gasLimit, toAddress, null, callData);
@@ -321,4 +322,18 @@ public class TransferService extends BaseService {
         return responseToLong;
     }
 
+
+    private long getGasPrice() {
+        JsonRpcCall call = new JsonRpcCall(EthereumRpcMethod.gasPrice, Arrays.asList());
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON_UTF8);
+        HttpEntity<String> request = new HttpEntity<String>(call.toString(), headers);
+
+        JsonRpcStringResponse response = restTemplate.postForObject(URL, request, JsonRpcStringResponse.class);
+        long responseToLong = Long.parseLong(HashUtils.without0x(response.getResult()), 16);
+        log.info("Gas price: " + responseToLong);
+
+        return responseToLong;
+    }
 }

@@ -38,6 +38,7 @@ import eu.cryptoeuro.service.rpc.EthereumRpcMethod;
 import eu.cryptoeuro.service.rpc.JsonRpcCall;
 import eu.cryptoeuro.service.rpc.JsonRpcCallMap;
 import eu.cryptoeuro.service.rpc.JsonRpcStringResponse;
+import eu.cryptoeuro.service.rpc.JsonRpcBlockResponse;
 import eu.cryptoeuro.service.rpc.JsonRpcTransactionLogResponse;
 
 @Component
@@ -248,11 +249,15 @@ public class TransferService extends BaseService {
         return response.getResult().stream().map(logEntry -> {
             Transfer transfer = new Transfer();
 
+            transfer.setId(logEntry.getTransactionHash());
             transfer.setBlockHash(logEntry.getBlockHash()); // todo check if corect
             transfer.setSourceAccount(HashUtils.unpadAddress(logEntry.getTopics().get(1)));
             transfer.setTargetAccount(HashUtils.unpadAddress(logEntry.getTopics().get(2)));
             transfer.setAmount(Long.parseLong(logEntry.getData().substring(2), 16));
 
+            JsonRpcBlockResponse blockResponse = getCallResponseForObject(call, JsonRpcBlockResponse.class);
+	    log.info("block response" + blockResponse.getTimestamp().toString());
+	    
             return transfer;
         } ).collect(Collectors.toList());
     }

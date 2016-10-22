@@ -12,4 +12,5 @@ public class JsonRpcTransactionLogEntry {
     String data;
 
     String blockHash;
+    String transactionHash;
 }

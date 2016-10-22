@@ -255,9 +255,14 @@ public class TransferService extends BaseService {
             transfer.setTargetAccount(HashUtils.unpadAddress(logEntry.getTopics().get(2)));
             transfer.setAmount(Long.parseLong(logEntry.getData().substring(2), 16));
 
+	/*
+	    log.info("starting block time check");
+            Map<String, Object> params = new HashMap<>();
+            params.put("address", logEntry.getAllContracts());
+
             JsonRpcBlockResponse blockResponse = getCallResponseForObject(call, JsonRpcBlockResponse.class);
 	    log.info("block response" + blockResponse.getTimestamp().toString());
-	    
+	  */  
             return transfer;
         } ).collect(Collectors.toList());
     }

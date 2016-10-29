@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.xml.bind.DatatypeConverter;
 
@@ -212,12 +213,21 @@ public class TransferService extends BaseService {
     */
 
     public List<Transfer> getTransfersForAccount(String address) {
+        return Stream.concat(
+		getTransfersForAccountFromTo(null, address).stream(),
+		getTransfersForAccountFromTo(address,null).stream()
+	     ).collect(Collectors.toList());
+    }
+
+    public List<Transfer> getTransfersForAccountFromTo(String fromAddress, String toAddress) {
         String transferMethodSignatureHash = "0x" + HashUtils.keccak256("Transfer(address,address,uint256)");
-        String paddedAddress = HashUtils.padAddressTo64(address);
+        String paddedFromAddress = (fromAddress != null) ? HashUtils.padAddressTo64(fromAddress) : null;
+        String paddedToAddress = (toAddress != null) ? HashUtils.padAddressTo64(toAddress) : null;
 
         List<String> topicsToFind = new ArrayList<>();
         topicsToFind.add(transferMethodSignatureHash);
-        topicsToFind.add(paddedAddress);
+        topicsToFind.add(paddedFromAddress);
+        topicsToFind.add(paddedToAddress);
 
         /*
         find a workaround for:
@@ -255,14 +265,12 @@ public class TransferService extends BaseService {
             transfer.setTargetAccount(HashUtils.unpadAddress(logEntry.getTopics().get(2)));
             transfer.setAmount(Long.parseLong(logEntry.getData().substring(2), 16));
 
-	/*
-	    log.info("starting block time check");
-            Map<String, Object> params = new HashMap<>();
-            params.put("address", logEntry.getAllContracts());
+            JsonRpcCallMap blockCall = new JsonRpcCallMap(EthereumRpcMethod.getBlockByHash, Arrays.asList(logEntry.getBlockHash(),false));
 
-            JsonRpcBlockResponse blockResponse = getCallResponseForObject(call, JsonRpcBlockResponse.class);
-	    log.info("block response" + blockResponse.getTimestamp().toString());
-	  */  
+            JsonRpcBlockResponse blockResponse = getCallResponseForObject(blockCall, JsonRpcBlockResponse.class);
+	    log.info("block time " + blockResponse.getTimestamp().toString());
+            transfer.setTimestamp(blockResponse.getTimestamp());
+
             return transfer;
         } ).collect(Collectors.toList());
     }

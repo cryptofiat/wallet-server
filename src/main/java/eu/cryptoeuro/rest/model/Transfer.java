@@ -5,6 +5,7 @@ import javax.persistence.Id;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+import java.util.Date;
 
 import lombok.Data;
 
@@ -30,5 +31,6 @@ public class Transfer {
     @NotNull
     private String signature;
     private String blockHash;
+    private Date timestamp;
 
 }

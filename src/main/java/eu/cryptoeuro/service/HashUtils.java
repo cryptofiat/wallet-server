@@ -42,6 +42,7 @@ public class HashUtils {
     }
 
     public static String without0x(String hex) {
+	if (hex == null) return null;
         return hex.startsWith("0x") ? hex.substring(2) : hex;
     }
 

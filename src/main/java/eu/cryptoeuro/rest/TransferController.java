@@ -49,14 +49,14 @@ public class TransferController {
     }
 
     @ApiOperation(value = "Get transfer.")
-    @RequestMapping(method = RequestMethod.GET, value = "/{transferId}")
+    @RequestMapping(method = RequestMethod.GET, value = "/{transactionHash}")
     public ResponseEntity<Transfer> getTransfer(
-            @PathVariable Long transferId
+            @PathVariable String transactionHash
     ){
-        log.info("Getting a transfer " + transferId);
+        log.info("Getting a transfer " + transactionHash);
 
         return new ResponseEntity<>(
-                transferService.get(transferId),
+                transferService.get(transactionHash),
                 new HttpHeaders(), HttpStatus.OK);
     }
 

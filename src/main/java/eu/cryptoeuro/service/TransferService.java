@@ -41,6 +41,7 @@ import eu.cryptoeuro.service.rpc.JsonRpcCallMap;
 import eu.cryptoeuro.service.rpc.JsonRpcStringResponse;
 import eu.cryptoeuro.service.rpc.JsonRpcBlockResponse;
 import eu.cryptoeuro.service.rpc.JsonRpcTransactionLogResponse;
+import eu.cryptoeuro.service.rpc.JsonRpcTransactionResponse;
 
 @Component
 @Slf4j
@@ -159,11 +160,12 @@ public class TransferService extends BaseService {
     }
     */
 
+/*
     // TODO cleanup
     public Transfer get(Long id){
         return null;
     }
-
+*/
     // TODO cleanup
     public Iterable<Transfer> getAll(){
         return null;
@@ -219,7 +221,24 @@ public class TransferService extends BaseService {
 	     ).collect(Collectors.toList());
     }
 
-    public List<Transfer> getTransfersForAccountFromTo(String fromAddress, String toAddress) {
+    public Transfer get(String transactionHash) {
+
+        JsonRpcCallMap call = new JsonRpcCallMap(EthereumRpcMethod.getTransactionByHash, Arrays.asList(transactionHash));
+
+        JsonRpcTransactionResponse response = getCallResponseForObject(call, JsonRpcTransactionResponse.class);
+	
+        log.info("Is "+transactionHash+" mined yet? " + response.isMined());
+        Transfer transfer = new Transfer();
+        transfer.setStatus((response.isMined()) ? TransferStatus.SUCCESSFUL : TransferStatus.PENDING);
+        transfer.setId(transactionHash);
+        transfer.setBlockHash(response.getBlockHash());
+	return transfer;
+    }
+
+
+    ///// PRIVATE METHODS /////
+
+    private List<Transfer> getTransfersForAccountFromTo(String fromAddress, String toAddress) {
         String transferMethodSignatureHash = "0x" + HashUtils.keccak256("Transfer(address,address,uint256)");
         String paddedFromAddress = (fromAddress != null) ? HashUtils.padAddressTo64(fromAddress) : null;
         String paddedToAddress = (toAddress != null) ? HashUtils.padAddressTo64(toAddress) : null;
@@ -228,22 +247,6 @@ public class TransferService extends BaseService {
         topicsToFind.add(transferMethodSignatureHash);
         topicsToFind.add(paddedFromAddress);
         topicsToFind.add(paddedToAddress);
-
-        /*
-        find a workaround for:
-        List<List> topicsToFind = new ArrayList<>();
-        List<String> topicsToFindBySource = new ArrayList<>();
-        topicsToFindBySource.add(transferMethodSignatureHash);
-        topicsToFindBySource.add(paddedAddress);
-
-        List<String> topicsToFindByTarget = new ArrayList<>();
-        topicsToFindByTarget.add(transferMethodSignatureHash);
-        topicsToFindByTarget.add(null);
-        topicsToFindByTarget.add(paddedAddress);
-
-        topicsToFind.add(topicsToFindBySource);
-        topicsToFind.add(topicsToFindByTarget);
-         */
 
         Map<String, Object> params = new HashMap<>();
         params.put("address", contractConfig.getAllContracts());
@@ -274,8 +277,6 @@ public class TransferService extends BaseService {
             return transfer;
         } ).collect(Collectors.toList());
     }
-
-    ///// PRIVATE METHODS /////
 
     private static ECKey getWalletServerSponsorKey() {
         File file = new File(System.getProperty("user.home"), ".WalletServerSponsor.key");

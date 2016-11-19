@@ -56,6 +56,9 @@ public class TransferService extends BaseService {
         this.accountService = accountService;
     }
 
+    // list of addresses that should be considered as recipients of fees
+    private static List<String> feeReceiverAddresses = Arrays.asList("0x8664e7a68809238d8f8e78e4b7c723282533a787");
+
     // Function definition: transfer(uint256 nonce, address destination, uint256 amount, uint256 fee, bytes signature, address delegate)
     private static Function transferFunction = Function.fromSignature("transfer", "uint256", "address", "uint256", "uint256", "bytes", "address");
 
@@ -257,9 +260,17 @@ public class TransferService extends BaseService {
 
         JsonRpcTransactionLogResponse response = getCallResponseForObject(call, JsonRpcTransactionLogResponse.class);
 
-        //todo filter delegated transfers which have fee and those that don't
+        Map<String, Long> fees = new HashMap<>();
+
         log.info(response.getResult().toString());
         return response.getResult().stream().map(logEntry -> {
+	    String toAddr = new String(HashUtils.unpadAddress(logEntry.getTopics().get(2)));
+
+	    if (this.feeReceiverAddresses.contains(toAddr)) {
+		fees.put(logEntry.getTransactionHash(),Long.parseLong(logEntry.getData().substring(2), 16));
+	        return null;
+	    }
+
             Transfer transfer = new Transfer();
 
             transfer.setId(logEntry.getTransactionHash());
@@ -271,11 +282,15 @@ public class TransferService extends BaseService {
             JsonRpcCallMap blockCall = new JsonRpcCallMap(EthereumRpcMethod.getBlockByHash, Arrays.asList(logEntry.getBlockHash(),false));
 
             JsonRpcBlockResponse blockResponse = getCallResponseForObject(blockCall, JsonRpcBlockResponse.class);
-	    log.info("block time " + blockResponse.getTimestamp().toString());
             transfer.setTimestamp(blockResponse.getTimestamp());
 
             return transfer;
-        } ).collect(Collectors.toList());
+        } ).filter(l -> l != null).collect(Collectors.toList()).stream().map( tx -> {
+
+	    tx.setFee(fees.get(tx.getId()));
+	    return tx;
+
+	} ).collect(Collectors.toList());
     }
 
     private static ECKey getWalletServerSponsorKey() {

@@ -31,10 +31,10 @@ import org.springframework.stereotype.Component;
 import eu.cryptoeuro.FeeConstant;
 import eu.cryptoeuro.config.ContractConfig;
 import eu.cryptoeuro.rest.command.CreateTransferCommand;
+import eu.cryptoeuro.rest.command.CreateBankTransferCommand;
 import eu.cryptoeuro.rest.model.Transfer;
 import eu.cryptoeuro.rest.model.TransferStatus;
 import eu.cryptoeuro.service.exception.AccountNotApprovedException;
-import eu.cryptoeuro.service.exception.FeeMismatchException;
 import eu.cryptoeuro.service.rpc.EthereumRpcMethod;
 import eu.cryptoeuro.service.rpc.JsonRpcCall;
 import eu.cryptoeuro.service.rpc.JsonRpcCallMap;
@@ -48,6 +48,7 @@ import eu.cryptoeuro.service.rpc.JsonRpcTransactionResponse;
 public class TransferService extends BaseService {
 
     private AccountService accountService;
+    private EmailService emailService;
     private ContractConfig contractConfig;
 
     @Autowired
@@ -59,6 +60,10 @@ public class TransferService extends BaseService {
     // list of addresses that should be considered as recipients of fees
     private static List<String> feeReceiverAddresses = Arrays.asList("0x8664e7a68809238d8f8e78e4b7c723282533a787");
 
+    // gateway address for sending to SEPA bank accounts
+    private static String bankProxyAddress = "0x8664e7a68809238d8f8e78e4b7c723282533a787";
+    private static String bankProxyInstructionEmail = "hghdsighsghsighh@gmail.com";
+
     // Function definition: transfer(uint256 nonce, address destination, uint256 amount, uint256 fee, bytes signature, address delegate)
     private static Function transferFunction = Function.fromSignature("transfer", "uint256", "address", "uint256", "uint256", "bytes", "address");
 
@@ -69,11 +74,6 @@ public class TransferService extends BaseService {
         //TODO check that Source has sufficient EUR balance (for amount + fee)
         //TODO check that we have enough ETH to submit
         //TODO currently "reference" field is ignored, what to do with that?
-
-        //TODO that's better to validate in TransferCommand, no ?
-        if (FeeConstant.FEE.compareTo(transfer.getFee()) != 0) {
-            throw new FeeMismatchException(transfer.getFee(), FeeConstant.FEE);
-        }
 
         ECKey sponsorKey = getWalletServerSponsorKey();
         byte[] signatureArg = DatatypeConverter.parseHexBinary(transfer.getSignature());
@@ -89,9 +89,38 @@ public class TransferService extends BaseService {
         result.setSourceAccount(transfer.getSourceAccount());
         result.setFee(transfer.getFee());
         result.setNonce(transfer.getNonce());
-        result.setReference(transfer.getReference());
         result.setSignature(transfer.getSignature());
         return result;
+    }
+
+    public Transfer delegatedBankTransfer(CreateBankTransferCommand bankTransfer){
+	CreateTransferCommand ethTransfer = new CreateTransferCommand();
+        ethTransfer.setAmount(bankTransfer.getAmount());
+        ethTransfer.setSourceAccount(bankTransfer.getSourceAccount());
+        ethTransfer.setFee(bankTransfer.getFee());
+        ethTransfer.setNonce(bankTransfer.getNonce());
+        ethTransfer.setSignature(bankTransfer.getSignature());
+
+        ethTransfer.setTargetAccount(this.bankProxyAddress);
+	Transfer result = delegatedTransfer(ethTransfer);
+
+	//TODO: Here should be something that forks the thread and waits async until the transfer has been mined. Or even do this part as job.
+
+	if (result.getId() != null) {
+		log.info("Sending  email instructions for bank transfer "+result.getId());
+		//instructions by email to send out bank transfer	
+		emailService.sendEmail(this.bankProxyInstructionEmail,
+		"Euro2.0 bank payout",
+		"bank account: "+bankTransfer.getTargetBankAccountIBAN()+"\n"+
+		"amount: "+bankTransfer.getAmount()+"\n"+
+		"reference: "+bankTransfer.getReference()+"\n"+
+		"from: "+bankTransfer.getSourceAccount()+"\n"+
+		"txhash: "+result.getId()+"\n"+
+		"name: "+bankTransfer.getRecipientName()+"\n"
+		);
+	}
+
+	return result;
     }
 
     /*

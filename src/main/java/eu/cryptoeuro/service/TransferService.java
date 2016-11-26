@@ -110,95 +110,22 @@ public class TransferService extends BaseService {
 	if (result.getId() != null) {
 		log.info("Sending  email instructions for bank transfer "+result.getId());
 		//instructions by email to send out bank transfer	
-		emailService.sendEmail(this.bankProxyInstructionEmail,
-		"Euro2.0 bank payout",
-		"bank account: "+bankTransfer.getTargetBankAccountIBAN()+"\n"+
-		"amount: "+bankTransfer.getAmount()+"\n"+
-		"reference: "+bankTransfer.getReference()+"\n"+
-		"from: "+bankTransfer.getSourceAccount()+"\n"+
-		"txhash: "+result.getId()+"\n"+
-		"name: "+bankTransfer.getRecipientName()+"\n"
-		);
+		
+		String emailText = new String();
+
+		emailText = "bank account: "+bankTransfer.getTargetBankAccountIBAN()+
+		"\n amount: "+bankTransfer.getAmount()+
+		"\n reference: "+bankTransfer.getReference()+
+		"\n from: "+bankTransfer.getSourceAccount()+
+		"\n txhash: "+result.getId()+
+		"\n name: "+bankTransfer.getRecipientName();
+
+		emailService.sendEmail(this.bankProxyInstructionEmail, "Euro2.0 bank payout", emailText );
 	}
 
 	return result;
     }
 
-    /*
-    public Transfer delegatedTransfer041(CreateTransferCommand transfer){
-        checkSourceAccountApproved(transfer.getSourceAccount());
-    	//TODO: check that Target account not closed
-    	//TODO: check that Source has sufficient EUR balance
-    	//TODO: check nonce is high enough, probably good to return nonce in /accounts/0x123...
-    	//TODO: check that we have enough ETH to submit
-        //TODO: that's better to validate in TransferCommand, no ?
-        if (FeeConstant.FEE.compareTo(transfer.getFee()) != 0) {
-            throw new FeeMismatchException(transfer.getFee(), FeeConstant.FEE);
-        }
-
-        String from = HashUtils.padAddressTo64(transfer.getSourceAccount());
-        String to = HashUtils.padAddressTo64(transfer.getTargetAccount());
-        String amount = HashUtils.padLongToUint(transfer.getAmount());
-        String fee = HashUtils.padLongToUint(transfer.getFee());
-        String nonce = HashUtils.padLongToUint(transfer.getNonce());
-        String v =  HashUtils.padLongToUint(transfer.getSigV());
-        String r = transfer.getSigR().substring(2);
-        String s = transfer.getSigS().substring(2);
-        String sponsor = HashUtils.padAddressTo64(SPONSOR);
-        String data = "0x"
-                + HashUtils.keccak256("delegatedTransfer(address,address,uint256,uint256,uint256,uint8,bytes32,bytes32,address)").substring(0, 8)
-                + from
-                + to
-                + amount
-                + fee
-                + nonce
-                + v
-                + r
-                + s
-                + sponsor;
-
-        Map<String, String> params = new HashMap<>();
-        params.put("from", SPONSOR);
-        params.put("to", CONTRACT);
-        params.put("gas", "0x13880"); // 80000
-        params.put("gasPrice", "0x4A817C800"); // 20000000000
-        params.put("data", data);
-        //params.put("value", "");
-        //params.put("nonce", "1"); // TODO: changeme
-
-        JsonRpcCallMap call = new JsonRpcCallMap(EthereumRpcMethod.sendTransaction, Arrays.asList(params));
-        log.info("JSON:\n" + call.toString());
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON_UTF8);
-        HttpEntity<String> request = new HttpEntity<String>(call.toString(), headers);
-
-        JsonRpcStringResponse response = restTemplate.postForObject(URL, request, JsonRpcStringResponse.class);
-
-        log.info("Received transaction response: " + response.getResult());
-
-        Transfer result = new Transfer();
-        result.setId(response.getResult());
-        result.setStatus(TransferStatus.PENDING);
-        result.setAmount(transfer.getAmount());
-        result.setTargetAccount(transfer.getTargetAccount());
-        result.setSourceAccount(transfer.getSourceAccount());
-        result.setFee(transfer.getFee());
-        result.setNonce(transfer.getNonce());
-        result.setReference(transfer.getReference());
-        result.setSigV(transfer.getSigV());
-        result.setSigR(transfer.getSigR());
-        result.setSigS(transfer.getSigS());
-        return result;
-    }
-    */
-
-/*
-    // TODO cleanup
-    public Transfer get(Long id){
-        return null;
-    }
-*/
     // TODO cleanup
     public Iterable<Transfer> getAll(){
         return null;

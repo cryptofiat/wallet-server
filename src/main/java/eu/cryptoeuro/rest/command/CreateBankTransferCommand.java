@@ -23,8 +23,7 @@ public class CreateBankTransferCommand {
     @Min(1)
     private Long amount;
     //TODO: should be FeeConstant.FEE_TO_SEPA
-    @Min(5)
-    @Max(5)
+    @Min(1)
     private Long fee;
     @NotNull
     @Min(1)

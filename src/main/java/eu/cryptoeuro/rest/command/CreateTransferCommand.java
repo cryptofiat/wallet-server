@@ -24,7 +24,6 @@ public class CreateTransferCommand {
     private Long amount;
     //TODO: should be FeeConstant.FEE
     @Min(1)
-    @Max(1)
     private Long fee;
     @NotNull
     @Min(1)

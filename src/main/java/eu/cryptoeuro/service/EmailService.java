@@ -24,11 +24,14 @@ public class EmailService {
     
   public void sendEmail(String to, String subject, String body) {
 	  
-	   log.info("logging to email w user: "+user+" pass: "+password);
-	   //Get the session object  
 	   Properties props = new Properties();  
 	   props.put("mail.smtp.host",host);  
 	   props.put("mail.smtp.port",String.valueOf(port));  
+
+
+	   /*
+	   //log.info("logging to email w user: "+user+" pass: "+password);
+	   //Get the session object  
 	   props.put("mail.smtp.auth", "true");  
 	     
 	   Session session = Session.getDefaultInstance(props,  
@@ -37,7 +40,11 @@ public class EmailService {
 	    return new PasswordAuthentication(user,password);  
 	      }  
 	    });  
-	  
+	   */
+
+	   props.put("mail.smtp.auth", "false");  
+	   Session session = Session.getDefaultInstance(props);  
+
 	   //Compose the message  
 	    try {  
 	     MimeMessage message = new MimeMessage(session);  

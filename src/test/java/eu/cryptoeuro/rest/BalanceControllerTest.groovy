@@ -13,6 +13,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 
 class BalanceControllerTest extends Specification {
 
+/*
     private BalanceController controller = new BalanceController()
     private sampleBalance = new Balance(1000, Currency.EUR_CENT)
     private sampleAccountAddress = "0x65fa6548764C08C0DD77495B33ED302d0C212691";
@@ -33,5 +34,5 @@ class BalanceControllerTest extends Specification {
         response.status == HttpStatus.OK.value()
         response.contentAsString == '{"amount":1000,"currency":"EUR_CENT"}'
     }
-
+*/
 }

@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import springfox.documentation.annotations.ApiIgnore;
 import eu.cryptoeuro.rest.command.CreateTransferCommand;
+import eu.cryptoeuro.rest.command.CreateBankTransferCommand;
 import eu.cryptoeuro.rest.exception.ValidationException;
 import eu.cryptoeuro.rest.model.Transfer;
 import eu.cryptoeuro.service.TransferService;
@@ -60,7 +61,7 @@ public class TransferController {
                 new HttpHeaders(), HttpStatus.OK);
     }
 
-    @ApiOperation(value = "Creates a transfer")
+    @ApiOperation(value = "Initiates a transfer to another Ethereum account.")
     @RequestMapping(method = RequestMethod.POST, value = "")
     public ResponseEntity<Transfer> postWithTransferRequest(
             @Valid @RequestBody @ApiParam CreateTransferCommand createTransferCommand,
@@ -72,6 +73,21 @@ public class TransferController {
 
         return new ResponseEntity<>(
                 transferService.delegatedTransfer(createTransferCommand),
+                new HttpHeaders(), HttpStatus.OK);
+    }
+
+    @ApiOperation(value = "Initiates a transfer to a SEPA bank account.")
+    @RequestMapping(method = RequestMethod.POST, value = "/bank")
+    public ResponseEntity<Transfer> postWithSepaTransferRequest(
+            @Valid @RequestBody @ApiParam CreateBankTransferCommand createBankTransferCommand,
+            @ApiIgnore Errors errors
+    ) {
+        if (errors.hasErrors()) {
+            throw new ValidationException(errors);
+        }
+
+        return new ResponseEntity<>(
+                transferService.delegatedBankTransfer(createBankTransferCommand),
                 new HttpHeaders(), HttpStatus.OK);
     }
 

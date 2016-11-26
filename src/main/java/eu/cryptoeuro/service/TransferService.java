@@ -31,10 +31,10 @@ import org.springframework.stereotype.Component;
 import eu.cryptoeuro.FeeConstant;
 import eu.cryptoeuro.config.ContractConfig;
 import eu.cryptoeuro.rest.command.CreateTransferCommand;
+import eu.cryptoeuro.rest.command.CreateBankTransferCommand;
 import eu.cryptoeuro.rest.model.Transfer;
 import eu.cryptoeuro.rest.model.TransferStatus;
 import eu.cryptoeuro.service.exception.AccountNotApprovedException;
-import eu.cryptoeuro.service.exception.FeeMismatchException;
 import eu.cryptoeuro.service.rpc.EthereumRpcMethod;
 import eu.cryptoeuro.service.rpc.JsonRpcCall;
 import eu.cryptoeuro.service.rpc.JsonRpcCallMap;
@@ -48,16 +48,23 @@ import eu.cryptoeuro.service.rpc.JsonRpcTransactionResponse;
 public class TransferService extends BaseService {
 
     private AccountService accountService;
+    private EmailService emailService;
     private ContractConfig contractConfig;
 
     @Autowired
-    public TransferService(ContractConfig contractConfig, AccountService accountService) {
+    public TransferService(ContractConfig contractConfig, AccountService accountService, EmailService emailService) {
         this.contractConfig = contractConfig;
         this.accountService = accountService;
+        this.emailService = emailService;
     }
 
     // list of addresses that should be considered as recipients of fees
     private static List<String> feeReceiverAddresses = Arrays.asList("0x8664e7a68809238d8f8e78e4b7c723282533a787");
+
+    // gateway address for sending to SEPA bank accounts
+    //private static String bankProxyAddress = "0x8664e7a68809238d8f8e78e4b7c723282533a787";
+    private static final String bankProxyAddress = "0x833898875a12a3d61ef18dc3d2b475c7ca3a4a72";
+    private static final String bankProxyInstructionEmail = "kristoxz@yahoo.com";
 
     // Function definition: transfer(uint256 nonce, address destination, uint256 amount, uint256 fee, bytes signature, address delegate)
     private static Function transferFunction = Function.fromSignature("transfer", "uint256", "address", "uint256", "uint256", "bytes", "address");
@@ -69,11 +76,6 @@ public class TransferService extends BaseService {
         //TODO check that Source has sufficient EUR balance (for amount + fee)
         //TODO check that we have enough ETH to submit
         //TODO currently "reference" field is ignored, what to do with that?
-
-        //TODO that's better to validate in TransferCommand, no ?
-        if (FeeConstant.FEE.compareTo(transfer.getFee()) != 0) {
-            throw new FeeMismatchException(transfer.getFee(), FeeConstant.FEE);
-        }
 
         ECKey sponsorKey = getWalletServerSponsorKey();
         byte[] signatureArg = DatatypeConverter.parseHexBinary(transfer.getSignature());
@@ -89,86 +91,44 @@ public class TransferService extends BaseService {
         result.setSourceAccount(transfer.getSourceAccount());
         result.setFee(transfer.getFee());
         result.setNonce(transfer.getNonce());
-        result.setReference(transfer.getReference());
         result.setSignature(transfer.getSignature());
         return result;
     }
 
-    /*
-    public Transfer delegatedTransfer041(CreateTransferCommand transfer){
-        checkSourceAccountApproved(transfer.getSourceAccount());
-    	//TODO: check that Target account not closed
-    	//TODO: check that Source has sufficient EUR balance
-    	//TODO: check nonce is high enough, probably good to return nonce in /accounts/0x123...
-    	//TODO: check that we have enough ETH to submit
-        //TODO: that's better to validate in TransferCommand, no ?
-        if (FeeConstant.FEE.compareTo(transfer.getFee()) != 0) {
-            throw new FeeMismatchException(transfer.getFee(), FeeConstant.FEE);
-        }
+    public Transfer delegatedBankTransfer(CreateBankTransferCommand bankTransfer){
+	CreateTransferCommand ethTransfer = new CreateTransferCommand();
+        ethTransfer.setAmount(bankTransfer.getAmount());
+        ethTransfer.setSourceAccount(bankTransfer.getSourceAccount());
+        ethTransfer.setFee(bankTransfer.getFee());
+        ethTransfer.setNonce(bankTransfer.getNonce());
+        ethTransfer.setSignature(bankTransfer.getSignature());
 
-        String from = HashUtils.padAddressTo64(transfer.getSourceAccount());
-        String to = HashUtils.padAddressTo64(transfer.getTargetAccount());
-        String amount = HashUtils.padLongToUint(transfer.getAmount());
-        String fee = HashUtils.padLongToUint(transfer.getFee());
-        String nonce = HashUtils.padLongToUint(transfer.getNonce());
-        String v =  HashUtils.padLongToUint(transfer.getSigV());
-        String r = transfer.getSigR().substring(2);
-        String s = transfer.getSigS().substring(2);
-        String sponsor = HashUtils.padAddressTo64(SPONSOR);
-        String data = "0x"
-                + HashUtils.keccak256("delegatedTransfer(address,address,uint256,uint256,uint256,uint8,bytes32,bytes32,address)").substring(0, 8)
-                + from
-                + to
-                + amount
-                + fee
-                + nonce
-                + v
-                + r
-                + s
-                + sponsor;
+        ethTransfer.setTargetAccount(this.bankProxyAddress);
+	Transfer result = delegatedTransfer(ethTransfer);
 
-        Map<String, String> params = new HashMap<>();
-        params.put("from", SPONSOR);
-        params.put("to", CONTRACT);
-        params.put("gas", "0x13880"); // 80000
-        params.put("gasPrice", "0x4A817C800"); // 20000000000
-        params.put("data", data);
-        //params.put("value", "");
-        //params.put("nonce", "1"); // TODO: changeme
+	//TODO: Here should be something that forks the thread and waits async until the transfer has been mined. Or even do this part as job.
 
-        JsonRpcCallMap call = new JsonRpcCallMap(EthereumRpcMethod.sendTransaction, Arrays.asList(params));
-        log.info("JSON:\n" + call.toString());
+	if (result.getId() != null) {
+		log.info("Sending  email instructions for bank transfer "+result.getId());
+		//instructions by email to send out bank transfer	
+		
+		String emailText = new String();
 
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON_UTF8);
-        HttpEntity<String> request = new HttpEntity<String>(call.toString(), headers);
+		emailText = "bank account: "+bankTransfer.getTargetBankAccountIBAN()+
+		"\n amount: "+bankTransfer.getAmount()+
+		"\n reference: "+bankTransfer.getReference()+
+		"\n from: "+bankTransfer.getSourceAccount()+
+		"\n txhash: "+result.getId()+
+		"\n name: "+bankTransfer.getRecipientName();
 
-        JsonRpcStringResponse response = restTemplate.postForObject(URL, request, JsonRpcStringResponse.class);
+		log.info("Email should go with body: "+emailText);
 
-        log.info("Received transaction response: " + response.getResult());
+		emailService.sendEmail(this.bankProxyInstructionEmail, "Euro2.0 bank payout", emailText );
+	}
 
-        Transfer result = new Transfer();
-        result.setId(response.getResult());
-        result.setStatus(TransferStatus.PENDING);
-        result.setAmount(transfer.getAmount());
-        result.setTargetAccount(transfer.getTargetAccount());
-        result.setSourceAccount(transfer.getSourceAccount());
-        result.setFee(transfer.getFee());
-        result.setNonce(transfer.getNonce());
-        result.setReference(transfer.getReference());
-        result.setSigV(transfer.getSigV());
-        result.setSigR(transfer.getSigR());
-        result.setSigS(transfer.getSigS());
-        return result;
+	return result;
     }
-    */
 
-/*
-    // TODO cleanup
-    public Transfer get(Long id){
-        return null;
-    }
-*/
     // TODO cleanup
     public Iterable<Transfer> getAll(){
         return null;

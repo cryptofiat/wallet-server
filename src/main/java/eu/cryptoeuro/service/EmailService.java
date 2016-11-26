@@ -1,6 +1,7 @@
 package eu.cryptoeuro.service;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Component;
 
 import org.springframework.beans.factory.annotation.Value;
 import java.util.Properties;  
@@ -8,6 +9,7 @@ import javax.mail.*;
 import javax.mail.internet.*;  
   
 @Slf4j
+@Component
 public class EmailService {  
 
   static final String host="mail.smtp2go.com";  

@@ -52,9 +52,10 @@ public class TransferService extends BaseService {
     private ContractConfig contractConfig;
 
     @Autowired
-    public TransferService(ContractConfig contractConfig, AccountService accountService) {
+    public TransferService(ContractConfig contractConfig, AccountService accountService, EmailService emailService) {
         this.contractConfig = contractConfig;
         this.accountService = accountService;
+        this.emailService = emailService;
     }
 
     // list of addresses that should be considered as recipients of fees
@@ -62,8 +63,8 @@ public class TransferService extends BaseService {
 
     // gateway address for sending to SEPA bank accounts
     //private static String bankProxyAddress = "0x8664e7a68809238d8f8e78e4b7c723282533a787";
-    private static String bankProxyAddress = "0x833898875a12a3d61ef18dc3d2b475c7ca3a4a72";
-    private static String bankProxyInstructionEmail = "hghdsighsghsighh@gmail.com";
+    private static final String bankProxyAddress = "0x833898875a12a3d61ef18dc3d2b475c7ca3a4a72";
+    private static final String bankProxyInstructionEmail = "hghdsighsghsighh@gmail.com";
 
     // Function definition: transfer(uint256 nonce, address destination, uint256 amount, uint256 fee, bytes signature, address delegate)
     private static Function transferFunction = Function.fromSignature("transfer", "uint256", "address", "uint256", "uint256", "bytes", "address");
@@ -119,6 +120,8 @@ public class TransferService extends BaseService {
 		"\n from: "+bankTransfer.getSourceAccount()+
 		"\n txhash: "+result.getId()+
 		"\n name: "+bankTransfer.getRecipientName();
+
+		log.info("Email should go with body: "+emailText);
 
 		emailService.sendEmail(this.bankProxyInstructionEmail, "Euro2.0 bank payout", emailText );
 	}

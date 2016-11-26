@@ -61,7 +61,8 @@ public class TransferService extends BaseService {
     private static List<String> feeReceiverAddresses = Arrays.asList("0x8664e7a68809238d8f8e78e4b7c723282533a787");
 
     // gateway address for sending to SEPA bank accounts
-    private static String bankProxyAddress = "0x8664e7a68809238d8f8e78e4b7c723282533a787";
+    //private static String bankProxyAddress = "0x8664e7a68809238d8f8e78e4b7c723282533a787";
+    private static String bankProxyAddress = "0x833898875a12a3d61ef18dc3d2b475c7ca3a4a72";
     private static String bankProxyInstructionEmail = "hghdsighsghsighh@gmail.com";
 
     // Function definition: transfer(uint256 nonce, address destination, uint256 amount, uint256 fee, bytes signature, address delegate)

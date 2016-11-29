@@ -9,5 +9,6 @@ public class Fee {
 
     @NonNull
     public Long amount = FeeConstant.FEE;
+    public Long amount_to_sepa = FeeConstant.FEE_TO_SEPA;
 
 }

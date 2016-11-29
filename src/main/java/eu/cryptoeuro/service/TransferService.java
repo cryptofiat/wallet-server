@@ -15,6 +15,7 @@ import java.util.stream.Stream;
 
 import javax.xml.bind.DatatypeConverter;
 
+import eu.cryptoeuro.util.KeyUtil;
 import lombok.extern.slf4j.Slf4j;
 
 import org.ethereum.core.CallTransaction.Function;
@@ -50,12 +51,14 @@ public class TransferService extends BaseService {
     private AccountService accountService;
     private EmailService emailService;
     private ContractConfig contractConfig;
+    private KeyUtil keyUtil;
 
     @Autowired
-    public TransferService(ContractConfig contractConfig, AccountService accountService, EmailService emailService) {
+    public TransferService(ContractConfig contractConfig, AccountService accountService, EmailService emailService, KeyUtil keyUtil) {
         this.contractConfig = contractConfig;
         this.accountService = accountService;
         this.emailService = emailService;
+        this.keyUtil = keyUtil;
     }
 
     // list of addresses that should be considered as recipients of fees
@@ -77,7 +80,7 @@ public class TransferService extends BaseService {
         //TODO check that we have enough ETH to submit
         //TODO currently "reference" field is ignored, what to do with that?
 
-        ECKey sponsorKey = getWalletServerSponsorKey();
+        ECKey sponsorKey = keyUtil.getWalletServerSponsorKey();
         byte[] signatureArg = DatatypeConverter.parseHexBinary(transfer.getSignature());
         byte[] callData = transferFunction.encode(transfer.getNonce(), transfer.getTargetAccount(), transfer.getAmount(), transfer.getFee(), signatureArg, SPONSOR);
 
@@ -251,23 +254,6 @@ public class TransferService extends BaseService {
 	    return tx;
 
 	} ).collect(Collectors.toList());
-    }
-
-    private static ECKey getWalletServerSponsorKey() {
-        File file = new File(System.getProperty("user.home"), ".WalletServerSponsor.key");
-        try {
-            String keyHex = toString(new FileInputStream(file));
-            return ECKey.fromPrivate(Hex.decode(keyHex));
-        }
-        catch (IOException e) {
-            throw new RuntimeException("Cannot load wallet-server sponsor account key. Make sure " + file.toString() + " exists and contains the private key in hex format.\n" + e.toString());
-        }
-    }
-
-    private static String toString(InputStream stream) throws IOException {
-        try (InputStream is = stream) {
-            return new Scanner(is).useDelimiter("\\A").next();
-        }
     }
 
     private void checkSourceAccountApproved(String account) {

@@ -1,0 +1,24 @@
+{
+  "id" : "5e7122a8-f08d-3520-8e7a-a4ef231d2be6",
+  "uuid" : "5e7122a8-f08d-3520-8e7a-a4ef231d2be6",
+  "request" : {
+    "url" : "/",
+    "method" : "POST",
+    "bodyPatterns" : [ {
+      "equalToJson" : "{\"method\":\"eth_call\",\"id\":1,\"jsonrpc\":\"2.0\",\"params\":[{\"data\":\"0xed2a2d6400000000000000000000000065fa6548764c08c0dd77495b33ed302d0c212690\",\"to\":\"0xaf71e622792f47119411ce019f4ca1b8d993496e\"},\"latest\"]}",
+      "ignoreArrayOrder" : true,
+      "ignoreExtraElements" : true
+    } ]
+  },
+  "response" : {
+    "status" : 200,
+    "bodyFileName" : "body-(root)-8PIqt.json",
+    "headers" : {
+      "Content-Type" : "application/json",
+      "Allow" : "OPTIONS, POST",
+      "Access-Control-Allow-Headers" : "origin, content-type, accept",
+      "Date" : "Wed, 07 Dec 2016 11:30:51 GMT",
+      "Transfer-Encoding" : "chunked"
+    }
+  }
+}

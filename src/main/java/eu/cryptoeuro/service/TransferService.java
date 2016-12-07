@@ -1,20 +1,16 @@
 package eu.cryptoeuro.service;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Scanner;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import javax.xml.bind.DatatypeConverter;
 
+import eu.cryptoeuro.util.KeyUtil;
 import lombok.extern.slf4j.Slf4j;
 
 import org.ethereum.core.CallTransaction.Function;
@@ -28,7 +24,6 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 
-import eu.cryptoeuro.FeeConstant;
 import eu.cryptoeuro.config.ContractConfig;
 import eu.cryptoeuro.rest.command.CreateTransferCommand;
 import eu.cryptoeuro.rest.command.CreateBankTransferCommand;
@@ -50,12 +45,14 @@ public class TransferService extends BaseService {
     private AccountService accountService;
     private EmailService emailService;
     private ContractConfig contractConfig;
+    private KeyUtil keyUtil;
 
     @Autowired
-    public TransferService(ContractConfig contractConfig, AccountService accountService, EmailService emailService) {
+    public TransferService(ContractConfig contractConfig, AccountService accountService, EmailService emailService, KeyUtil keyUtil) {
         this.contractConfig = contractConfig;
         this.accountService = accountService;
         this.emailService = emailService;
+        this.keyUtil = keyUtil;
     }
 
     // list of addresses that should be considered as recipients of fees
@@ -70,6 +67,14 @@ public class TransferService extends BaseService {
     private static Function transferFunction = Function.fromSignature("transfer", "uint256", "address", "uint256", "uint256", "bytes", "address");
 
     public Transfer delegatedTransfer(CreateTransferCommand transfer){
+        log.info("delegatedTransfer:");
+        log.info("sourceAccount:" + transfer.getSourceAccount());
+        log.info("targetAccount:" + transfer.getTargetAccount());
+        log.info("amount:" + transfer.getAmount());
+        log.info("fee:" + transfer.getFee());
+        log.info("nonce:" + transfer.getNonce());
+        log.info("signature:" + transfer.getSignature());
+
         checkSourceAccountApproved(transfer.getSourceAccount());
         checkSourceAccountApproved(transfer.getTargetAccount());
         //TODO check that Target account not closed
@@ -77,7 +82,7 @@ public class TransferService extends BaseService {
         //TODO check that we have enough ETH to submit
         //TODO currently "reference" field is ignored, what to do with that?
 
-        ECKey sponsorKey = getWalletServerSponsorKey();
+        ECKey sponsorKey = keyUtil.getWalletServerSponsorKey();
         byte[] signatureArg = DatatypeConverter.parseHexBinary(transfer.getSignature());
         byte[] callData = transferFunction.encode(transfer.getNonce(), transfer.getTargetAccount(), transfer.getAmount(), transfer.getFee(), signatureArg, SPONSOR);
 
@@ -96,6 +101,14 @@ public class TransferService extends BaseService {
     }
 
     public Transfer delegatedBankTransfer(CreateBankTransferCommand bankTransfer){
+        log.info("delegatedBankTransfer:");
+        log.info("sourceAccount:" + bankTransfer.getSourceAccount());
+        log.info("targetBankAccountIBAN:" + bankTransfer.getTargetBankAccountIBAN());
+        log.info("amount:" + bankTransfer.getAmount());
+        log.info("fee:" + bankTransfer.getFee());
+        log.info("nonce:" + bankTransfer.getNonce());
+        log.info("signature:" + bankTransfer.getSignature());
+
 	CreateTransferCommand ethTransfer = new CreateTransferCommand();
         ethTransfer.setAmount(bankTransfer.getAmount());
         ethTransfer.setSourceAccount(bankTransfer.getSourceAccount());
@@ -251,23 +264,6 @@ public class TransferService extends BaseService {
 	    return tx;
 
 	} ).collect(Collectors.toList());
-    }
-
-    private static ECKey getWalletServerSponsorKey() {
-        File file = new File(System.getProperty("user.home"), ".WalletServerSponsor.key");
-        try {
-            String keyHex = toString(new FileInputStream(file));
-            return ECKey.fromPrivate(Hex.decode(keyHex));
-        }
-        catch (IOException e) {
-            throw new RuntimeException("Cannot load wallet-server sponsor account key. Make sure " + file.toString() + " exists and contains the private key in hex format.\n" + e.toString());
-        }
-    }
-
-    private static String toString(InputStream stream) throws IOException {
-        try (InputStream is = stream) {
-            return new Scanner(is).useDelimiter("\\A").next();
-        }
     }
 
     private void checkSourceAccountApproved(String account) {

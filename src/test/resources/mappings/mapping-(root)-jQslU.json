@@ -1,0 +1,24 @@
+{
+  "id" : "9545eeac-c7f4-31d5-ae4b-b68aa67bb013",
+  "uuid" : "9545eeac-c7f4-31d5-ae4b-b68aa67bb013",
+  "request" : {
+    "url" : "/",
+    "method" : "POST",
+    "bodyPatterns" : [ {
+      "equalToJson" : "{\"method\":\"eth_getBalance\",\"id\":1,\"jsonrpc\":\"2.0\",\"params\":[\"0x65fa6548764c08c0dd77495b33ed302d0c212691\",\"latest\"]}",
+      "ignoreArrayOrder" : true,
+      "ignoreExtraElements" : true
+    } ]
+  },
+  "response" : {
+    "status" : 200,
+    "bodyFileName" : "body-(root)-jQslU.json",
+    "headers" : {
+      "Content-Type" : "application/json",
+      "Allow" : "OPTIONS, POST",
+      "Access-Control-Allow-Headers" : "origin, content-type, accept",
+      "Date" : "Wed, 07 Dec 2016 08:04:07 GMT",
+      "Transfer-Encoding" : "chunked"
+    }
+  }
+}

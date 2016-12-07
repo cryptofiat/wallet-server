@@ -1,0 +1,24 @@
+{
+  "id" : "927f11c8-f883-3286-bcdf-d5ec4d7d48a0",
+  "uuid" : "927f11c8-f883-3286-bcdf-d5ec4d7d48a0",
+  "request" : {
+    "url" : "/",
+    "method" : "POST",
+    "bodyPatterns" : [ {
+      "equalToJson" : "{\"method\":\"eth_getTransactionCount\",\"id\":1,\"params\":[\"0x8664e7a68809238d8f8e78e4b7c723282533a787\",\"latest\"],\"jsonrpc\":\"2.0\"}",
+      "ignoreArrayOrder" : true,
+      "ignoreExtraElements" : true
+    } ]
+  },
+  "response" : {
+    "status" : 200,
+    "bodyFileName" : "body-(root)-APmHp.json",
+    "headers" : {
+      "Content-Type" : "application/json",
+      "Allow" : "OPTIONS, POST",
+      "Access-Control-Allow-Headers" : "origin, content-type, accept",
+      "Date" : "Wed, 07 Dec 2016 10:04:00 GMT",
+      "Transfer-Encoding" : "chunked"
+    }
+  }
+}

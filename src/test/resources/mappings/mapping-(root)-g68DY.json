@@ -1,0 +1,24 @@
+{
+  "id" : "1a19eeb1-9598-3c2e-a9e6-b7820815c088",
+  "uuid" : "1a19eeb1-9598-3c2e-a9e6-b7820815c088",
+  "request" : {
+    "url" : "/",
+    "method" : "POST",
+    "bodyPatterns" : [ {
+      "equalToJson" : "{\"method\":\"eth_getBlockByHash\",\"id\":1,\"params\":[\"0x515b95d335b099393b03e98238a9caff6230fc3c2a68f51cb67e7ce5cab04b5c\",false],\"jsonrpc\":\"2.0\"}",
+      "ignoreArrayOrder" : true,
+      "ignoreExtraElements" : true
+    } ]
+  },
+  "response" : {
+    "status" : 200,
+    "bodyFileName" : "body-(root)-g68DY.json",
+    "headers" : {
+      "Content-Type" : "application/json",
+      "Allow" : "OPTIONS, POST",
+      "Access-Control-Allow-Headers" : "origin, content-type, accept",
+      "Date" : "Wed, 07 Dec 2016 09:57:46 GMT",
+      "Transfer-Encoding" : "chunked"
+    }
+  }
+}

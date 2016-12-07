@@ -1,0 +1,24 @@
+{
+  "id" : "49eb6ef4-966e-356b-8357-318a249642f4",
+  "uuid" : "49eb6ef4-966e-356b-8357-318a249642f4",
+  "request" : {
+    "url" : "/",
+    "method" : "POST",
+    "bodyPatterns" : [ {
+      "equalToJson" : "{\"method\":\"eth_call\",\"id\":1,\"jsonrpc\":\"2.0\",\"params\":[{\"data\":\"0xed2a2d6400000000000000000000000065fa6548764c08c0dd77495b33ed302d0c212691\",\"to\":\"0xaf71e622792f47119411ce019f4ca1b8d993496e\"},\"latest\"]}",
+      "ignoreArrayOrder" : true,
+      "ignoreExtraElements" : true
+    } ]
+  },
+  "response" : {
+    "status" : 200,
+    "bodyFileName" : "body-(root)-dI6jw.json",
+    "headers" : {
+      "Content-Type" : "application/json",
+      "Allow" : "OPTIONS, POST",
+      "Access-Control-Allow-Headers" : "origin, content-type, accept",
+      "Date" : "Wed, 07 Dec 2016 09:54:08 GMT",
+      "Transfer-Encoding" : "chunked"
+    }
+  }
+}

@@ -1,80 +1,82 @@
 package eu.cryptoeuro.service
 
-import eu.cryptoeuro.FeeConstant
-import eu.cryptoeuro.config.ContractConfig
+import eu.cryptoeuro.rest.command.CreateBankTransferCommand
 import eu.cryptoeuro.rest.command.CreateTransferCommand
 import eu.cryptoeuro.rest.model.Transfer
-import eu.cryptoeuro.service.rpc.JsonRpcStringResponse
-import eu.cryptoeuro.util.KeyUtil
-import org.ethereum.crypto.ECKey
-import org.springframework.web.client.RestTemplate
-import spock.lang.Specification
+import eu.cryptoeuro.rest.model.TransferStatus
+import org.springframework.beans.factory.annotation.Autowired
 
-class TransferServiceSpec extends Specification {
+class TransferServiceSpec extends WireMockBaseSpec {
 
-    AccountService accountService = Mock(AccountService)
-    ContractConfig contractConfig = Mock(ContractConfig)
-    KeyUtil keyUtil = Mock(KeyUtil)
-    EmailService emailService = Mock(EmailService)
-    TransferService transferService = new TransferService(contractConfig, accountService, emailService, keyUtil)
+    @Autowired
+    TransferService transferService
 
-    String sampleAddress = "0x65fa6548764C08C0DD77495B33ED302d0C212691"
-    String sampleNumber =  "0x0000000000000000000000000000000000000001"
+    String sampleTransferId = "0x8f9c84ef5149591dbd36b8cdb1374963e8b9499b0a3a8f0c796398d7271377a2"
+    String sampleAccount = "0x65fa6548764c08c0dd77495b33ed302d0c212691";
 
-    def setup() {
-        contractConfig.delegationContractAddress >> sampleAddress
-
-        transferService.SPONSOR = sampleAddress
-        transferService.URL = "https://sample.url"
-
-        transferService.restTemplate = Mock(RestTemplate)
+    def "get: get a transfer by id"() {
+        when:
+        Transfer transfer = transferService.get(sampleTransferId)
+        then:
+        transfer.getId().equals(sampleTransferId)
+        transfer.getStatus().equals(TransferStatus.PENDING)
     }
 
-    def "DelegatedTransfer: Create a delegated transfer"() {
-        given:
-        givenAccountsAreApproved()
-        givenEthCallRespondsWithANumber(3)
-        givenKeyIsSet()
+    //TODO complete the functionality and redo test
+    def "getTransfersForAccount: get a transfer by account"() {
+        when:
+        List<Transfer> transfers = transferService.getTransfersForAccount(sampleAccount)
+        then:
+        transfers.size().equals(2)
+    }
+
+    def "delegatedTransfer: Performs a delegated transfer, which is signed by originator and delegated and signed by gateway"() {
         when:
         Transfer transfer = transferService.delegatedTransfer(sampleCreateTransferCommand())
         then:
-        transfer != null
+        transfer.id.equals(sampleTransferId)
+        transfer.targetAccount.equals(sampleCreateTransferCommand().getTargetAccount())
+        transfer.sourceAccount.equals(sampleCreateTransferCommand().getSourceAccount())
+        transfer.status.equals(TransferStatus.PENDING)
+        transfer.amount.equals(sampleCreateTransferCommand().getAmount())
+        transfer.fee.equals(sampleCreateTransferCommand().getFee())
+        transfer.nonce.equals(sampleCreateTransferCommand().getNonce())
+        transfer.signature.equals(sampleCreateTransferCommand().getSignature())
     }
 
-    def "DelegatedTransfer: Not present key prevents transfer creation"() {
-        given:
-        givenAccountsAreApproved()
+    def "delegatedBankTransfer: Performs a delegated bank transfer, which is signed by originator and delegated and signed by gateway"() {
         when:
-        Transfer transfer = transferService.delegatedTransfer(sampleCreateTransferCommand())
+        Transfer transfer = transferService.delegatedBankTransfer(sampleCreateBankTransferCommand())
         then:
-        thrown RuntimeException
-
-    }
-
-    def givenEthCallRespondsWithANumber(int n) {
-        n * transferService.restTemplate.
-                postForObject(transferService.URL, _, JsonRpcStringResponse.class) >> new JsonRpcStringResponse(result:sampleNumber)
-    }
-
-    def givenKeyIsSet() {
-        def key = Mock(ECKey)
-        key.getPrivKeyBytes() >> new byte[100]
-        1 * keyUtil.getWalletServerSponsorKey() >> key
-    }
-
-    def givenAccountsAreApproved() {
-        2 * accountService.isApproved(_ as String) >> true
+        transfer.id.equals(sampleTransferId)
+        transfer.targetAccount.equals(TransferService.bankProxyAddress)
+        transfer.sourceAccount.equals(sampleCreateBankTransferCommand().getSourceAccount())
+        transfer.status.equals(TransferStatus.PENDING)
+        transfer.amount.equals(sampleCreateBankTransferCommand().getAmount())
+        transfer.fee.equals(sampleCreateBankTransferCommand().getFee())
+        transfer.nonce.equals(sampleCreateBankTransferCommand().getNonce())
+        transfer.signature.equals(sampleCreateBankTransferCommand().getSignature())
     }
 
     CreateTransferCommand sampleCreateTransferCommand() {
-        return new CreateTransferCommand(
-                sourceAccount: "123",
-                targetAccount: "321",
-                fee: FeeConstant.FEE,
-                signature: "6865726F6E6779616E672E636F6D",
-                amount: new Long(123),
-                nonce: new Long(1)
-        )
+        return [
+                sourceAccount:"0x65fa6548764c08c0dd77495b33ed302d0c212691",
+                targetAccount:"0x833898875a12a3d61ef18dc3d2b475c7ca3a4a72",
+                amount:1,
+                fee:1,
+                nonce:2,
+                signature:"cc193b8fe8c8b986f676fdb142cc9cea5c8369ef494b5207abdaf0de4a27efd07cfc8c5094b6418384169ab467fc9c5e880730a502c0b6b87c35eb30baa6a8431b"
+            ]
     }
 
+    CreateBankTransferCommand sampleCreateBankTransferCommand() {
+        return [
+                sourceAccount:"0x65fa6548764c08c0dd77495b33ed302d0c212691",
+                targetBankAccountIBAN:"IBAN_NOT_USED_IN_ETH",
+                amount:1,
+                fee:1,
+                nonce:2,
+                signature:"cc193b8fe8c8b986f676fdb142cc9cea5c8369ef494b5207abdaf0de4a27efd07cfc8c5094b6418384169ab467fc9c5e880730a502c0b6b87c35eb30baa6a8431b"
+        ]
+    }
 }

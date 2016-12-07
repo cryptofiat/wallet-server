@@ -1,15 +1,10 @@
 package eu.cryptoeuro.service;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Scanner;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -29,7 +24,6 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 
-import eu.cryptoeuro.FeeConstant;
 import eu.cryptoeuro.config.ContractConfig;
 import eu.cryptoeuro.rest.command.CreateTransferCommand;
 import eu.cryptoeuro.rest.command.CreateBankTransferCommand;
@@ -73,6 +67,14 @@ public class TransferService extends BaseService {
     private static Function transferFunction = Function.fromSignature("transfer", "uint256", "address", "uint256", "uint256", "bytes", "address");
 
     public Transfer delegatedTransfer(CreateTransferCommand transfer){
+        log.info("delegatedTransfer:");
+        log.info("sourceAccount:" + transfer.getSourceAccount());
+        log.info("targetAccount:" + transfer.getTargetAccount());
+        log.info("amount:" + transfer.getAmount());
+        log.info("fee:" + transfer.getFee());
+        log.info("nonce:" + transfer.getNonce());
+        log.info("signature:" + transfer.getSignature());
+
         checkSourceAccountApproved(transfer.getSourceAccount());
         checkSourceAccountApproved(transfer.getTargetAccount());
         //TODO check that Target account not closed
@@ -99,6 +101,14 @@ public class TransferService extends BaseService {
     }
 
     public Transfer delegatedBankTransfer(CreateBankTransferCommand bankTransfer){
+        log.info("delegatedBankTransfer:");
+        log.info("sourceAccount:" + bankTransfer.getSourceAccount());
+        log.info("targetBankAccountIBAN:" + bankTransfer.getTargetBankAccountIBAN());
+        log.info("amount:" + bankTransfer.getAmount());
+        log.info("fee:" + bankTransfer.getFee());
+        log.info("nonce:" + bankTransfer.getNonce());
+        log.info("signature:" + bankTransfer.getSignature());
+
 	CreateTransferCommand ethTransfer = new CreateTransferCommand();
         ethTransfer.setAmount(bankTransfer.getAmount());
         ethTransfer.setSourceAccount(bankTransfer.getSourceAccount());

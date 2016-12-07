@@ -1,0 +1,24 @@
+{
+  "id" : "95c7688d-505c-30c5-9229-0e8ca4c9af8e",
+  "uuid" : "95c7688d-505c-30c5-9229-0e8ca4c9af8e",
+  "request" : {
+    "url" : "/",
+    "method" : "POST",
+    "bodyPatterns" : [ {
+      "equalToJson" : "{\"method\":\"eth_call\",\"id\":1,\"jsonrpc\":\"2.0\",\"params\":[{\"data\":\"0xed2a2d6400000000000000000000000065fa6548764c08c0dd77495b33ed302d0c212691\",\"to\":\"0xaf71e622792f47119411ce019f4ca1b8d993496e\"},\"latest\"]}",
+      "ignoreArrayOrder" : true,
+      "ignoreExtraElements" : true
+    } ]
+  },
+  "response" : {
+    "status" : 200,
+    "bodyFileName" : "body-(root)-gF9df.json",
+    "headers" : {
+      "Content-Type" : "application/json",
+      "Allow" : "OPTIONS, POST",
+      "Access-Control-Allow-Headers" : "origin, content-type, accept",
+      "Date" : "Wed, 07 Dec 2016 09:55:20 GMT",
+      "Transfer-Encoding" : "chunked"
+    }
+  }
+}

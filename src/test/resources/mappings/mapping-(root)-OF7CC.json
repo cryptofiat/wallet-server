@@ -1,0 +1,24 @@
+{
+  "id" : "9f045448-f0ad-3ebf-aba6-79a24e8d6886",
+  "uuid" : "9f045448-f0ad-3ebf-aba6-79a24e8d6886",
+  "request" : {
+    "url" : "/",
+    "method" : "POST",
+    "bodyPatterns" : [ {
+      "equalToJson" : "{\"method\":\"eth_gasPrice\",\"id\":1,\"params\":[],\"jsonrpc\":\"2.0\"}",
+      "ignoreArrayOrder" : true,
+      "ignoreExtraElements" : true
+    } ]
+  },
+  "response" : {
+    "status" : 200,
+    "bodyFileName" : "body-(root)-OF7CC.json",
+    "headers" : {
+      "Content-Type" : "application/json",
+      "Allow" : "OPTIONS, POST",
+      "Access-Control-Allow-Headers" : "origin, content-type, accept",
+      "Date" : "Wed, 07 Dec 2016 10:04:01 GMT",
+      "Transfer-Encoding" : "chunked"
+    }
+  }
+}

@@ -1,0 +1,24 @@
+{
+  "id" : "a2b0578b-618c-3b17-9089-1a47f2ea8211",
+  "uuid" : "a2b0578b-618c-3b17-9089-1a47f2ea8211",
+  "request" : {
+    "url" : "/",
+    "method" : "POST",
+    "bodyPatterns" : [ {
+      "equalToJson" : "{\"method\":\"eth_call\",\"id\":1,\"jsonrpc\":\"2.0\",\"params\":[{\"data\":\"0xed2a2d64000000000000000000000000a10a263D4336E4466502b2889D27D04582a86663\",\"to\":\"0xaf71e622792f47119411ce019f4ca1b8d993496e\"},\"latest\"]}",
+      "ignoreArrayOrder" : true,
+      "ignoreExtraElements" : true
+    } ]
+  },
+  "response" : {
+    "status" : 200,
+    "bodyFileName" : "body-(root)-XxZco.json",
+    "headers" : {
+      "Content-Type" : "application/json",
+      "Allow" : "OPTIONS, POST",
+      "Access-Control-Allow-Headers" : "origin, content-type, accept",
+      "Date" : "Wed, 07 Dec 2016 08:04:06 GMT",
+      "Transfer-Encoding" : "chunked"
+    }
+  }
+}

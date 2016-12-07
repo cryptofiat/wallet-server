@@ -1,0 +1,24 @@
+{
+  "id" : "1d82b993-6251-30e5-b95b-6607241696c9",
+  "uuid" : "1d82b993-6251-30e5-b95b-6607241696c9",
+  "request" : {
+    "url" : "/",
+    "method" : "POST",
+    "bodyPatterns" : [ {
+      "equalToJson" : "{\"method\":\"eth_call\",\"id\":1,\"jsonrpc\":\"2.0\",\"params\":[{\"data\":\"0xed2a2d64000000000000000000000000123\",\"to\":\"0xaf71e622792f47119411ce019f4ca1b8d993496e\"},\"latest\"]}",
+      "ignoreArrayOrder" : true,
+      "ignoreExtraElements" : true
+    } ]
+  },
+  "response" : {
+    "status" : 200,
+    "bodyFileName" : "body-(root)-LDkrk.json",
+    "headers" : {
+      "Content-Type" : "application/json",
+      "Allow" : "OPTIONS, POST",
+      "Access-Control-Allow-Headers" : "origin, content-type, accept",
+      "Date" : "Wed, 07 Dec 2016 11:30:51 GMT",
+      "Transfer-Encoding" : "chunked"
+    }
+  }
+}

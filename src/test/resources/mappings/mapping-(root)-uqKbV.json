@@ -1,0 +1,24 @@
+{
+  "id" : "79285193-b754-315f-b4b3-50c3ba379501",
+  "uuid" : "79285193-b754-315f-b4b3-50c3ba379501",
+  "request" : {
+    "url" : "/",
+    "method" : "POST",
+    "bodyPatterns" : [ {
+      "equalToJson" : "{\"method\":\"eth_call\",\"id\":1,\"jsonrpc\":\"2.0\",\"params\":[{\"data\":\"0x70a0823100000000000000000000000065fa6548764c08c0dd77495b33ed302d0c212690\",\"to\":\"0x3e11e52b136d12e0344d4d415897bfb755991fd3\"},\"latest\"]}",
+      "ignoreArrayOrder" : true,
+      "ignoreExtraElements" : true
+    } ]
+  },
+  "response" : {
+    "status" : 200,
+    "bodyFileName" : "body-(root)-uqKbV.json",
+    "headers" : {
+      "Content-Type" : "application/json",
+      "Allow" : "OPTIONS, POST",
+      "Access-Control-Allow-Headers" : "origin, content-type, accept",
+      "Date" : "Wed, 07 Dec 2016 11:18:21 GMT",
+      "Transfer-Encoding" : "chunked"
+    }
+  }
+}

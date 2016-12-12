@@ -39,16 +39,6 @@ public class TransferController {
     @Autowired
     private TransferService transferService;
 
-    @ApiOperation(value = "Get all transfer.")
-    @RequestMapping(method = RequestMethod.GET, value = "")
-    public ResponseEntity<Iterable<Transfer>> getTransfer(){
-        log.info("Getting all transfers");
-
-        return new ResponseEntity<>(
-                transferService.getAll(),
-                new HttpHeaders(), HttpStatus.OK);
-    }
-
     @ApiOperation(value = "Get transfer.")
     @RequestMapping(method = RequestMethod.GET, value = "/{transactionHash}")
     public ResponseEntity<Transfer> getTransfer(

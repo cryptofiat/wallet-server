@@ -77,3 +77,13 @@ eclipse {
 	}
 }
 
+test {
+	test {
+		testLogging {
+			events "passed", "skipped", "failed", "standardError"
+		}
+	}
+}
+
+test.dependsOn cleanTest
+

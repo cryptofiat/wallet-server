@@ -142,11 +142,6 @@ public class TransferService extends BaseService {
 	return result;
     }
 
-    // TODO cleanup
-    public Iterable<Transfer> getAll(){
-        return null;
-    }
-
     /*
     public String mintToken(Optional<String> account, Optional<Long> amount) {
         // DOCS: https://github.com/ethcore/parity/wiki/JSONRPC#eth_sendtransaction

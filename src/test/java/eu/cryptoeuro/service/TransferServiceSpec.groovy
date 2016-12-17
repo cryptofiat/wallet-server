@@ -12,6 +12,7 @@ class TransferServiceSpec extends WireMockBaseSpec {
     TransferService transferService
 
     String sampleTransferId = "0x8f9c84ef5149591dbd36b8cdb1374963e8b9499b0a3a8f0c796398d7271377a2"
+    String sampleBankTransferId = "0xbb85d120229ed89b347a3a12c35d0c034785f3a07256e385f594deba9f347951"
     String sampleAccount = "0x65fa6548764c08c0dd77495b33ed302d0c212691";
 
     def "get: get a transfer by id"() {
@@ -48,7 +49,7 @@ class TransferServiceSpec extends WireMockBaseSpec {
         when:
         Transfer transfer = transferService.delegatedBankTransfer(TransferFixture.sampleCreateBankTransferCommand())
         then:
-        transfer.id.equals(sampleTransferId)
+        transfer.id.equals(sampleBankTransferId)
         transfer.targetAccount.equals(TransferService.bankProxyAddress)
         transfer.sourceAccount.equals(TransferFixture.sampleCreateBankTransferCommand().getSourceAccount())
         transfer.status.equals(TransferStatus.PENDING)

@@ -1,9 +1,8 @@
 package eu.cryptoeuro.service
 
-import eu.cryptoeuro.rest.command.CreateBankTransferCommand
-import eu.cryptoeuro.rest.command.CreateTransferCommand
 import eu.cryptoeuro.rest.model.Transfer
 import eu.cryptoeuro.rest.model.TransferStatus
+import eu.cryptoeuro.fixture.TransferFixture
 import org.springframework.beans.factory.annotation.Autowired
 
 class TransferServiceSpec extends WireMockBaseSpec {

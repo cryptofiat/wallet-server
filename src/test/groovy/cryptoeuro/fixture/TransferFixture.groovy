@@ -1,4 +1,4 @@
-package eu.cryptoeuro.service;
+package eu.cryptoeuro.fixture;
 
 import eu.cryptoeuro.rest.command.CreateBankTransferCommand;
 import eu.cryptoeuro.rest.command.CreateTransferCommand

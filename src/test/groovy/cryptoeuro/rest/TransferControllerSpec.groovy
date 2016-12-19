@@ -2,9 +2,8 @@ package eu.cryptoeuro.rest
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import eu.cryptoeuro.TestUtils
-import eu.cryptoeuro.rest.command.CreateTransferCommand
 import eu.cryptoeuro.rest.model.Transfer
-import eu.cryptoeuro.service.TransferFixture
+import eu.cryptoeuro.fixture.TransferFixture
 import eu.cryptoeuro.service.TransferService
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
@@ -17,9 +16,8 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 
 class TransferControllerSpec extends Specification {
 
-    TransferController controller = new TransferController();
-    protected static ObjectMapper mapper = new ObjectMapper()
-
+    private TransferController controller = new TransferController();
+    private static ObjectMapper mapper = new ObjectMapper()
     private MockMvc mockMvc
 
     def setup() {

@@ -5,6 +5,7 @@ import eu.cryptoeuro.TestUtils
 import eu.cryptoeuro.rest.model.Balance
 import eu.cryptoeuro.rest.model.Currency
 import eu.cryptoeuro.rest.model.Nonce
+import eu.cryptoeuro.rest.model.Transfer
 import eu.cryptoeuro.service.AccountService
 import eu.cryptoeuro.service.BalanceService
 import eu.cryptoeuro.service.NonceService
@@ -23,9 +24,6 @@ class AccountControllerSpec extends Specification {
     private AccountController controller = new AccountController()
     private static ObjectMapper mapper = new ObjectMapper()
     private MockMvc mockMvc
-
-    private sampleBalance = new Balance(1000, Currency.EUR_CENT)
-
 
     def setup() {
         mockMvc = TestUtils.getMockMvc(controller)
@@ -51,8 +49,51 @@ class AccountControllerSpec extends Specification {
         account.nonce == AccountFixture.sampleAccount().nonce
     }
 
-    def "get account transfers "() {
-        
+    def "get account transfers"() {
+        given:
+        respondWithSampleTransfers()
+        when:
+        MockHttpServletResponse response = mockMvc.perform(get("/v1/accounts/" + AccountFixture.sampleAccount().address + "/transfers")).andReturn().response
+        then:
+        response.status == HttpStatus.OK.value()
+        List<Transfer> transfers = mapper.readValue(response.contentAsString, List.class);
+        transfers.size() == 2
+    }
+
+    def "get account nonce"() {
+        given:
+        respondWithSampleNonce()
+        when:
+        MockHttpServletResponse response = mockMvc.perform(get("/v1/accounts/" + AccountFixture.sampleAccount().address + "/nonce")).andReturn().response
+        then:
+        response.status == HttpStatus.OK.value()
+        Nonce nonce = mapper.readValue(response.contentAsString, Nonce.class);
+        nonce.nonce == AccountFixture.sampleAccount().nonce
+    }
+
+    def "get account ether balance"() {
+        given:
+        Balance sampleBalance = new Balance(100, Currency.ETH)
+        respondWithSampleEtherBalance(sampleBalance)
+        when:
+        MockHttpServletResponse response = mockMvc.perform(get("/v1/accounts/" + AccountFixture.sampleAccount().address + "/balance/eth")).andReturn().response
+        then:
+        response.status == HttpStatus.OK.value()
+        Balance balance = mapper.readValue(response.contentAsString, Balance.class);
+        balance.amount == sampleBalance.amount
+        balance.currency == sampleBalance.currency
+    }
+
+    def respondWithSampleEtherBalance(Balance sampleBalance) {
+        1 * controller.balanceService.getEtherBalance(AccountFixture.sampleAccount().address) >> sampleBalance
+    }
+
+    def respondWithSampleNonce() {
+        1 * controller.nonceService.getDelegatedNonceOf(AccountFixture.sampleAccount().address) >> new Nonce(AccountFixture.sampleAccount().nonce)
+    }
+
+    def respondWithSampleTransfers() {
+        1 * controller.transferService.getTransfersForAccount(AccountFixture.sampleAccount().address) >> [new Transfer(), new Transfer()]
     }
 
     def respondWithSampleAccount() {

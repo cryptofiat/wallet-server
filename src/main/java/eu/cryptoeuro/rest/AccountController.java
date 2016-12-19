@@ -2,11 +2,8 @@ package eu.cryptoeuro.rest;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-
 import java.util.List;
-
 import lombok.extern.slf4j.Slf4j;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -63,7 +60,7 @@ public class AccountController {
                 new HttpHeaders(), HttpStatus.OK);
     }
 
-    @ApiOperation(value = "Get account.")
+    @ApiOperation(value = "Get account transfers.")
     @RequestMapping(method = RequestMethod.GET, value = "/{accountAddress}/transfers")
     public ResponseEntity<List> getAccountTransfers(@PathVariable String accountAddress){
         log.info("Getting account transfers " + accountAddress.toString());

@@ -33,7 +33,9 @@ public class TransferFixture {
     }
 
     public static Transfer sampleTransfer() {
-        [id: 0x3c4ce49a42bd00d039010416ddf850411796a0bdbfb8ef7639e4e71d0d12d0a8]
+        return Transfer.builder().
+                id("0x3c4ce49a42bd00d039010416ddf850411796a0bdbfb8ef7639e4e71d0d12d0a8")
+                .build()
     }
 
 }

@@ -45,6 +45,9 @@ public class AccountController {
     @RequestMapping(method = RequestMethod.GET, value = "/{accountAddress}")
     public ResponseEntity<Account> getAccount(@PathVariable String accountAddress){
         log.info("Getting account " + accountAddress);
+
+        Account account = Account.builder().address(accountAddress).build();
+/*
         Account account = new Account(
                 accountAddress,
                 accountService.isApproved(accountAddress),
@@ -52,7 +55,7 @@ public class AccountController {
                 accountService.isFrozen(accountAddress),
                 nonceService.getDelegatedNonceOf(accountAddress).getNonce(),
                 balanceService.getBalance(accountAddress).getAmount()
-                );
+                );*/
         log.info("Statuses for account " + accountAddress + " -> " + account);
 
         return new ResponseEntity<>(

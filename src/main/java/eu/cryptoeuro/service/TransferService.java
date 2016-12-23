@@ -88,16 +88,15 @@ public class TransferService extends BaseService {
 
         String txHash = sendRawTransaction(sponsorKey, callData);
 
-        Transfer result = new Transfer();
-        result.setId(txHash);
-        result.setStatus(TransferStatus.PENDING);
-        result.setAmount(transfer.getAmount());
-        result.setTargetAccount(transfer.getTargetAccount());
-        result.setSourceAccount(transfer.getSourceAccount());
-        result.setFee(transfer.getFee());
-        result.setNonce(transfer.getNonce());
-        result.setSignature(transfer.getSignature());
-        return result;
+        return Transfer.builder()
+                .id(txHash)
+                .status(TransferStatus.PENDING)
+                .amount(transfer.getAmount())
+                .targetAccount(transfer.getTargetAccount())
+                .sourceAccount(transfer.getSourceAccount())
+                .fee(transfer.getFee())
+                .nonce(transfer.getNonce())
+                .signature(transfer.getSignature()).build();
     }
 
     public Transfer delegatedBankTransfer(CreateBankTransferCommand bankTransfer){
@@ -199,11 +198,10 @@ public class TransferService extends BaseService {
         JsonRpcTransactionResponse response = getCallResponseForObject(call, JsonRpcTransactionResponse.class);
 	
         log.info("Is "+transactionHash+" mined yet? " + response.isMined());
-        Transfer transfer = new Transfer();
-        transfer.setStatus((response.isMined()) ? TransferStatus.SUCCESSFUL : TransferStatus.PENDING);
-        transfer.setId(transactionHash);
-        transfer.setBlockHash(response.getBlockHash());
-	return transfer;
+        return Transfer.builder()
+                .id(transactionHash)
+                .status((response.isMined()) ? TransferStatus.SUCCESSFUL : TransferStatus.PENDING)
+                .blockHash(response.getBlockHash()).build();
     }
 
 
@@ -232,27 +230,23 @@ public class TransferService extends BaseService {
 
         log.info(response.getResult().toString());
         return response.getResult().stream().map(logEntry -> {
-	    String toAddr = new String(HashUtils.unpadAddress(logEntry.getTopics().get(2)));
+            String toAddr = new String(HashUtils.unpadAddress(logEntry.getTopics().get(2)));
 
-	    if (this.feeReceiverAddresses.contains(toAddr)) {
-		fees.put(logEntry.getTransactionHash(),Long.parseLong(logEntry.getData().substring(2), 16));
-	        return null;
-	    }
-
-            Transfer transfer = new Transfer();
-
-            transfer.setId(logEntry.getTransactionHash());
-            transfer.setBlockHash(logEntry.getBlockHash()); // todo check if corect
-            transfer.setSourceAccount(HashUtils.unpadAddress(logEntry.getTopics().get(1)));
-            transfer.setTargetAccount(HashUtils.unpadAddress(logEntry.getTopics().get(2)));
-            transfer.setAmount(Long.parseLong(logEntry.getData().substring(2), 16));
+            if (this.feeReceiverAddresses.contains(toAddr)) {
+            fees.put(logEntry.getTransactionHash(),Long.parseLong(logEntry.getData().substring(2), 16));
+                return null;
+            }
 
             JsonRpcCallMap blockCall = new JsonRpcCallMap(EthereumRpcMethod.getBlockByHash, Arrays.asList(logEntry.getBlockHash(),false));
-
             JsonRpcBlockResponse blockResponse = getCallResponseForObject(blockCall, JsonRpcBlockResponse.class);
-            transfer.setTimestamp(blockResponse.getTimestamp());
 
-            return transfer;
+            return Transfer.builder()
+                    .id(logEntry.getTransactionHash())
+                    .blockHash(logEntry.getBlockHash()) // todo check if corect
+                    .sourceAccount(HashUtils.unpadAddress(logEntry.getTopics().get(1)))
+                    .targetAccount(HashUtils.unpadAddress(logEntry.getTopics().get(2)))
+                    .amount(Long.parseLong(logEntry.getData().substring(2), 16))
+                    .timestamp(blockResponse.getTimestamp()).build();
         } ).filter(l -> l != null).collect(Collectors.toList()).stream().map( tx -> {
 
 	    tx.setFee(fees.get(tx.getId()));

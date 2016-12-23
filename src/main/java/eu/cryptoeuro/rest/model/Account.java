@@ -2,11 +2,12 @@ package eu.cryptoeuro.rest.model;
 
 import javax.validation.constraints.NotNull;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.*;
 
-@Data
-@AllArgsConstructor
+@Getter
+@Setter
+@Builder
+//@AllArgsConstructor
 public class Account {
 
     @NotNull
@@ -21,5 +22,6 @@ public class Account {
     private Long nonce;
     @NotNull
     private Long balance;
+
 
 }

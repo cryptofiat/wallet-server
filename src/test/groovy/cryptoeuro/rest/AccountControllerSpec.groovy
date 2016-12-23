@@ -15,6 +15,7 @@ import org.springframework.mock.web.MockHttpServletResponse
 import org.springframework.test.web.servlet.MockMvc
 import spock.lang.Specification
 import eu.cryptoeuro.fixture.AccountFixture
+import eu.cryptoeuro.fixture.TransferFixture
 import eu.cryptoeuro.rest.model.Account
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get
@@ -93,7 +94,7 @@ class AccountControllerSpec extends Specification {
     }
 
     def respondWithSampleTransfers() {
-        1 * controller.transferService.getTransfersForAccount(AccountFixture.sampleAccount().address) >> [new Transfer(), new Transfer()]
+        1 * controller.transferService.getTransfersForAccount(AccountFixture.sampleAccount().address) >> [TransferFixture.sampleTransfer(), TransferFixture.sampleTransfer()]
     }
 
     def respondWithSampleAccount() {

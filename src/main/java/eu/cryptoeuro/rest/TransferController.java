@@ -21,11 +21,13 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import springfox.documentation.annotations.ApiIgnore;
+import eu.cryptoeuro.rest.command.NotifyEscrowCommand;
 import eu.cryptoeuro.rest.command.CreateTransferCommand;
 import eu.cryptoeuro.rest.command.CreateBankTransferCommand;
 import eu.cryptoeuro.rest.exception.ValidationException;
 import eu.cryptoeuro.rest.model.Transfer;
 import eu.cryptoeuro.service.TransferService;
+import eu.cryptoeuro.service.EmailService;
 
 @Api(value="transfers",
         description="transfers desc",
@@ -35,6 +37,9 @@ import eu.cryptoeuro.service.TransferService;
 @Slf4j
 @CrossOrigin(origins = "*")
 public class TransferController {
+
+    @Autowired
+    private EmailService emailService;
 
     @Autowired
     private TransferService transferService;
@@ -78,6 +83,22 @@ public class TransferController {
 
         return new ResponseEntity<>(
                 transferService.delegatedBankTransfer(createBankTransferCommand),
+                new HttpHeaders(), HttpStatus.OK);
+    }
+
+    @ApiOperation(value = "Notifies the escrow recipient of an inbound transfer.")
+    @RequestMapping(method = RequestMethod.POST, value = "/notifyEscrow")
+    public ResponseEntity<String> notifyEscrow(
+            @Valid @RequestBody @ApiParam NotifyEscrowCommand notifyEscrowCommand,
+            @ApiIgnore Errors errors
+    ) {
+        if (errors.hasErrors()) {
+            throw new ValidationException(errors);
+        }
+
+        emailService.notifyEscrow(notifyEscrowCommand);
+
+        return new ResponseEntity<String>("Sent",
                 new HttpHeaders(), HttpStatus.OK);
     }
 

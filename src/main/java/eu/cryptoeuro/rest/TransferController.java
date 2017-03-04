@@ -26,8 +26,11 @@ import eu.cryptoeuro.rest.command.CreateTransferCommand;
 import eu.cryptoeuro.rest.command.CreateBankTransferCommand;
 import eu.cryptoeuro.rest.exception.ValidationException;
 import eu.cryptoeuro.rest.model.Transfer;
+import eu.cryptoeuro.rest.model.ContractInfo;
 import eu.cryptoeuro.service.TransferService;
 import eu.cryptoeuro.service.EmailService;
+import eu.cryptoeuro.service.ContractService;
+import eu.cryptoeuro.config.ContractConfig;
 
 @Api(value="transfers",
         description="transfers desc",
@@ -42,7 +45,14 @@ public class TransferController {
     private EmailService emailService;
 
     @Autowired
+    private ContractService contractService;
+
+    @Autowired
     private TransferService transferService;
+
+    @Autowired
+    private ContractConfig contractConfig;
+
 
     @ApiOperation(value = "Get transfer.")
     @RequestMapping(method = RequestMethod.GET, value = "/{transactionHash}")
@@ -99,6 +109,16 @@ public class TransferController {
         emailService.notifyEscrow(notifyEscrowCommand);
 
         return new ResponseEntity<String>("Sent",
+                new HttpHeaders(), HttpStatus.OK);
+    }
+
+    @ApiOperation(value = "Display contract addresses from base contract.")
+    @RequestMapping(method = RequestMethod.GET, value = "/contractInfo")
+    public ResponseEntity<ContractInfo> contractInfo() {
+
+	ContractInfo ci = contractService.contractInfo();
+
+        return new ResponseEntity<ContractInfo>(ci,
                 new HttpHeaders(), HttpStatus.OK);
     }
 

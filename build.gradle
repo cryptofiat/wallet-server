@@ -53,6 +53,9 @@ dependencies {
 	compile('org.json:json:20160212')
 	compile('org.bouncycastle:bcprov-jdk15on:1.54')
 	compile('com.h2database:h2')
+	compile('org.thymeleaf:thymeleaf')
+	compile('org.thymeleaf:thymeleaf-spring4')
+	compile('in.ashwanthkumar:slack-java-webhook:0.0.7')
 	compile('org.apache.httpcomponents:httpclient:4.5.2')
 	compile('org.ethereum:ethereumj-core:1.1.0-RELEASE') {
 		exclude group: "org.slf4j", module: "slf4j-log4j12"

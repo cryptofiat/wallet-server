@@ -9,7 +9,7 @@ public class JsonRpcTransactionResponse {
     public JsonRpcTransactionEntity result;
 
     public boolean isMined() {
-      return (result.getBlockNumber() > 0) ? true : false;
+      return (result != null && result.getBlockNumber() > 0) ? true : false;
     }
     public String getBlockHash() {
 	return result.getBlockHash();

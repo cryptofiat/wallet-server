@@ -37,6 +37,8 @@ import eu.cryptoeuro.service.rpc.JsonRpcStringResponse;
 import eu.cryptoeuro.service.rpc.JsonRpcBlockResponse;
 import eu.cryptoeuro.service.rpc.JsonRpcTransactionLogResponse;
 import eu.cryptoeuro.service.rpc.JsonRpcTransactionResponse;
+import eu.cryptoeuro.service.SlackService;
+import java.io.IOException;
 
 @Component
 @Slf4j
@@ -46,6 +48,9 @@ public class TransferService extends BaseService {
     private EmailService emailService;
     private ContractConfig contractConfig;
     private KeyUtil keyUtil;
+
+    @Autowired
+    private SlackService slackService;
 
     @Autowired
     public TransferService(ContractConfig contractConfig, AccountService accountService, EmailService emailService, KeyUtil keyUtil) {
@@ -122,6 +127,9 @@ public class TransferService extends BaseService {
 	//TODO: Here should be something that forks the thread and waits async until the transfer has been mined. Or even do this part as job.
 
 	if (result.getId() != null) {
+
+		slackService.notifyPayout(bankTransfer, result.getId());
+
 		log.info("Sending  email instructions for bank transfer "+result.getId());
 		//instructions by email to send out bank transfer	
 		
@@ -135,6 +143,7 @@ public class TransferService extends BaseService {
 		"\n name: "+bankTransfer.getRecipientName();
 
 		log.info("Email should go with body: "+emailText);
+
 
 		emailService.sendEmail(this.bankProxyInstructionEmail, "Euro2.0 bank payout", emailText );
 	}

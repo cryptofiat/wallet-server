@@ -31,6 +31,7 @@ import eu.cryptoeuro.service.TransferService;
 import eu.cryptoeuro.service.EmailService;
 import eu.cryptoeuro.service.ContractService;
 import eu.cryptoeuro.config.ContractConfig;
+import java.io.IOException;
 
 @Api(value="transfers",
         description="transfers desc",
@@ -114,7 +115,7 @@ public class TransferController {
 
     @ApiOperation(value = "Display contract addresses from base contract.")
     @RequestMapping(method = RequestMethod.GET, value = "/contractInfo")
-    public ResponseEntity<ContractInfo> contractInfo() {
+    public ResponseEntity<ContractInfo> contractInfo() throws IOException {
 
 	ContractInfo ci = contractService.contractInfo();
 

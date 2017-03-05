@@ -12,7 +12,7 @@ public class JsonRpcTransactionResponse {
       return (result != null && result.getBlockNumber() > 0) ? true : false;
     }
     public String getBlockHash() {
-	return result.getBlockHash();
+	return (result != null) ? result.getBlockHash() : "";
     }
 
 }

@@ -4,7 +4,7 @@ api:
 
 spring:
   datasource:
-    url: jdbc:mysql://localhost:3306/wallet_server_db?characterEncoding=UTF-8&useLegacyDatetimeCode=false&serverTimezone=UTC
+    url: jdbc:mysql://localhost:13306/wallet_server_db?characterEncoding=UTF-8&useLegacyDatetimeCode=false&serverTimezone=UTC
     username: wallet-service
     password: q1w2e3r4
     initialize: true
@@ -25,3 +25,48 @@ flyway:
     continue-on-error: false
     test-on-borrow: true
     validation-query: SELECT 1
+
+ethereum:
+  node:
+    url:http://big-parity.euro2.ee:8545
+
+sponsor:
+  ethereum:
+    address: 0x8664e7a68809238d8f8e78e4b7c723282533a787
+#   address: 0xdbf25a870895fe608f6ce5830d8c13a5598b060e
+#   address: 0x31c0ec79c3b14ff86673d0fa92c260b42ff14437
+
+contract:
+  ethereum:
+    address: 0xa10a263D4336E4466502b2889D27D04582a86663
+    block: 0x241B13
+
+email:
+  user: euro20
+  password: abc123
+  bankinstruction:
+    recipient: someone@example.org
+
+slack:
+  webhook:
+    bankinstruction:
+      url: https://hooks.slack.com/services/ADDYOUROWNREALSLACKURL
+
+endpoints:
+  enabled: false
+
+---
+spring:
+  profiles: dev
+ethereum:
+  node:
+    url: http://localhost:8545
+#   url=http://eth.euro2.ee:8545
+
+---
+spring:
+  profiles: test
+
+ethereum:
+  node:
+    url: http://localhost:28545

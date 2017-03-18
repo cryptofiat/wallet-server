@@ -19,8 +19,4 @@ public class GatewayApplication {
         return new ProtobufHttpMessageConverter();
     }
 
-	@Bean
-	ProtobufHttpMessageConverter protobufHttpMessageConverter() {
-		return new ProtobufHttpMessageConverter();
-	}
 }

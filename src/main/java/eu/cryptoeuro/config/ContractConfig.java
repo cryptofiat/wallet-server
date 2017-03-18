@@ -14,6 +14,7 @@ public class ContractConfig {
 
     private Optional<String> ACCOUNT_CONTRACT_ADDRESS = Optional.empty();
     private Optional<String> DELEGATION_CONTRACT_ADDRESS = Optional.empty();
+    private Optional<String> RESERVE_CONTRACT_ADDRESS = Optional.empty();
     private Optional<List<String>> CONTRACT_LIST = Optional.empty();
 
     private ContractService contractService;
@@ -38,6 +39,11 @@ public class ContractConfig {
     public String getDelegationContractAddress() {
         DELEGATION_CONTRACT_ADDRESS = getContractAddress(DELEGATION_CONTRACT_ADDRESS, 7);
         return DELEGATION_CONTRACT_ADDRESS.orElseThrow(() -> new RuntimeException("Can't fetch delegation contract address"));
+    }
+
+    public String getReserveContractAddress() {
+        RESERVE_CONTRACT_ADDRESS = getContractAddress(RESERVE_CONTRACT_ADDRESS, 4);
+        return RESERVE_CONTRACT_ADDRESS.orElseThrow(() -> new RuntimeException("Can't fetch reserve contract address"));
     }
 
     public List<String> getAllContracts() {

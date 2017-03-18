@@ -32,12 +32,10 @@ public class SupplyService extends BaseService {
     }
 
     public Balance getTotalSupply() {
-        // TODO: Make totalSupply public in etherium contract and test following code
-        /*
         String data = "0x" + HashUtils.keccak256("totalSupply()").substring(0, 8);
 
         Map<String, String> params = new HashMap<>();
-        params.put("to", contractConfig.getAccountContractAddress());
+        params.put("to", contractConfig.getReserveContractAddress());
         params.put("data", data);
 
         JsonRpcCallMap call = new JsonRpcCallMap(EthereumRpcMethod.call, Arrays.asList(params, "latest"));
@@ -45,9 +43,8 @@ public class SupplyService extends BaseService {
 
         log.info(response.getResult());
         long responseToLong = Long.parseLong(response.getResult().substring(2).trim(), 16);
-        */
-        long responseToLong = new Long(777);
-        log.info("FAKE DATA! Total EUR_CENT supply in etherium network: " + responseToLong);
+        //long responseToLong = new Long(777);
+        log.info("Total EUR_CENT supply in etherium network: " + responseToLong);
 
         return new Balance(responseToLong, Currency.EUR_CENT);
 

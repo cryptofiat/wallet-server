@@ -1,16 +1,17 @@
 apply plugin: 'rebel'
 
 buildscript {
-	ext {
-		springBootVersion = '1.4.0.RELEASE'
-	}
-	repositories {
-		mavenCentral()
-	}
-	dependencies {
-		classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
+    ext {
+        springBootVersion = '1.4.0.RELEASE'
+    }
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
         classpath group: 'org.zeroturnaround', name: 'gradle-jrebel-plugin', version: '1.1.2'
-	}
+        classpath 'com.google.protobuf:protobuf-gradle-plugin:0.8.1'
+    }
 }
 
 apply plugin: 'java'
@@ -18,76 +19,96 @@ apply plugin: 'eclipse'
 apply plugin: 'idea'
 apply plugin: 'spring-boot'
 apply plugin: 'groovy'
+apply plugin: 'com.google.protobuf'
 
 bootRun {
-    if ( project.hasProperty('jvmArgs') ) {
+    if (project.hasProperty('jvmArgs')) {
         jvmArgs = (project.jvmArgs.split("\\s+") as List)
     }
 }
 jar.dependsOn(generateRebel)
 
 jar {
-	baseName = 'wallet-server'
-	version = '0.0.2-SNAPSHOT'
+    baseName = 'wallet-server'
+    version = '0.0.2-SNAPSHOT'
 }
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
 repositories {
-	mavenCentral()
-	maven { url "https://repo.spring.io/snapshot" }
-	maven { url "https://repo.spring.io/milestone" }
-	maven { url "http://dl.bintray.com/ethereum/maven" }
+    mavenCentral()
+    maven { url "https://repo.spring.io/snapshot" }
+    maven { url "https://repo.spring.io/milestone" }
+    maven { url "http://dl.bintray.com/ethereum/maven" }
 }
 
 dependencies {
-	compile('javax.mail:mail:1.4')
-	compile('org.springframework.boot:spring-boot-starter-actuator')
-	compile('org.springframework.boot:spring-boot-starter-data-jpa')
-	compile('org.springframework.boot:spring-boot-starter-thymeleaf')
-	compile('org.springframework.boot:spring-boot-starter-web')
-	compile('org.springframework.boot:spring-boot-devtools')
-	compile('org.projectlombok:lombok')
-	compile('io.springfox:springfox-swagger2:2.1.2')
-	compile('io.springfox:springfox-swagger-ui:2.1.2')
-	compile('cglib:cglib-nodep:3.2.0')
-	compile('org.json:json:20160212')
-	compile('org.bouncycastle:bcprov-jdk15on:1.54')
-	compile('com.h2database:h2')
-	compile('org.thymeleaf:thymeleaf')
-	compile('org.thymeleaf:thymeleaf-spring4')
-	compile('in.ashwanthkumar:slack-java-webhook:0.0.7')
-	compile('org.apache.httpcomponents:httpclient:4.5.2')
-	compile('org.ethereum:ethereumj-core:1.1.0-RELEASE') {
-		exclude group: "org.slf4j", module: "slf4j-log4j12"
-	}
+    compile('javax.mail:mail:1.4')
+    compile('org.springframework.boot:spring-boot-starter-actuator')
+    compile('org.springframework.boot:spring-boot-starter-data-jpa')
+    compile('org.springframework.boot:spring-boot-starter-thymeleaf')
+    compile('org.springframework.boot:spring-boot-starter-web')
+    compile('org.springframework.boot:spring-boot-devtools')
+    compile('org.projectlombok:lombok')
+    compile('io.springfox:springfox-swagger2:2.1.2')
+    compile('io.springfox:springfox-swagger-ui:2.1.2')
+    compile('cglib:cglib-nodep:3.2.0')
+    compile('org.json:json:20160212')
+    compile('org.bouncycastle:bcprov-jdk15on:1.54')
+    compile('com.h2database:h2')
+    compile('org.thymeleaf:thymeleaf')
+    compile('org.thymeleaf:thymeleaf-spring4')
+    compile('in.ashwanthkumar:slack-java-webhook:0.0.7')
+    compile('org.apache.httpcomponents:httpclient:4.5.2')
+    compile('org.ethereum:ethereumj-core:1.1.0-RELEASE') {
+        exclude group: "org.slf4j", module: "slf4j-log4j12"
+    }
+    compile('com.google.protobuf:protobuf-java:3.2.0')
+    compile('com.googlecode.protobuf-java-format:protobuf-java-format:1.4')
 
-	testCompile('org.springframework.boot:spring-boot-starter-test')
-	testCompile("org.spockframework:spock-spring:1.0-groovy-2.4")
-	testCompile('org.springframework.cloud:spring-cloud-contract-wiremock')
-	testCompile('com.github.tomakehurst:wiremock-standalone:2.4.1')
+    testCompile('org.springframework.boot:spring-boot-starter-test')
+    testCompile("org.spockframework:spock-spring:1.0-groovy-2.4")
+    testCompile('org.springframework.cloud:spring-cloud-contract-wiremock')
+    testCompile('com.github.tomakehurst:wiremock-standalone:2.4.1')
 }
 
 dependencyManagement {
-	imports {
-		mavenBom "org.springframework.cloud:spring-cloud-contract-dependencies:1.0.0.M1"
-	}
+    imports {
+        mavenBom "org.springframework.cloud:spring-cloud-contract-dependencies:1.0.0.M1"
+    }
 }
 
 eclipse {
-	classpath {
-		 containers.remove('org.eclipse.jdt.launching.JRE_CONTAINER')
-		 containers 'org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.8'
-	}
+    classpath {
+        containers.remove('org.eclipse.jdt.launching.JRE_CONTAINER')
+        containers 'org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.8'
+    }
 }
 
 test {
-	test {
-		testLogging {
-			events "passed", "skipped", "failed", "standardError"
-		}
-	}
+    test {
+        testLogging {
+            events "passed", "skipped", "failed", "standardError"
+        }
+    }
 }
 
 test.dependsOn cleanTest
+
+protobuf {
+    protoc {
+        artifact = 'com.google.protobuf:protoc:3.2.0'
+        generatedFilesBaseDir = "$projectDir/src/generated"
+    }
+}
+
+clean {
+    delete protobuf.generatedFilesBaseDir
+}
+
+idea {
+    module {
+        sourceDirs += file("${protobuf.generatedFilesBaseDir}/main/java");
+    }
+}
 

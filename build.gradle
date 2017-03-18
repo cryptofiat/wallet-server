@@ -1,16 +1,17 @@
 apply plugin: 'rebel'
 
 buildscript {
-	ext {
-		springBootVersion = '1.4.0.RELEASE'
-	}
-	repositories {
-		mavenCentral()
-	}
-	dependencies {
-		classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
+    ext {
+        springBootVersion = '1.4.0.RELEASE'
+    }
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
         classpath group: 'org.zeroturnaround', name: 'gradle-jrebel-plugin', version: '1.1.2'
-	}
+        classpath 'com.google.protobuf:protobuf-gradle-plugin:0.8.1'
+    }
 }
 
 apply plugin: 'java'
@@ -18,26 +19,27 @@ apply plugin: 'eclipse'
 apply plugin: 'idea'
 apply plugin: 'spring-boot'
 apply plugin: 'groovy'
+apply plugin: 'com.google.protobuf'
 
 bootRun {
-    if ( project.hasProperty('jvmArgs') ) {
+    if (project.hasProperty('jvmArgs')) {
         jvmArgs = (project.jvmArgs.split("\\s+") as List)
     }
 }
 jar.dependsOn(generateRebel)
 
 jar {
-	baseName = 'wallet-server'
-	version = '0.0.2-SNAPSHOT'
+    baseName = 'wallet-server'
+    version = '0.0.2-SNAPSHOT'
 }
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
 repositories {
-	mavenCentral()
-	maven { url "https://repo.spring.io/snapshot" }
-	maven { url "https://repo.spring.io/milestone" }
-	maven { url "http://dl.bintray.com/ethereum/maven" }
+    mavenCentral()
+    maven { url "https://repo.spring.io/snapshot" }
+    maven { url "https://repo.spring.io/milestone" }
+    maven { url "http://dl.bintray.com/ethereum/maven" }
 }
 
 dependencies {
@@ -66,32 +68,49 @@ dependencies {
 	compile('com.google.protobuf:protobuf-java:3.2.0')
 	compile('com.googlecode.protobuf-java-format:protobuf-java-format:1.4')
 
-	testCompile('org.springframework.boot:spring-boot-starter-test')
-	testCompile("org.spockframework:spock-spring:1.0-groovy-2.4")
-	testCompile('org.springframework.cloud:spring-cloud-contract-wiremock')
-	testCompile('com.github.tomakehurst:wiremock-standalone:2.4.1')
+    testCompile('org.springframework.boot:spring-boot-starter-test')
+    testCompile("org.spockframework:spock-spring:1.0-groovy-2.4")
+    testCompile('org.springframework.cloud:spring-cloud-contract-wiremock')
+    testCompile('com.github.tomakehurst:wiremock-standalone:2.4.1')
 }
 
 dependencyManagement {
-	imports {
-		mavenBom "org.springframework.cloud:spring-cloud-contract-dependencies:1.0.0.M1"
-	}
+    imports {
+        mavenBom "org.springframework.cloud:spring-cloud-contract-dependencies:1.0.0.M1"
+    }
 }
 
 eclipse {
-	classpath {
-		 containers.remove('org.eclipse.jdt.launching.JRE_CONTAINER')
-		 containers 'org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.8'
-	}
+    classpath {
+        containers.remove('org.eclipse.jdt.launching.JRE_CONTAINER')
+        containers 'org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.8'
+    }
 }
 
 test {
-	test {
-		testLogging {
-			events "passed", "skipped", "failed", "standardError"
-		}
-	}
+    test {
+        testLogging {
+            events "passed", "skipped", "failed", "standardError"
+        }
+    }
 }
 
 test.dependsOn cleanTest
+
+protobuf {
+    protoc {
+        artifact = 'com.google.protobuf:protoc:3.2.0'
+        generatedFilesBaseDir = "$projectDir/src/generated"
+    }
+}
+
+clean {
+    delete protobuf.generatedFilesBaseDir
+}
+
+idea {
+    module {
+        sourceDirs += file("${protobuf.generatedFilesBaseDir}/main/java");
+    }
+}
 

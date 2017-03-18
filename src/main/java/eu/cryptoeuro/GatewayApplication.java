@@ -10,9 +10,14 @@ import org.springframework.http.converter.protobuf.ProtobufHttpMessageConverter;
 @EnableAutoConfiguration
 public class GatewayApplication {
 
-	public static void main(String[] args) {
-		SpringApplication.run(GatewayApplication.class, args);
-	}
+    public static void main(String[] args) {
+        SpringApplication.run(GatewayApplication.class, args);
+    }
+
+    @Bean
+    ProtobufHttpMessageConverter protobufHttpMessageConverter() {
+        return new ProtobufHttpMessageConverter();
+    }
 
 	@Bean
 	ProtobufHttpMessageConverter protobufHttpMessageConverter() {

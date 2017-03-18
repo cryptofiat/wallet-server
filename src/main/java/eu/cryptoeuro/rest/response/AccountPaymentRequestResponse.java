@@ -1,4 +1,4 @@
-package eu.cryptoeuro.paymentrequest.rest.response;
+package eu.cryptoeuro.rest.response;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Builder;

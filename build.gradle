@@ -61,6 +61,8 @@ dependencies {
 	compile('org.ethereum:ethereumj-core:1.1.0-RELEASE') {
 		exclude group: "org.slf4j", module: "slf4j-log4j12"
 	}
+	compile('com.google.protobuf:protobuf-java:3.2.0')
+	compile('com.googlecode.protobuf-java-format:protobuf-java-format:1.4')
 	compile "mysql:mysql-connector-java:5.1.30"
 	compile('org.flywaydb:flyway-core:4.0.1')
 	compile('com.google.protobuf:protobuf-java:3.2.0')

@@ -17,6 +17,7 @@ apply plugin: 'java'
 apply plugin: 'eclipse'
 apply plugin: 'idea'
 apply plugin: 'spring-boot'
+apply plugin: 'groovy'
 
 bootRun {
     if ( project.hasProperty('jvmArgs') ) {
@@ -62,6 +63,8 @@ dependencies {
 	}
 	compile "mysql:mysql-connector-java:5.1.30"
 	compile('org.flywaydb:flyway-core:4.0.1')
+	compile('com.google.protobuf:protobuf-java:3.2.0')
+	compile('com.googlecode.protobuf-java-format:protobuf-java-format:1.4')
 
 	testCompile('org.springframework.boot:spring-boot-starter-test')
 	testCompile("org.spockframework:spock-spring:1.0-groovy-2.4")

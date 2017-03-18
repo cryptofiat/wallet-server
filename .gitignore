@@ -1,5 +1,7 @@
 /build/
+/.idea
 /bin/
+/logs
 .classpath
 .project
 .settings

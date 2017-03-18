@@ -1,3 +1,3 @@
 `wallet-server` is a wrapper around Ethereum API.
 
-It talks to Parity server and exposes features as friendly HTTP endpoints. 
+It exposes features as friendly HTTP endpoints and forwards them to a Parity server. 

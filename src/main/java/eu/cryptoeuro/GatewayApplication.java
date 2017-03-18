@@ -4,7 +4,11 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
+import org.springframework.http.MediaType;
 import org.springframework.http.converter.protobuf.ProtobufHttpMessageConverter;
+
+import java.nio.charset.Charset;
+import java.util.Arrays;
 
 @SpringBootApplication
 @EnableAutoConfiguration
@@ -14,9 +18,15 @@ public class GatewayApplication {
         SpringApplication.run(GatewayApplication.class, args);
     }
 
+    /*
     @Bean
     ProtobufHttpMessageConverter protobufHttpMessageConverter() {
-        return new ProtobufHttpMessageConverter();
+        ProtobufHttpMessageConverter protobufHttpMessageConverter = new ProtobufHttpMessageConverter();
+
+        MediaType BITCOIN_PAYMENTREQUEST = new MediaType("application", "bitcoin-paymentrequest", Charset.forName("UTF-8"));
+        protobufHttpMessageConverter.setSupportedMediaTypes(Arrays.asList(BITCOIN_PAYMENTREQUEST, ProtobufHttpMessageConverter.PROTOBUF, MediaType.TEXT_PLAIN, MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML));
+        return protobufHttpMessageConverter;
     }
+    */
 
 }

@@ -1,6 +1,6 @@
 package eu.cryptoeuro.rest;
 
-import eu.cryptoeuro.paymentrequest.rest.response.PaymentRequestResponse;
+import eu.cryptoeuro.paymentrequest.rest.response.AccountPaymentRequestResponse;
 import eu.cryptoeuro.rest.model.*;
 import eu.cryptoeuro.service.*;
 import io.swagger.annotations.Api;
@@ -72,9 +72,9 @@ public class AccountController {
 
     @ApiOperation(value = "Get account payment requests.")
     @RequestMapping(method = RequestMethod.GET, value = "/{accountAddress}/requests")
-    public ResponseEntity<List<PaymentRequestResponse>> getAccountPaymentRequests(@PathVariable String accountAddress){
+    public ResponseEntity<List<AccountPaymentRequestResponse>> getAccountPaymentRequests(@PathVariable String accountAddress){
         log.info("Getting account payment requests " + accountAddress.toString());
-        List<PaymentRequestResponse> paymentRequests = paymentRequestService.findPaymentRequestsRelatedToAddress(accountAddress);
+        List<AccountPaymentRequestResponse> paymentRequests = paymentRequestService.findPaymentRequestsRelatedToAddress(accountAddress);
         log.info("Getting account requests: " + paymentRequests.size());
         return new ResponseEntity<>(
             paymentRequests,

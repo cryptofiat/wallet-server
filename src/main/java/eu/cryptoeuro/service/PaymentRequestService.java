@@ -1,7 +1,7 @@
 package eu.cryptoeuro.service;
 
 import eu.cryptoeuro.dao.PaymentRequestRepository;
-import eu.cryptoeuro.paymentrequest.rest.response.PaymentRequestResponse;
+import eu.cryptoeuro.paymentrequest.rest.response.AccountPaymentRequestResponse;
 import eu.cryptoeuro.rest.model.PaymentRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,12 +16,12 @@ public class PaymentRequestService {
     @Autowired
     PaymentRequestRepository paymentRequestRepository;
 
-    public List<PaymentRequestResponse> findPaymentRequestsRelatedToAddress(String address) {
-        List<PaymentRequestResponse> paymentRequests = new ArrayList<>();
+    public List<AccountPaymentRequestResponse> findPaymentRequestsRelatedToAddress(String address) {
+        List<AccountPaymentRequestResponse> paymentRequests = new ArrayList<>();
 
         for (PaymentRequest paymentRequest : paymentRequestRepository.findByRequestorAddress(address)) {
             paymentRequests.add(
-                PaymentRequestResponse.builder()
+                AccountPaymentRequestResponse.builder()
                 .isRequesting(true)
                 .adresseeAddress(paymentRequest.getAdresseeAddress())
                 .requestorAddress(paymentRequest.getRequestorAddress())
@@ -31,7 +31,7 @@ public class PaymentRequestService {
 
         for (PaymentRequest paymentRequest : paymentRequestRepository.findByAdresseeAddress(address)) {
             paymentRequests.add(
-                PaymentRequestResponse.builder()
+                AccountPaymentRequestResponse.builder()
                     .isRequesting(false)
                     .adresseeAddress(paymentRequest.getAdresseeAddress())
                     .requestorAddress(paymentRequest.getRequestorAddress())

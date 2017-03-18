@@ -7,7 +7,7 @@ import lombok.Data;
 @Data
 @Builder
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class PaymentRequestResponse {
+public class AccountPaymentRequestResponse {
     boolean isRequesting;
     String requestorAddress;
     String adresseeAddress;

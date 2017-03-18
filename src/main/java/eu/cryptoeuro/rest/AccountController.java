@@ -1,6 +1,6 @@
 package eu.cryptoeuro.rest;
 
-import eu.cryptoeuro.paymentrequest.rest.response.AccountPaymentRequestResponse;
+import eu.cryptoeuro.rest.response.AccountPaymentRequestResponse;
 import eu.cryptoeuro.rest.model.*;
 import eu.cryptoeuro.service.*;
 import io.swagger.annotations.Api;

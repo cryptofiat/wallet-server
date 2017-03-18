@@ -1,7 +1,7 @@
 package eu.cryptoeuro.service;
 
 import eu.cryptoeuro.dao.PaymentRequestRepository;
-import eu.cryptoeuro.paymentrequest.rest.response.AccountPaymentRequestResponse;
+import eu.cryptoeuro.rest.response.AccountPaymentRequestResponse;
 import eu.cryptoeuro.rest.model.PaymentRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;

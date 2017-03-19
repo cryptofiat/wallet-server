@@ -34,6 +34,10 @@ public class PushNotificationController {
     @ApiOperation(value = "Push transfer notification to apps listening on the receivers address.")
     @RequestMapping(method = RequestMethod.POST, value = "transfer")
     public ResponseEntity<String> pushTransfer( @RequestBody @ApiParam NotifyTransferCommand cmd){
+
+	//TODO: add command validation
+	//TODO: return the {name: code} firebase response
+
         pushService.pushNotifyTransfer(cmd);
 
         return new ResponseEntity<String>(

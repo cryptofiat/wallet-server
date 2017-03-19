@@ -14,6 +14,8 @@ import java.nio.charset.Charset;
 import java.net.URL;
 import java.net.HttpURLConnection;
 import java.io.OutputStreamWriter;
+import java.io.InputStreamReader;
+import java.io.BufferedReader;
 import org.json.JSONObject;
 import org.json.JSONException;
 
@@ -51,10 +53,16 @@ public class PushNotificationService {
                           httpCon.setRequestProperty("Content-Length", String.valueOf(postDataBytes.length));
                           httpCon.setDoOutput(true);
                           httpCon.getOutputStream().write(postDataBytes);
-
-                          OutputStreamWriter out = new OutputStreamWriter(
-                              httpCon.getOutputStream());
-                          out.close();
+                          httpCon.getOutputStream().flush();
+                          httpCon.getOutputStream().close();
+			/* TODO: best to replace  with a check if {"name":"-Kfa44Yk16G_UcfRKw9H"} is returned
+			  BufferedReader rd = new BufferedReader(new InputStreamReader(httpCon.getInputStream()));
+			  String line;
+			  while ((line = rd.readLine()) != null) {
+			     System.out.println(line);
+			  }
+			*/
+			  rd.close();
                 } catch (IOException io) {
                         log.warn("IO excpetion");
                 } catch (JSONException ex) {

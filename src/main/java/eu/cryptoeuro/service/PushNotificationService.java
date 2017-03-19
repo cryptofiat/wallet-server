@@ -61,8 +61,8 @@ public class PushNotificationService {
 			  while ((line = rd.readLine()) != null) {
 			     System.out.println(line);
 			  }
-			*/
 			  rd.close();
+			*/
                 } catch (IOException io) {
                         log.warn("IO excpetion");
                 } catch (JSONException ex) {

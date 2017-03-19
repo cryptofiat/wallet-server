@@ -45,7 +45,7 @@ public class PushNotificationService {
 
                           URL url = new URL(firebaseUrl+"/push/"+cmd.getAddress()+".json?auth="+superKey);
 
-                          log.info("Putting msg: "+cmdJson.toString()+ " to: " + url.toString());
+                          //log.info("Putting msg: "+cmdJson.toString()+ " to: " + url.toString());
 
                           HttpURLConnection httpCon = (HttpURLConnection) url.openConnection();
                           httpCon.setRequestMethod("POST");
@@ -55,13 +55,14 @@ public class PushNotificationService {
                           httpCon.getOutputStream().write(postDataBytes);
                           httpCon.getOutputStream().flush();
                           httpCon.getOutputStream().close();
-			/* TODO: best to replace  with a check if {"name":"-Kfa44Yk16G_UcfRKw9H"} is returned
 			  BufferedReader rd = new BufferedReader(new InputStreamReader(httpCon.getInputStream()));
 			  String line;
-			  while ((line = rd.readLine()) != null) {
-			     System.out.println(line);
+			  // just print  out the first line ... this should be returned to controller  as json/object
+			  if ((line = rd.readLine()) != null) {
+			     System.out.println( "Push server responded for "+cmd.getAddress()+" with: " + line);
 			  }
 			  rd.close();
+			/* TODO: best to replace  with a check if {"name":"-Kfa44Yk16G_UcfRKw9H"} is returned
 			*/
                 } catch (IOException io) {
                         log.warn("IO excpetion");

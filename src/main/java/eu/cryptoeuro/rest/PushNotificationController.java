@@ -12,7 +12,9 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
+import io.swagger.annotations.ApiParam;
 
 import eu.cryptoeuro.rest.command.NotifyTransferCommand;
 import eu.cryptoeuro.service.PushNotificationService;
@@ -31,7 +33,7 @@ public class PushNotificationController {
 
     @ApiOperation(value = "Push transfer notification to apps listening on the receivers address.")
     @RequestMapping(method = RequestMethod.POST, value = "transfer")
-    public ResponseEntity<String> pushTransfer(NotifyTransferCommand cmd){
+    public ResponseEntity<String> pushTransfer( @RequestBody @ApiParam NotifyTransferCommand cmd){
         pushService.pushNotifyTransfer(cmd);
 
         return new ResponseEntity<String>(

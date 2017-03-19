@@ -42,6 +42,9 @@ public class PushNotificationService {
                           byte[] postDataBytes = cmdJson.toString().getBytes("UTF-8");
 
                           URL url = new URL(firebaseUrl+"/push/"+cmd.getAddress()+".json?auth="+superKey);
+
+                          log.info("Putting msg: "+cmdJson.toString()+ " to: " + url.toString());
+
                           HttpURLConnection httpCon = (HttpURLConnection) url.openConnection();
                           httpCon.setRequestMethod("POST");
                           httpCon.setRequestProperty("Content-Type", "application/json");
@@ -51,7 +54,6 @@ public class PushNotificationService {
 
                           OutputStreamWriter out = new OutputStreamWriter(
                               httpCon.getOutputStream());
-                          log.info("Putting ref: "+httpCon.getResponseCode()+ " msg: " + httpCon.getResponseMessage());
                           out.close();
                 } catch (IOException io) {
                         log.warn("IO excpetion");

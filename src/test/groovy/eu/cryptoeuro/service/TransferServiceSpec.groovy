@@ -4,6 +4,7 @@ import eu.cryptoeuro.rest.model.Transfer
 import eu.cryptoeuro.rest.model.TransferStatus
 import eu.cryptoeuro.fixture.TransferFixture
 import org.springframework.beans.factory.annotation.Autowired
+import spock.lang.Ignore
 
 class TransferServiceSpec extends WireMockBaseSpec {
 
@@ -30,6 +31,7 @@ class TransferServiceSpec extends WireMockBaseSpec {
         transfers.size().equals(2)
     }
 
+    @Ignore("depends on external wallet server")
     def "delegatedTransfer: Performs a delegated transfer, which is signed by originator and delegated and signed by gateway"() {
         when:
         Transfer transfer = transferService.delegatedTransfer(TransferFixture.sampleCreateTransferCommand())
@@ -44,6 +46,7 @@ class TransferServiceSpec extends WireMockBaseSpec {
         transfer.signature.equals(TransferFixture.sampleCreateTransferCommand().getSignature())
     }
 
+    @Ignore("depends on external wallet server")
     def "delegatedBankTransfer: Performs a delegated bank transfer, which is signed by originator and delegated and signed by gateway"() {
         when:
         Transfer transfer = transferService.delegatedBankTransfer(TransferFixture.sampleCreateBankTransferCommand())

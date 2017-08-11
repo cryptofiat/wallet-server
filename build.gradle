@@ -68,6 +68,7 @@ dependencies {
 //    compile("org.flywaydb:flyway-core:4.2.0")
 //    compile "org.hibernate:hibernate-java8:5.1.0.Final"
 //    compile "mysql:mysql-connector-java:5.1.30"
+    compile('org.apache.commons:commons-jcs-core:2.1')
 
 
     testCompile('org.springframework.boot:spring-boot-starter-test')

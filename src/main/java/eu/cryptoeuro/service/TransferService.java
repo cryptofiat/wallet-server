@@ -10,6 +10,8 @@ import java.util.stream.Stream;
 
 import javax.xml.bind.DatatypeConverter;
 
+import eu.cryptoeuro.rest.model.TransferHistory;
+import eu.cryptoeuro.rest.model.TransferHistoryManager;
 import eu.cryptoeuro.util.KeyUtil;
 import lombok.extern.slf4j.Slf4j;
 
@@ -195,9 +197,22 @@ public class TransferService extends BaseService {
     */
 
     public List<Transfer> getTransfersForAccount(String address) {
+	    TransferHistory transferHistory = TransferHistoryManager.getInstance().getTransferHistory(address);
+	    log.info("Loaded history cache for address "+address+" up to block "+transferHistory.lastBlock);
+	    long latestBlock = getLatestBlock(); 
+	    transferHistory.transferList = Stream.concat(
+				transferHistory.transferList.stream(),
+				getTransfersForAccount(address,transferHistory.lastBlock+1).stream() // todo: should be to latest block
+				).collect(Collectors.toList());
+	    transferHistory.lastBlock = latestBlock; //get new last block
+	    TransferHistoryManager.getInstance().storeTransferHistory(transferHistory);
+            return transferHistory.transferList; 
+    }
+
+    public List<Transfer> getTransfersForAccount(String address, long fromBlock) {
         return Stream.concat(
-		getTransfersForAccountFromTo(null, address).stream(),
-		getTransfersForAccountFromTo(address,null).stream()
+		getTransfersForAccountFromTo(null, address, fromBlock).stream(),
+		getTransfersForAccountFromTo(address,null, fromBlock).stream()
 	     ).collect(Collectors.toList());
     }
 
@@ -218,7 +233,7 @@ public class TransferService extends BaseService {
 
     ///// PRIVATE METHODS /////
 
-    private List<Transfer> getTransfersForAccountFromTo(String fromAddress, String toAddress) {
+    private List<Transfer> getTransfersForAccountFromTo(String fromAddress, String toAddress, long fromBlock) {
         String transferMethodSignatureHash = "0x" + HashUtils.keccak256("Transfer(address,address,uint256)");
         String paddedFromAddress = (fromAddress != null) ? HashUtils.padAddressTo64(fromAddress) : null;
         String paddedToAddress = (toAddress != null) ? HashUtils.padAddressTo64(toAddress) : null;
@@ -230,7 +245,7 @@ public class TransferService extends BaseService {
 
         Map<String, Object> params = new HashMap<>();
         params.put("address", contractConfig.getAllContracts());
-        params.put("fromBlock", CONTRACT_FROM_BLOCK);
+        params.put("fromBlock", ( Long.decode(CONTRACT_FROM_BLOCK) > fromBlock ) ? CONTRACT_FROM_BLOCK : "0x" + Long.toHexString(fromBlock) );
         params.put("topics", topicsToFind);
 
         JsonRpcCallMap call = new JsonRpcCallMap(EthereumRpcMethod.getLogs, Arrays.asList(params));
@@ -327,6 +342,19 @@ public class TransferService extends BaseService {
         JsonRpcStringResponse response = restTemplate.postForObject(URL, request, JsonRpcStringResponse.class);
         long responseToLong = Long.parseLong(HashUtils.without0x(response.getResult()), 16);
         log.info("Gas price: " + responseToLong);
+
+        return responseToLong;
+    }
+    private long getLatestBlock() {
+        JsonRpcCall call = new JsonRpcCall(EthereumRpcMethod.blockNumber, Arrays.asList());
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON_UTF8);
+        HttpEntity<String> request = new HttpEntity<String>(call.toString(), headers);
+
+        JsonRpcStringResponse response = restTemplate.postForObject(URL, request, JsonRpcStringResponse.class);
+        long responseToLong = Long.parseLong(HashUtils.without0x(response.getResult()), 16);
+        log.info("Latest block: " + responseToLong);
 
         return responseToLong;
     }

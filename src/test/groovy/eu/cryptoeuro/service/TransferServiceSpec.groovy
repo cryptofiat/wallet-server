@@ -24,6 +24,7 @@ class TransferServiceSpec extends WireMockBaseSpec {
     }
 
     //TODO complete the functionality and redo test
+    @Ignore("needs mocking of the eth_blockNumber call")
     def "getTransfersForAccount: get a transfer by account"() {
         when:
         List<Transfer> transfers = transferService.getTransfersForAccount(sampleAccount)

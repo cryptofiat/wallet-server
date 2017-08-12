@@ -18,13 +18,20 @@
 # CACHE REGIONS AVAILABLE
 
 # Regions preconfigured for caching
-jcs.region.transferHistoryCache=DC,RFailover
+jcs.region.transferHistoryCache=DC
 jcs.region.transferHistoryCache.cacheattributes= org.apache.commons.jcs.engine.CompositeCacheAttributes
 jcs.region.transferHistoryCache.cacheattributes.MaxObjects=1200
 jcs.region.transferHistoryCache.cacheattributes.MemoryCacheName= org.apache.commons.jcs.engine.memory.lru.LRUMemoryCache
-jcs.region.transferHistoryCache.elementattributes.IsEternal=false
-jcs.region.transferHistoryCache.elementattributes.MaxLife=7200
-jcs.region.transferHistoryCache.elementattributes.IdleTime=1800
+jcs.region.transferHistoryCache.elementattributes.IsEternal=true
+#jcs.region.transferHistoryCache.elementattributes.MaxLife=7200
+#jcs.region.transferHistoryCache.elementattributes.IdleTime=1800
 jcs.region.transferHistoryCache.elementattributes.IsSpool=true
 jcs.region.transferHistoryCache.elementattributes.IsRemote=true
 jcs.region.transferHistoryCache.elementattributes.IsLateral=true
+
+#manually create directory /var/cache/wallet-server
+
+jcs.auxiliary.DC= org.apache.commons.jcs.auxiliary.disk.indexed.IndexedDiskCacheFactory
+jcs.auxiliary.DC.attributes= org.apache.commons.jcs.auxiliary.disk.indexed.IndexedDiskCacheAttributes
+jcs.auxiliary.DC.attributes.DiskPath=./
+jcs.auxiliary.DC.attributes.MaxKeySize=100000

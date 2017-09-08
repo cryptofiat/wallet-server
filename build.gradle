@@ -65,7 +65,7 @@ dependencies {
 	}
 	compile('com.google.protobuf:protobuf-java:3.2.0')
 	compile('com.googlecode.protobuf-java-format:protobuf-java-format:1.4')
-	compile "mysql:mysql-connector-java:5.1.30"
+	compile "mysql:mysql-connector-java:6.0.6"
 	compile('org.flywaydb:flyway-core:4.0.1')
 	compile('com.google.protobuf:protobuf-java:3.2.0')
 	compile('com.googlecode.protobuf-java-format:protobuf-java-format:1.4')
@@ -74,6 +74,8 @@ dependencies {
     testCompile("org.spockframework:spock-spring:1.0-groovy-2.4")
     testCompile('org.springframework.cloud:spring-cloud-contract-wiremock')
     testCompile('com.github.tomakehurst:wiremock-standalone:2.4.1')
+
+    compile group: 'org.bitcoinj', name: 'bitcoinj-core', version: '0.12'
 }
 
 dependencyManagement {

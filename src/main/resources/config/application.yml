@@ -8,7 +8,7 @@ spring:
     username: wallet-service
     password: q1w2e3r4
     initialize: true
-    driver-class-name: com.mysql.jdbc.Driver
+    driver-class-name: com.mysql.cj.jdbc.Driver
     continue-on-error: false
     test-on-borrow: true
     validation-query: SELECT 1

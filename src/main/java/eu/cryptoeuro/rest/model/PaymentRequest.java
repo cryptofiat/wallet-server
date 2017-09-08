@@ -1,5 +1,6 @@
 package eu.cryptoeuro.rest.model;
 
+import lombok.Builder;
 import lombok.Data;
 import org.hibernate.validator.constraints.NotEmpty;
 
@@ -10,6 +11,7 @@ import javax.persistence.Id;
 
 @Entity
 @Data
+@Builder
 public class PaymentRequest {
     @Id
     @GeneratedValue(strategy= GenerationType.IDENTITY)

@@ -37,9 +37,9 @@ public class FlywayConfiguration {
 		String[] migrationLocations = locations;
 
 		flyway.setLocations(migrationLocations);    //Where do I look for migrations
-
-//		flyway.repair(); //If migration failed cleanup and retry
-//		flyway.migrate(); //Apply migrations
+//        flyway.clean();
+		flyway.repair(); //If migration failed cleanup and retry
+		flyway.migrate(); //Apply migrations
 		return flyway;
 	}
 }

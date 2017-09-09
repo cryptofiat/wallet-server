@@ -3,6 +3,6 @@ CREATE TABLE payment_request (
   requestor_address VARCHAR(50) NOT NULL,
   receiver_address VARCHAR(50) NOT NULL,
   euro2_payment_uri VARCHAR(250) NOT NULL,
-  payer_address VARCHAR(50) NULLABLE,
+  payer_address VARCHAR(50),
   PRIMARY KEY (id)
 );

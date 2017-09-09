@@ -54,7 +54,7 @@ dependencies {
 	compile('cglib:cglib-nodep:3.2.0')
 	compile('org.json:json:20160212')
 	compile('org.bouncycastle:bcprov-jdk15on:1.54')
-	compile('com.h2database:h2')
+//	compile('com.h2database:h2')
 	compile('org.thymeleaf:thymeleaf')
 	compile('org.thymeleaf:thymeleaf-spring4')
 	compile('in.ashwanthkumar:slack-java-webhook:0.0.7')
@@ -70,6 +70,7 @@ dependencies {
     compile('org.apache.commons:commons-jcs-core:2.1')
 
 
+    testCompile 'com.h2database:h2:1.4.191'
     testCompile('org.springframework.boot:spring-boot-starter-test')
     testCompile("org.spockframework:spock-spring:1.0-groovy-2.4")
     testCompile('org.springframework.cloud:spring-cloud-contract-wiremock')

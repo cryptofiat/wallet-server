@@ -10,7 +10,6 @@ buildscript {
     dependencies {
         classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
         classpath group: 'org.zeroturnaround', name: 'gradle-jrebel-plugin', version: '1.1.2'
-        classpath 'com.google.protobuf:protobuf-gradle-plugin:0.8.1'
     }
 }
 
@@ -19,7 +18,6 @@ apply plugin: 'eclipse'
 apply plugin: 'idea'
 apply plugin: 'spring-boot'
 apply plugin: 'groovy'
-apply plugin: 'com.google.protobuf'
 
 bootRun {
     if (project.hasProperty('jvmArgs')) {
@@ -64,12 +62,8 @@ dependencies {
     compile('org.ethereum:ethereumj-core:1.3.1-RELEASE') {
         exclude group: "org.slf4j", module: "slf4j-log4j12"
     }
-	compile('com.google.protobuf:protobuf-java:3.2.0')
-	compile('com.googlecode.protobuf-java-format:protobuf-java-format:1.4')
 	compile "mysql:mysql-connector-java:6.0.6"
 	compile('org.flywaydb:flyway-core:4.0.1')
-	compile('com.google.protobuf:protobuf-java:3.2.0')
-	compile('com.googlecode.protobuf-java-format:protobuf-java-format:1.4')
     compile('com.github.cryptofiat:euro2-payment-uri:2.2') {
         exclude group: "org.slf4j", module: "slf4j-simple"
     }
@@ -103,19 +97,8 @@ test {
 
 test.dependsOn cleanTest
 
-protobuf {
-    protoc {
-        artifact = 'com.google.protobuf:protoc:3.2.0'
-        generatedFilesBaseDir = "$projectDir/src/generated"
-    }
-}
-
-clean {
-    delete protobuf.generatedFilesBaseDir
-}
-
 idea {
     module {
-        sourceDirs += file("${protobuf.generatedFilesBaseDir}/main/java");
+        sourceDirs
     }
 }

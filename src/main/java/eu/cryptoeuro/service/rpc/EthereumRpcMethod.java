@@ -12,6 +12,7 @@ public enum EthereumRpcMethod implements Serializable {
     call("eth_call"),
     getBlockByHash("eth_getBlockByHash"),
     getTransactionByHash("eth_getTransactionByHash"),
+    blockNumber("eth_blockNumber"),
     getLogs("eth_getLogs");
 
     private final String method;

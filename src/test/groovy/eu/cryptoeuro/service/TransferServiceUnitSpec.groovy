@@ -16,7 +16,8 @@ class TransferServiceUnitSpec extends Specification {
     ContractConfig contractConfig = Mock(ContractConfig)
     KeyUtil keyUtil = Mock(KeyUtil)
     EmailService emailService = Mock(EmailService)
-    TransferService transferService = new TransferService(contractConfig, accountService, emailService, keyUtil)
+    GasPriceService gasPriceService = Mock(GasPriceService)
+    TransferService transferService = new TransferService(contractConfig, accountService, emailService, keyUtil, gasPriceService)
 
     String sampleAddress = "0x65fa6548764C08C0DD77495B33ED302d0C212691"
     String sampleNumber =  "0x0000000000000000000000000000000000000001"
@@ -28,12 +29,14 @@ class TransferServiceUnitSpec extends Specification {
         transferService.URL = "https://sample.url"
 
         transferService.restTemplate = Mock(RestTemplate)
+
+        gasPriceService.getGasPriceInWei() >> 20000000000
     }
 
     def "DelegatedTransfer: Create a delegated transfer"() {
         given:
         givenAccountsAreApproved()
-        givenEthCallRespondsWithANumber(3)
+        givenEthCallRespondsWithANumber(2)
         givenKeyIsSet()
         when:
         Transfer transfer = transferService.delegatedTransfer(sampleCreateTransferCommand())

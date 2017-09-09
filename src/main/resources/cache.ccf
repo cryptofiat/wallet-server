@@ -1,0 +1,37 @@
+# DEFAULT CACHE REGION
+
+# sets the default aux value for any non configured caches
+#jcs.default=DC,RFailover
+#jcs.default.cacheattributes=
+#    org.apache.commons.jcs.engine.CompositeCacheAttributes
+#jcs.default.cacheattributes.MaxObjects=1000
+#jcs.default.cacheattributes.MemoryCacheName=
+#    org.apache.commons.jcs.engine.memory.lru.LRUMemoryCache
+#jcs.default.elementattributes.IsEternal=false
+#jcs.default.elementattributes.MaxLife=3600
+#jcs.default.elementattributes.IdleTime=1800
+#jcs.default.elementattributes.IsSpool=true
+#jcs.default.elementattributes.IsRemote=true
+#jcs.default.elementattributes.IsLateral=true
+
+
+# CACHE REGIONS AVAILABLE
+
+# Regions preconfigured for caching
+jcs.region.transferHistoryCache=DC
+jcs.region.transferHistoryCache.cacheattributes= org.apache.commons.jcs.engine.CompositeCacheAttributes
+jcs.region.transferHistoryCache.cacheattributes.MaxObjects=1200
+jcs.region.transferHistoryCache.cacheattributes.MemoryCacheName= org.apache.commons.jcs.engine.memory.lru.LRUMemoryCache
+jcs.region.transferHistoryCache.elementattributes.IsEternal=true
+#jcs.region.transferHistoryCache.elementattributes.MaxLife=7200
+#jcs.region.transferHistoryCache.elementattributes.IdleTime=1800
+jcs.region.transferHistoryCache.elementattributes.IsSpool=true
+jcs.region.transferHistoryCache.elementattributes.IsRemote=true
+jcs.region.transferHistoryCache.elementattributes.IsLateral=true
+
+#manually create directory /var/cache/wallet-server
+
+jcs.auxiliary.DC= org.apache.commons.jcs.auxiliary.disk.indexed.IndexedDiskCacheFactory
+jcs.auxiliary.DC.attributes= org.apache.commons.jcs.auxiliary.disk.indexed.IndexedDiskCacheAttributes
+jcs.auxiliary.DC.attributes.DiskPath=./
+jcs.auxiliary.DC.attributes.MaxKeySize=100000

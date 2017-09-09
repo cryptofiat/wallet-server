@@ -10,6 +10,8 @@ import java.util.stream.Stream;
 
 import javax.xml.bind.DatatypeConverter;
 
+import eu.cryptoeuro.rest.model.TransferHistory;
+import eu.cryptoeuro.rest.model.TransferHistoryManager;
 import eu.cryptoeuro.util.KeyUtil;
 import lombok.extern.slf4j.Slf4j;
 
@@ -37,27 +39,29 @@ import eu.cryptoeuro.service.rpc.JsonRpcStringResponse;
 import eu.cryptoeuro.service.rpc.JsonRpcBlockResponse;
 import eu.cryptoeuro.service.rpc.JsonRpcTransactionLogResponse;
 import eu.cryptoeuro.service.rpc.JsonRpcTransactionResponse;
-import eu.cryptoeuro.service.SlackService;
-import java.io.IOException;
 
 @Component
 @Slf4j
 public class TransferService extends BaseService {
 
+    public static final int GAS_LIMIT = 350000;
+
     private AccountService accountService;
     private EmailService emailService;
     private ContractConfig contractConfig;
     private KeyUtil keyUtil;
+    private GasPriceService gasPriceService;
 
     @Autowired
     private SlackService slackService;
 
     @Autowired
-    public TransferService(ContractConfig contractConfig, AccountService accountService, EmailService emailService, KeyUtil keyUtil) {
+    public TransferService(ContractConfig contractConfig, AccountService accountService, EmailService emailService, KeyUtil keyUtil, GasPriceService gasPriceService) {
         this.contractConfig = contractConfig;
         this.accountService = accountService;
         this.emailService = emailService;
         this.keyUtil = keyUtil;
+        this.gasPriceService = gasPriceService;
     }
 
     // list of addresses that should be considered as recipients of fees
@@ -131,11 +135,8 @@ public class TransferService extends BaseService {
 		slackService.notifyPayout(bankTransfer, result.getId());
 
 		log.info("Sending  email instructions for bank transfer "+result.getId());
-		//instructions by email to send out bank transfer	
-		
-		String emailText = new String();
 
-		emailText = "bank account: "+bankTransfer.getTargetBankAccountIBAN()+
+		String emailText = "bank account: "+bankTransfer.getTargetBankAccountIBAN()+
 		"\n amount: "+bankTransfer.getAmount()+
 		"\n reference: "+bankTransfer.getReference()+
 		"\n from: "+bankTransfer.getSourceAccount()+
@@ -195,9 +196,22 @@ public class TransferService extends BaseService {
     */
 
     public List<Transfer> getTransfersForAccount(String address) {
+	    TransferHistory transferHistory = TransferHistoryManager.getInstance().getTransferHistory(address);
+	    log.info("Loaded history cache for address "+address+" up to block "+transferHistory.lastBlock);
+	    long latestBlock = getLatestBlock();
+	    transferHistory.transferList = Stream.concat(
+				transferHistory.transferList.stream(),
+				getTransfersForAccount(address,transferHistory.lastBlock+1).stream() // todo: should be to latest block
+				).collect(Collectors.toList());
+	    transferHistory.lastBlock = latestBlock; //get new last block
+	    TransferHistoryManager.getInstance().storeTransferHistory(transferHistory);
+            return transferHistory.transferList;
+    }
+
+    public List<Transfer> getTransfersForAccount(String address, long fromBlock) {
         return Stream.concat(
-		getTransfersForAccountFromTo(null, address).stream(),
-		getTransfersForAccountFromTo(address,null).stream()
+		getTransfersForAccountFromTo(null, address, fromBlock).stream(),
+		getTransfersForAccountFromTo(address,null, fromBlock).stream()
 	     ).collect(Collectors.toList());
     }
 
@@ -206,7 +220,7 @@ public class TransferService extends BaseService {
         JsonRpcCallMap call = new JsonRpcCallMap(EthereumRpcMethod.getTransactionByHash, Arrays.asList(transactionHash));
 
         JsonRpcTransactionResponse response = getCallResponseForObject(call, JsonRpcTransactionResponse.class);
-	
+
         log.info("Is "+transactionHash+" mined yet? " + response.isMined());
         Transfer transfer = new Transfer();
         transfer.setStatus((response.isMined()) ? TransferStatus.SUCCESSFUL : TransferStatus.PENDING);
@@ -218,7 +232,7 @@ public class TransferService extends BaseService {
 
     ///// PRIVATE METHODS /////
 
-    private List<Transfer> getTransfersForAccountFromTo(String fromAddress, String toAddress) {
+    private List<Transfer> getTransfersForAccountFromTo(String fromAddress, String toAddress, long fromBlock) {
         String transferMethodSignatureHash = "0x" + HashUtils.keccak256("Transfer(address,address,uint256)");
         String paddedFromAddress = (fromAddress != null) ? HashUtils.padAddressTo64(fromAddress) : null;
         String paddedToAddress = (toAddress != null) ? HashUtils.padAddressTo64(toAddress) : null;
@@ -230,7 +244,7 @@ public class TransferService extends BaseService {
 
         Map<String, Object> params = new HashMap<>();
         params.put("address", contractConfig.getAllContracts());
-        params.put("fromBlock", CONTRACT_FROM_BLOCK);
+        params.put("fromBlock", ( Long.decode(CONTRACT_FROM_BLOCK) > fromBlock ) ? CONTRACT_FROM_BLOCK : "0x" + Long.toHexString(fromBlock) );
         params.put("topics", topicsToFind);
 
         JsonRpcCallMap call = new JsonRpcCallMap(EthereumRpcMethod.getLogs, Arrays.asList(params));
@@ -279,9 +293,9 @@ public class TransferService extends BaseService {
     private String sendRawTransaction(ECKey signer, byte[] callData) {
         long transactionCount = getTransactionCount(SPONSOR);
         byte[] nonce = ByteUtil.longToBytesNoLeadZeroes(transactionCount);
-        long gasPriceLong = Math.round(getGasPrice() * 1.1); // KK: not sure if increasing gas price by 10% is necessary
-        byte[] gasPrice = ByteUtil.longToBytesNoLeadZeroes(gasPriceLong);
-        byte[] gasLimit = ByteUtil.longToBytesNoLeadZeroes(350000);
+        long gasPriceWei = gasPriceService.getGasPriceInWei();
+        byte[] gasPrice = ByteUtil.longToBytesNoLeadZeroes(gasPriceWei);
+        byte[] gasLimit = ByteUtil.longToBytesNoLeadZeroes(GAS_LIMIT);
         byte[] toAddress = Hex.decode(HashUtils.without0x(contractConfig.getDelegationContractAddress()));
 
         Transaction transaction = new Transaction(nonce, gasPrice, gasLimit, toAddress, null, callData);
@@ -316,9 +330,8 @@ public class TransferService extends BaseService {
         return responseToLong;
     }
 
-
-    private long getGasPrice() {
-        JsonRpcCall call = new JsonRpcCall(EthereumRpcMethod.gasPrice, Arrays.asList());
+    private long getLatestBlock() {
+        JsonRpcCall call = new JsonRpcCall(EthereumRpcMethod.blockNumber, Arrays.asList());
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON_UTF8);
@@ -326,7 +339,7 @@ public class TransferService extends BaseService {
 
         JsonRpcStringResponse response = restTemplate.postForObject(URL, request, JsonRpcStringResponse.class);
         long responseToLong = Long.parseLong(HashUtils.without0x(response.getResult()), 16);
-        log.info("Gas price: " + responseToLong);
+        log.info("Latest block: " + responseToLong);
 
         return responseToLong;
     }

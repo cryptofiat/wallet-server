@@ -1,9 +1,12 @@
 package eu.cryptoeuro.rest;
 
+import eu.cryptoeuro.rest.model.GasPrice;
+import eu.cryptoeuro.service.GasPriceService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -24,6 +27,9 @@ import eu.cryptoeuro.rest.model.Fee;
 @CrossOrigin(origins = "*")
 public class FeeController {
 
+    @Autowired
+    private GasPriceService gasPriceService;
+
     @ApiOperation(value = "Get fee.")
     @RequestMapping(method = RequestMethod.GET, value = "")
     public ResponseEntity<Fee> getFee(){
@@ -34,4 +40,15 @@ public class FeeController {
 
     }
 
+    @ApiOperation(value = "Get gas price.")
+    @RequestMapping(method = RequestMethod.GET, value = "/gasPrice")
+    public ResponseEntity<GasPrice> getGasPrice() {
+        Long gasPriceWei = gasPriceService.getGasPriceInWei();
+        log.info("Getting gas price (wei): " + gasPriceWei);
+        return new ResponseEntity<>(
+            new GasPrice(gasPriceWei),
+            new HttpHeaders(),
+            HttpStatus.OK
+        );
+    }
 }

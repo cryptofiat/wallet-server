@@ -18,7 +18,6 @@ import springfox.documentation.annotations.ApiIgnore;
 
 import javax.validation.Valid;
 import java.nio.charset.StandardCharsets;
-import java.security.SignatureException;
 
 @RestController
 @RequestMapping("/v1/payment-request")
@@ -44,7 +43,7 @@ public class PaymentRequestController {
         String signatureString = euro2PaymentURI.getSignature();
         byte[] signatureBytes = Hex.decode(signatureString);
         ECKey.ECDSASignature ecdsaSignature = ECKey.ECDSASignature.decodeFromDER(signatureBytes);
-        String uriWithoutSignature = createPaymentRequestCommand.getEuro2PaymentUri().replace("?signature=" + euro2PaymentURI.getSignature(), "");
+        String uriWithoutSignature = createPaymentRequestCommand.getEuro2PaymentUri().replace("&signature=" + euro2PaymentURI.getSignature(), "");
         byte[] uriWithoutSignatureRawHash = uriWithoutSignature.getBytes(StandardCharsets.UTF_8);
 
         try {

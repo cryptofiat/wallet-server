@@ -28,7 +28,7 @@ flyway:
 
 ethereum:
   node:
-    url:http://big-parity.euro2.ee:8545
+    url: http://big-parity.euro2.ee:8545
 
 sponsor:
   ethereum:
@@ -50,7 +50,7 @@ email:
 slack:
   webhook:
     bankinstruction:
-      url: https://hooks.slack.com/services/ADDYOUROWNREALSLACKURL
+      url: https://hooks.slack.com/services/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
 
 endpoints:
   enabled: false

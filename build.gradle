@@ -67,6 +67,8 @@ dependencies {
     compile('com.github.cryptofiat:euro2-payment-uri:2.2') {
         exclude group: "org.slf4j", module: "slf4j-simple"
     }
+    compile('org.apache.commons:commons-jcs-core:2.1')
+
 
     testCompile('org.springframework.boot:spring-boot-starter-test')
     testCompile("org.spockframework:spock-spring:1.0-groovy-2.4")

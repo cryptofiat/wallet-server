@@ -1,10 +1,12 @@
 package eu.cryptoeuro.ethereumcryptography
 
+import eu.cryptoeuro.euro2paymenturi.Euro2PaymentURI
 import org.bouncycastle.util.encoders.Hex
 import org.ethereum.crypto.ECKey
 import org.ethereum.crypto.HashUtil
-import spock.lang.Ignore
 import spock.lang.Specification
+
+import java.nio.charset.StandardCharsets
 
 class EthereumCryptoTests extends Specification {
 
@@ -31,27 +33,30 @@ class EthereumCryptoTests extends Specification {
             key.verify(rawHash, sig) == true
     }
 
-    @Ignore
-    def "get signature and message hash and derive the signer address"() {
+    def "get signature and message hash and derive the signer address from the euro2PaymentUri"() {
         given:
-            String hexSignature = "0x"
-            byte[] signatureDER = Hex.decode(hexSignature)
-            ECKey.ECDSASignature sig = ECKey.ECDSASignature.decodeFromDER(signatureDER)
+
+            String euro2PaymentRequestUri = "euro2:0xae0a73fdf0fa05e118b9b4e4da41d0e77d4b932e/payment?amount=1200&signature_type=ETH&message=eee&signature=c5bad2f2fafd3458358f6f5eb5d6eca009d76d2a052df48c54e75eee6463111a304404db1b462e25bb20ac01be90345bc6eed529de78ac73c578f36d489b47c01c"
+            Euro2PaymentURI euro2PaymentURI = Euro2PaymentURI.parse(euro2PaymentRequestUri)
+            euro2PaymentURI.getAddress()
+
+            String signatureString = euro2PaymentURI.getSignature();
+            byte[] signatureBytes = Hex.decode(signatureString);
+            byte[] r = Arrays.copyOfRange(signatureBytes, 0, 32);
+            byte[] s = Arrays.copyOfRange(signatureBytes, 32, 64);
+            byte v = signatureBytes[64]
+
+            ECKey.ECDSASignature ecdsaSignature = ECKey.ECDSASignature.fromComponents(r,s,v)
+
+            String uriWithoutSignature = euro2PaymentRequestUri.replace("&signature=" + euro2PaymentURI.getSignature(), "")
+            assert uriWithoutSignature == "euro2:0xae0a73fdf0fa05e118b9b4e4da41d0e77d4b932e/payment?amount=1200&signature_type=ETH&message=eee"
         when:
-            byte[] rawtx = Hex.decode("f82804881bc16d674ec8000094cd2a3d9f938e13cd947ec05abc7fe734df8dd8268609184e72a0006480");
-            byte[] rawHash = HashUtil.sha3(rawtx);
-            byte[] address = Hex.decode("cd2a3d9f938e13cd947ec05abc7fe734df8dd826");
-            ECKey key = ECKey.signatureToKey(rawHash, sig);
-            System.out.println("Signature public key\t: " + Hex.toHexString(key.getPubKey()));
-            System.out.println("Sender is\t\t: " + Hex.toHexString(key.getAddress()));
+            byte[] uriWithoutSignatureRawHash = HashUtil.sha3(uriWithoutSignature.getBytes(StandardCharsets.UTF_8));
+
         then:
-            key == ECKey.signatureToKey(rawHash, sig.toBase64())
-            key == ECKey.recoverFromSignature(0, sig, rawHash)
-            key.getPubKey() == ECKey.recoverPubBytesFromSignature(0, sig, rawHash)
-            address == key.getAddress()
-            address == ECKey.signatureToAddress(rawHash, sig)
-            address == ECKey.signatureToAddress(rawHash, sig.toBase64())
-            address == ECKey.recoverAddressFromSignature(0, sig, rawHash)
-            key.verify(rawHash, sig) == true
+            ECKey.signatureToKey(uriWithoutSignatureRawHash, ecdsaSignature).verify(uriWithoutSignatureRawHash, ecdsaSignature)
+            String requestorAddress = Hex.toHexString(ECKey.signatureToAddress(uriWithoutSignatureRawHash, ecdsaSignature))
+            println requestorAddress
+            "ae0a73fdf0fa05e118b9b4e4da41d0e77d4b932e" == requestorAddress
     }
 }

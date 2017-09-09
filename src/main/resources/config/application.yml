@@ -55,6 +55,11 @@ slack:
 endpoints:
   enabled: false
 
+firebase:
+  url: https://euro2-f4201.firebaseio.com/push
+  super:
+    key: THEFIREBASESUPERKEY
+
 ---
 spring:
   profiles: dev

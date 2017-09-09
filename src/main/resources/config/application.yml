@@ -83,8 +83,9 @@ fixed:
 spring:
   profiles: test
   datasource:
-    url: jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE;MODE=MYSQL;INIT=RUNSCRIPT FROM 'classpath:db/h2/init_h2.sql';
-    username:
+#    url: jdbc:h2:mem:public;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE;MODE=MYSQL;INIT=RUNSCRIPT FROM 'classpath:db/h2/init_h2.sql';
+    url: jdbc:h2:mem:public;MODE=MySQL;DATABASE_TO_UPPER=false;DB_CLOSE_DELAY=-1;MVCC=TRUE;LOCK_TIMEOUT=10000;DB_CLOSE_ON_EXIT=FALSE;TRACE_LEVEL_FILE=3;INIT=RUNSCRIPT FROM 'classpath:db/h2/init_h2.sql';
+    username: sa
     password:
     driver-class-name: org.h2.Driver
     platform: h2
@@ -94,6 +95,10 @@ spring:
     show-sql: true
     hibernate:
       ddl-auto: create
+
+flyway:
+  user: sa
+  password:
 
 ethereum:
   node:

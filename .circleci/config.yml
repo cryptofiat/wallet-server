@@ -40,7 +40,15 @@ jobs:
         
       # run tests!
       - run: gradle test
+      - run: gradle build
 
+      - add_ssh_keys:
+          fingerprints:
+            - "b5:55:0e:be:54:39:7c:8c:8e:8f:9b:8d:5a:a1:f0:75"
 
-
-
+      - deploy:
+          command: |
+            if [ "${CIRCLE_BRANCH}" == "master" -o "${CIRCLE_BRANCH}" == "circleci-integration"  ]; then
+              scp -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -r  build/libs ubuntu@wallet.euro2.ee:~/wallet-server/
+              ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no ubuntu@wallet.euro2.ee sudo systemctl restart wallet-server
+            fi

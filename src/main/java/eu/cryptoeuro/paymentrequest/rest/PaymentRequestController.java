@@ -1,72 +1,74 @@
 package eu.cryptoeuro.paymentrequest.rest;
 
-import com.google.protobuf.ByteString;
-import com.google.protobuf.InvalidProtocolBufferException;
-import eu.cryptoeuro.rest.model.*;
+import eu.cryptoeuro.dao.PaymentRequestRepository;
+import eu.cryptoeuro.euro2paymenturi.Euro2PaymentURI;
+import eu.cryptoeuro.paymentrequest.rest.command.CreatePaymentRequestCommand;
+import eu.cryptoeuro.rest.exception.ValidationException;
+import eu.cryptoeuro.rest.model.PaymentRequest;
 import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import lombok.extern.slf4j.Slf4j;
-import org.bitcoin.protocols.payments.Protos;
-import org.bitcoinj.core.Address;
-import org.bitcoinj.core.NetworkParameters;
-import org.bitcoinj.script.Script;
 import org.bouncycastle.util.encoders.Hex;
-import org.ethereum.vm.program.Program;
-import org.springframework.http.MediaType;
-import org.springframework.http.RequestEntity;
+import org.ethereum.crypto.ECKey;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.*;
+import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.*;
+import springfox.documentation.annotations.ApiIgnore;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.time.Instant;
-
-import static org.bitcoin.protocols.payments.Protos.PaymentRequest;
-import static org.bitcoin.protocols.payments.Protos.PaymentDetails;
+import javax.validation.Valid;
+import java.nio.charset.StandardCharsets;
+import java.security.SignatureException;
 
 @RestController
 @RequestMapping("/v1/payment-request")
 @Slf4j
 public class PaymentRequestController {
 
+    @Autowired
+    PaymentRequestRepository paymentRequestRepository;
 
-    //TODO Current MVP implementation uses hex serialisation, upgrade to true protobuf (needs some hacking to make it work in spring)
-    @ApiOperation(value = "Store a payment request.")
-//    @RequestMapping(method = RequestMethod.POST, value = "", consumes = {MediaType.APPLICATION_OCTET_STREAM_VALUE})
-//    public String storePaymentRequest(@RequestBody InputStream requestInputStream){
-    @RequestMapping(method = RequestMethod.POST, value = "" , consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-    public String storePaymentRequest(/*@RequestBody String requestHex*/ @RequestParam("requestHex") String requestHex){
-
-        PaymentRequest paymentRequest = null;
-        try {
-            paymentRequest = PaymentRequest.parseFrom(Hex.decode(requestHex));
-        } catch (InvalidProtocolBufferException e) {
-            e.printStackTrace();
+    @ApiOperation(value = "Submit payment request")
+    @RequestMapping(method = RequestMethod.POST, value = "")
+    public ResponseEntity<String> submitPaymentRequest(
+        @Valid @RequestBody @ApiParam CreatePaymentRequestCommand createPaymentRequestCommand,
+        @ApiIgnore Errors errors
+    ) {
+        if (errors.hasErrors()) {
+            throw new ValidationException(errors);
         }
 
-        PaymentDetails paymentDetails = null;
+        Euro2PaymentURI euro2PaymentURI = createPaymentRequestCommand.toEuro2PaymentURI();
+        euro2PaymentURI.getAddress();
+
+        String signatureString = euro2PaymentURI.getSignature();
+        byte[] signatureBytes = Hex.decode(signatureString);
+        ECKey.ECDSASignature ecdsaSignature = ECKey.ECDSASignature.decodeFromDER(signatureBytes);
+        String uriWithoutSignature = createPaymentRequestCommand.getEuro2PaymentUri().replace("?signature=" + euro2PaymentURI.getSignature(), "");
+        byte[] uriWithoutSignatureRawHash = uriWithoutSignature.getBytes(StandardCharsets.UTF_8);
 
         try {
-            paymentDetails = PaymentDetails.parseFrom(paymentRequest.getSerializedPaymentDetails());
-        } catch (InvalidProtocolBufferException e) {
+            if (!ECKey.signatureToKey(uriWithoutSignatureRawHash, ecdsaSignature).verify(uriWithoutSignatureRawHash, ecdsaSignature)) throw new Exception();
+        } catch (Exception e) {
             e.printStackTrace();
+            throw new RuntimeException("Invalid euro payment uri signature");
         }
+        byte[] requestorAddressByteArray = ECKey.recoverAddressFromSignature(0, ecdsaSignature, uriWithoutSignatureRawHash);
 
-        Script script = new Script(paymentDetails.getOutputs(0).getScript().toByteArray());
 
+        PaymentRequest paymentRequest = PaymentRequest
+            .builder()
+            .requestorAddress(Hex.toHexString(requestorAddressByteArray))
+            .receiverAddress(euro2PaymentURI.getAddress())
+            .payerAddress(euro2PaymentURI.getPayer())
+            .euro2PaymentUri(createPaymentRequestCommand.getEuro2PaymentUri())
+            .build();
 
-        Address toAddress = script.getToAddress(NetworkParameters.prodNet());
-        String publicKeyHashOut = Hex.toHexString(script.getPubKeyHash());
+        paymentRequestRepository.save(paymentRequest);
 
-        eu.cryptoeuro.rest.model.PaymentRequest.builder().adresseeAddress(toAddress.toString());
-        log.info("test");
-
-        return "euro2:?r=http://wallet.euro2.ee:8080/v1/payment-request/abcdefg";
-    }
-
-    @ApiOperation(value = "Get a Payment Request by ID.")
-    @RequestMapping(method = RequestMethod.GET, value = "/{id}", produces = "application/x-protobuf")
-    public PaymentRequest getPaymentRequest(@PathVariable("id") String id){
-        PaymentDetails paymentDetails = PaymentDetails.newBuilder().setTime(Instant.now().toEpochMilli()).build();
-        return PaymentRequest.newBuilder().setSerializedPaymentDetails(paymentDetails.toByteString()).build();
+        return new ResponseEntity<String>(
+            "Success",
+            new HttpHeaders(), HttpStatus.OK);
     }
 
 }

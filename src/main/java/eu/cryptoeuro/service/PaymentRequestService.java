@@ -1,7 +1,7 @@
 package eu.cryptoeuro.service;
 
 import eu.cryptoeuro.dao.PaymentRequestRepository;
-import eu.cryptoeuro.rest.response.AccountPaymentRequestResponse;
+import eu.cryptoeuro.rest.response.PaymentRequestResponse;
 import eu.cryptoeuro.rest.model.PaymentRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,24 +16,24 @@ public class PaymentRequestService {
     @Autowired
     PaymentRequestRepository paymentRequestRepository;
 
-    public List<AccountPaymentRequestResponse> findPaymentRequestsRelatedToAddress(String address) {
-        List<AccountPaymentRequestResponse> paymentRequests = new ArrayList<>();
+    public List<PaymentRequestResponse> findPaymentRequestsRelatedToAddress(String address) {
+        List<PaymentRequestResponse> paymentRequests = new ArrayList<>();
 
         for (PaymentRequest paymentRequest : paymentRequestRepository.findByRequestorAddress(address)) {
             paymentRequests.add(
-                AccountPaymentRequestResponse.builder()
+                PaymentRequestResponse.builder()
                 .isRequesting(true)
-                .adresseeAddress(paymentRequest.getAdresseeAddress())
+                .payerAddress(paymentRequest.getPayerAddress())
                 .requestorAddress(paymentRequest.getRequestorAddress())
                 .build()
             );
         }
 
-        for (PaymentRequest paymentRequest : paymentRequestRepository.findByAdresseeAddress(address)) {
+        for (PaymentRequest paymentRequest : paymentRequestRepository.findByPayerAddress(address)) {
             paymentRequests.add(
-                AccountPaymentRequestResponse.builder()
+                PaymentRequestResponse.builder()
                     .isRequesting(false)
-                    .adresseeAddress(paymentRequest.getAdresseeAddress())
+                    .payerAddress(paymentRequest.getPayerAddress())
                     .requestorAddress(paymentRequest.getRequestorAddress())
                     .build()
             );

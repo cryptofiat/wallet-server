@@ -17,6 +17,10 @@ public class PaymentRequest {
     @GeneratedValue(strategy= GenerationType.IDENTITY)
     private Long id;
     @NotEmpty
+    String euro2PaymentUri;
+    @NotEmpty
     String requestorAddress;
-    String adresseeAddress;
+    String payerAddress;
+    @NotEmpty
+    String receiverAddress;
 }

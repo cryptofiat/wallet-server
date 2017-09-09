@@ -7,8 +7,13 @@ import lombok.Data;
 @Data
 @Builder
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class AccountPaymentRequestResponse {
+public class PaymentRequestResponse {
+    private Long id;
+    String euro2PaymentUri;
+
     boolean isRequesting;
+
     String requestorAddress;
-    String adresseeAddress;
+    String receiverAddress;
+    String payerAddress;
 }

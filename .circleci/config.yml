@@ -48,5 +48,7 @@ jobs:
 
       - deploy:
           command: |
-            scp -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -r repo/wallet-server/build/libs ubuntu@wallet.euro2.ee:wallet-server/build/libs/
-            ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no ubuntu@wallet.euro2.ee:wallet/run-wallet-server.sh
+            if [ "${CIRCLE_BRANCH}" == "master" -o "${CIRCLE_BRANCH}" == "circleci-integration"  ]; then
+              scp -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -r  ~/repo/wallet-server/build/libs ubuntu@wallet.euro2.ee:wallet-server/build/libs/
+              ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no ubuntu@wallet.euro2.ee:wallet/run-wallet-server.sh
+            fi

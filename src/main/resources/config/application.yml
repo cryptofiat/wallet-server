@@ -43,9 +43,9 @@ contract:
 
 email:
   user: euro20
-  password: abc123
+  password: YqzyMqnXtkz8
   bankinstruction:
-    recipient: someone@example.org
+    recipient: kristoxz@yahoo.com
 
 slack:
   webhook:
@@ -60,13 +60,23 @@ firebase:
   super:
     key: THEFIREBASESUPERKEY
 
+fixed:
+  gas:
+    price:
+      gwei: 1
+
 ---
 spring:
   profiles: dev
 ethereum:
   node:
     url: http://localhost:8545
-#   url=http://eth.euro2.ee:8545
+#   url: http://eth.euro2.ee:8545
+#   url: http://big-parity.euro2.ee:8545
+fixed:
+  gas:
+    price:
+      gwei: 2
 
 ---
 spring:

@@ -2,7 +2,7 @@ apply plugin: 'rebel'
 
 buildscript {
     ext {
-        springBootVersion = '1.4.0.RELEASE'
+        springBootVersion = '1.5.6.RELEASE'
     }
     repositories {
         mavenCentral()

@@ -1,14 +1,18 @@
 package eu.cryptoeuro.ethereumcryptography
 
 import eu.cryptoeuro.euro2paymenturi.Euro2PaymentURI
+import eu.cryptoeuro.service.EthSignatureService
 import org.bouncycastle.util.encoders.Hex
 import org.ethereum.crypto.ECKey
 import org.ethereum.crypto.HashUtil
+import org.springframework.beans.factory.annotation.Autowired
 import spock.lang.Specification
 
 import java.nio.charset.StandardCharsets
 
 class EthereumCryptoTests extends Specification {
+
+    EthSignatureService ethSignatureService = new EthSignatureService()
 
     def "build signature and they obtain address from it & verify it"() {
         given:
@@ -33,7 +37,7 @@ class EthereumCryptoTests extends Specification {
             key.verify(rawHash, sig) == true
     }
 
-    def "get signature and message hash and derive the signer address from the euro2PaymentUri"() {
+    def "get signature and message hash and derive the signer address from the euro2PaymentUri - solution example"() {
         given:
 
             String euro2PaymentRequestUri = "euro2:0xae0a73fdf0fa05e118b9b4e4da41d0e77d4b932e/payment?amount=1200&signature_type=ETH&message=eee&signature=c5bad2f2fafd3458358f6f5eb5d6eca009d76d2a052df48c54e75eee6463111a304404db1b462e25bb20ac01be90345bc6eed529de78ac73c578f36d489b47c01c"
@@ -47,7 +51,6 @@ class EthereumCryptoTests extends Specification {
             byte v = signatureBytes[64]
 
             ECKey.ECDSASignature ecdsaSignature = ECKey.ECDSASignature.fromComponents(r,s,v)
-
             String uriWithoutSignature = euro2PaymentRequestUri.replace("&signature=" + euro2PaymentURI.getSignature(), "")
             assert uriWithoutSignature == "euro2:0xae0a73fdf0fa05e118b9b4e4da41d0e77d4b932e/payment?amount=1200&signature_type=ETH&message=eee"
         when:
@@ -56,6 +59,22 @@ class EthereumCryptoTests extends Specification {
         then:
             ECKey.signatureToKey(uriWithoutSignatureRawHash, ecdsaSignature).verify(uriWithoutSignatureRawHash, ecdsaSignature)
             String requestorAddress = Hex.toHexString(ECKey.signatureToAddress(uriWithoutSignatureRawHash, ecdsaSignature))
+            println requestorAddress
+            "ae0a73fdf0fa05e118b9b4e4da41d0e77d4b932e" == requestorAddress
+    }
+
+    def "get signature and message hash and derive the signer address from the euro2PaymentUri using ethSignatureService"() {
+        given:
+            String euro2PaymentRequestUri = "euro2:0xae0a73fdf0fa05e118b9b4e4da41d0e77d4b932e/payment?amount=1200&signature_type=ETH&message=eee&signature=c5bad2f2fafd3458358f6f5eb5d6eca009d76d2a052df48c54e75eee6463111a304404db1b462e25bb20ac01be90345bc6eed529de78ac73c578f36d489b47c01c"
+            Euro2PaymentURI euro2PaymentURI = Euro2PaymentURI.parse(euro2PaymentRequestUri)
+            ECKey.ECDSASignature ecdsaSignature = ethSignatureService.parseHexSignature(euro2PaymentURI.getSignature());
+            String uriWithoutSignature = euro2PaymentRequestUri.replace("&signature=" + euro2PaymentURI.getSignature(), "")
+            assert uriWithoutSignature == "euro2:0xae0a73fdf0fa05e118b9b4e4da41d0e77d4b932e/payment?amount=1200&signature_type=ETH&message=eee"
+        when:
+            byte[] rawHashOfUriWithoutSignature = ethSignatureService.rawHashSignableMessage(uriWithoutSignature);
+        then:
+            ethSignatureService.verifySignature(rawHashOfUriWithoutSignature, ecdsaSignature)
+            String requestorAddress = ethSignatureService.obtainEthAddressFromSignature(rawHashOfUriWithoutSignature, ecdsaSignature)
             println requestorAddress
             "ae0a73fdf0fa05e118b9b4e4da41d0e77d4b932e" == requestorAddress
     }

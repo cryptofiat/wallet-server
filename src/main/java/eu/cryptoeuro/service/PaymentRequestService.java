@@ -22,19 +22,11 @@ public class PaymentRequestService {
         for (PaymentRequest paymentRequest : paymentRequestRepository.findByRequestorAddress(address)) {
             paymentRequests.add(
                 PaymentRequestResponse.builder()
-                .isRequesting(true)
-                .payerAddress(paymentRequest.getPayerAddress())
-                .requestorAddress(paymentRequest.getRequestorAddress())
-                .build()
-            );
-        }
-
-        for (PaymentRequest paymentRequest : paymentRequestRepository.findByPayerAddress(address)) {
-            paymentRequests.add(
-                PaymentRequestResponse.builder()
-                    .isRequesting(false)
-                    .payerAddress(paymentRequest.getPayerAddress())
+                    .isRequesting(true)
+                    .euro2PaymentUri(paymentRequest.getEuro2PaymentUri())
                     .requestorAddress(paymentRequest.getRequestorAddress())
+                    .receiver(paymentRequest.getReceiver())
+                    .payer(paymentRequest.getPayer())
                     .build()
             );
         }

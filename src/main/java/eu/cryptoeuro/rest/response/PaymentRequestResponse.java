@@ -14,6 +14,6 @@ public class PaymentRequestResponse {
     boolean isRequesting;
 
     String requestorAddress;
-    String receiverAddress;
-    String payerAddress;
+    String receiver;
+    String payer;
 }

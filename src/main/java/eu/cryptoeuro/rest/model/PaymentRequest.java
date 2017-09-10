@@ -1,7 +1,9 @@
 package eu.cryptoeuro.rest.model;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.experimental.Tolerate;
 import org.hibernate.validator.constraints.NotEmpty;
 
 import javax.persistence.Entity;
@@ -20,7 +22,10 @@ public class PaymentRequest {
     String euro2PaymentUri;
     @NotEmpty
     String requestorAddress;
-    String payerAddress;
+    String payer;
     @NotEmpty
-    String receiverAddress;
+    String receiver;
+
+    @Tolerate
+    PaymentRequest() {}
 }

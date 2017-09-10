@@ -7,5 +7,4 @@ import java.util.List;
 
 public interface PaymentRequestRepository extends CrudRepository<PaymentRequest,Long> {
     List<PaymentRequest> findByRequestorAddress(String requestorAddress);
-    List<PaymentRequest> findByPayerAddress(String payerAddress);
 }

@@ -20,7 +20,7 @@ import javax.validation.Valid;
 import java.nio.charset.StandardCharsets;
 
 @RestController
-@RequestMapping("/v1/payment-request")
+@RequestMapping("/v1/payment-requests")
 @Slf4j
 public class PaymentRequestController {
 

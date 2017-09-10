@@ -21,7 +21,6 @@ public class BalanceServiceSpec extends WireMockBaseSpec {
         balance.currency.equals(Currency.ETH)
     }
 
-    @Ignore
     def "getBalance: Gets EUR balance based on account address"(){
         when:
         Balance balance = balanceService.getBalance(sampleAccount)
@@ -30,7 +29,6 @@ public class BalanceServiceSpec extends WireMockBaseSpec {
         balance.currency.equals(Currency.EUR_CENT)
     }
 
-    @Ignore
     def "getBalance: Throws exception when getting EUR balance based on invalid account address"(){
         when:
         Balance balance = balanceService.getBalance(invalidSampleAccount)
@@ -38,7 +36,6 @@ public class BalanceServiceSpec extends WireMockBaseSpec {
         thrown NullPointerException
     }
 
-    @Ignore
     def "getBalance: Gets EUR balance based on non exsisting account address"(){
         when:
         Balance balance = balanceService.getBalance(nonExistingSampleAccount)

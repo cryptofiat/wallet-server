@@ -12,7 +12,6 @@ class AccountServiceSpec extends WireMockBaseSpec {
     String nonExistingSampleAccount = "0x65fa6548764c08c0dd77495b33ed302d0c212690";
     String invalidSampleAccount = "0x123";
 
-    @Ignore
     def "isApproved: Gets if account is approved"() {
         when:
         Boolean isApproved = accountService.isApproved(sampleAccount)
@@ -20,7 +19,6 @@ class AccountServiceSpec extends WireMockBaseSpec {
         isApproved.equals(true)
     }
 
-    @Ignore
     def "isApproved: Gets false if account does not exist"() {
         when:
         Boolean isApproved = accountService.isApproved(nonExistingSampleAccount)
@@ -28,7 +26,6 @@ class AccountServiceSpec extends WireMockBaseSpec {
         isApproved.equals(false)
     }
 
-    @Ignore
     def "isApproved: Throws exception on getting is account approved on invalid"() {
         when:
         Boolean isApproved = accountService.isApproved(invalidSampleAccount)
@@ -36,7 +33,6 @@ class AccountServiceSpec extends WireMockBaseSpec {
         thrown NullPointerException
     }
 
-    @Ignore
     def "isClosed: Gets if account is closed"() {
         when:
         Boolean isClosed = accountService.isClosed(sampleAccount)
@@ -44,7 +40,6 @@ class AccountServiceSpec extends WireMockBaseSpec {
         isClosed.equals(false)
     }
 
-    @Ignore
     def "isFrozen: Gets if account is frozen"() {
         when:
         Boolean isFrozen = accountService.isFrozen(sampleAccount)

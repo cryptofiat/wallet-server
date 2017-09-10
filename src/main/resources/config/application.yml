@@ -1,0 +1,105 @@
+api:
+  title: Wallet server
+  description: A wrapper around Ethereum API. It exposes features as friendly HTTP endpoints and forwards them to a Parity server.
+
+spring:
+  datasource:
+    url: jdbc:mysql://localhost:3306/wallet_server_db?characterEncoding=UTF-8&useLegacyDatetimeCode=false&serverTimezone=UTC
+    username: wallet-service
+    password: q1w2e3r4
+    initialize: true
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    continue-on-error: false
+    test-on-borrow: true
+    validation-query: SELECT 1
+
+flyway:
+  user: flyway
+  password: q1w2e3r4
+  datasource:
+    url: ${spring.datasource.url}
+    username: ${flyway.user}
+    password: ${flyway.password}
+    driver-class-name: ${spring.datasource.driver-class-name}
+    initialize: false
+    continue-on-error: false
+    test-on-borrow: true
+    validation-query: SELECT 1
+    locations: classpath:db/migration
+
+ethereum:
+  node:
+    url: http://big-parity.euro2.ee:8545
+
+sponsor:
+  ethereum:
+    address: 0x8664e7a68809238d8f8e78e4b7c723282533a787
+#   address: 0xdbf25a870895fe608f6ce5830d8c13a5598b060e
+#   address: 0x31c0ec79c3b14ff86673d0fa92c260b42ff14437
+
+contract:
+  ethereum:
+    address: 0xa10a263D4336E4466502b2889D27D04582a86663
+    block: 0x241B13
+
+email:
+  user: euro20
+  password: YqzyMqnXtkz8
+  bankinstruction:
+    recipient: kristoxz@yahoo.com
+
+slack:
+  webhook:
+    bankinstruction:
+      url: https://hooks.slack.com/services/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
+
+endpoints:
+  enabled: false
+
+firebase:
+  url: https://euro2-f4201.firebaseio.com/push
+  super:
+    key: THEFIREBASESUPERKEY
+
+fixed:
+  gas:
+    price:
+      gwei: 1
+
+---
+spring:
+  profiles: dev
+ethereum:
+  node:
+    url: http://localhost:8545
+#   url: http://eth.euro2.ee:8545
+#   url: http://big-parity.euro2.ee:8545
+fixed:
+  gas:
+    price:
+      gwei: 2
+
+---
+spring:
+  profiles: test
+  datasource:
+#    url: jdbc:h2:mem:public;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE;MODE=MYSQL;INIT=RUNSCRIPT FROM 'classpath:db/h2/init_h2.sql';
+    url: jdbc:h2:mem:public;MODE=MySQL;DATABASE_TO_UPPER=false;DB_CLOSE_DELAY=-1;MVCC=TRUE;LOCK_TIMEOUT=10000;DB_CLOSE_ON_EXIT=FALSE;TRACE_LEVEL_FILE=3;INIT=RUNSCRIPT FROM 'classpath:db/h2/init_h2.sql';
+    username: sa
+    password:
+    driver-class-name: org.h2.Driver
+    platform: h2
+
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
+    show-sql: true
+    hibernate:
+      ddl-auto: create
+
+flyway:
+  user: sa
+  password:
+
+ethereum:
+  node:
+    url: http://localhost:28545

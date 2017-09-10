@@ -1,7 +1,11 @@
 package eu.cryptoeuro.rest;
 
+import eu.cryptoeuro.rest.response.PaymentRequestResponse;
+import eu.cryptoeuro.rest.model.*;
+import eu.cryptoeuro.service.*;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,15 +17,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
-
-import eu.cryptoeuro.rest.model.Account;
-import eu.cryptoeuro.rest.model.Balance;
-import eu.cryptoeuro.rest.model.Nonce;
-import eu.cryptoeuro.rest.model.Transfer;
-import eu.cryptoeuro.service.AccountService;
-import eu.cryptoeuro.service.BalanceService;
-import eu.cryptoeuro.service.NonceService;
-import eu.cryptoeuro.service.TransferService;
 
 @Api(value="accounts",
         description="Accounts info.",
@@ -40,6 +35,8 @@ public class AccountController {
     private NonceService nonceService;
     @Autowired
     private TransferService transferService;
+    @Autowired
+    PaymentRequestService paymentRequestService;
 
     @ApiOperation(value = "Get account.")
     @RequestMapping(method = RequestMethod.GET, value = "/{accountAddress}")
@@ -71,6 +68,17 @@ public class AccountController {
         return new ResponseEntity<>(
                 transfers,
                 new HttpHeaders(), HttpStatus.OK);
+    }
+
+    @ApiOperation(value = "Get account payment requests.")
+    @RequestMapping(method = RequestMethod.GET, value = "/{accountAddress}/requests")
+    public ResponseEntity<List<PaymentRequestResponse>> getAccountPaymentRequests(@PathVariable String accountAddress){
+        log.info("Getting account payment requests " + accountAddress.toString());
+        List<PaymentRequestResponse> paymentRequests = paymentRequestService.findPaymentRequestsRelatedToAddress(accountAddress);
+        log.info("Getting account requests: " + paymentRequests.size());
+        return new ResponseEntity<>(
+            paymentRequests,
+            new HttpHeaders(), HttpStatus.OK);
     }
 
     @ApiOperation(value = "Get account ether balance.")

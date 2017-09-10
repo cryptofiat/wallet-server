@@ -30,6 +30,7 @@ public class CreateTransferCommand {
     private Long nonce;
     @NotNull
     private String signature;
+    private Long paymentRequestId;
 
     @AssertTrue(message="Fee does not match expected")
     private boolean isValidFee() {

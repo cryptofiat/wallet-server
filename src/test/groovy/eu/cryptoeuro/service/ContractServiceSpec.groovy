@@ -1,12 +1,14 @@
 package eu.cryptoeuro.service
 
 import org.springframework.beans.factory.annotation.Autowired
+import spock.lang.Ignore
 
 class ContractServiceSpec extends WireMockBaseSpec {
 
     @Autowired
     ContractService contractService
 
+    @Ignore
     def "getContract: Gets a single contract address, that is associated with the main contract"() {
         when:
         String contractAddress = contractService.getContract(1)
@@ -14,6 +16,7 @@ class ContractServiceSpec extends WireMockBaseSpec {
         contractAddress.equals("0x95f5c59e3f0f994e9fe66ea6ede76b22161551b5")
     }
 
+    @Ignore
     def "getContract: Gets a single contract address, with an order number which is out of scope"() {
         when:
         String contractAddress = contractService.getContract(999)
@@ -21,6 +24,7 @@ class ContractServiceSpec extends WireMockBaseSpec {
         contractAddress.equals("0x0000000000000000000000000000000000000000")
     }
 
+    @Ignore
     def "getAllContracts: Gets all contracts, which are associated with the main contract"() {
         when:
         List<String> allContractAddresses = contractService.getAllContracts()

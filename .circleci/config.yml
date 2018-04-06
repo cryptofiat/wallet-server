@@ -8,7 +8,7 @@ jobs:
     docker:
       # specify the version you desire here
       - image: circleci/openjdk:8-jdk
-      
+
       # Specify service dependencies here if necessary
       # CircleCI maintains a library of pre-built images
       # documented at https://circleci.com/docs/2.0/circleci-images/
@@ -20,7 +20,7 @@ jobs:
       # Customize the JVM maximum heap limit
       JVM_OPTS: -Xmx3200m
       TERM: dumb
-    
+
     steps:
       - checkout
 
@@ -37,18 +37,20 @@ jobs:
           paths:
             - ~/.m2
           key: v1-dependencies-{{ checksum "build.gradle" }}
-        
+
       # run tests!
       - run: gradle test
       - run: gradle build
 
       - add_ssh_keys:
           fingerprints:
-            - "b5:55:0e:be:54:39:7c:8c:8e:8f:9b:8d:5a:a1:f0:75"
+            #- "b5:55:0e:be:54:39:7c:8c:8e:8f:9b:8d:5a:a1:f0:75"
+            - "9f:98:67:4f:e4:75:0a:cf:dd:cb:75:82:94:57:2e:da"
 
       - deploy:
           command: |
             if [ "${CIRCLE_BRANCH}" == "master" ]; then
-              scp -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -r  build/libs/* ubuntu@wallet.euro2.ee:~/wallet-server
-              ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no ubuntu@wallet.euro2.ee sudo systemctl restart wallet-server
+              ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no wallet-server@wallet.euro2.ee /bin/sh mkdir /opt/wallet-server/builds/"${CIRCLE_BUILD_NUM}"
+              scp -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -r  build/libs/* wallet-server@wallet.euro2.ee:/opt/wallet-server/builds/"${CIRCLE_BUILD_NUM}"/
+              ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no wallet-server@wallet.euro2.ee /bin/sh /opt/wallet-server/wallet-server-deploy.sh
             fi

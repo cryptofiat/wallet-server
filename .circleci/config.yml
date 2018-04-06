@@ -50,7 +50,7 @@ jobs:
       - deploy:
           command: |
             if [ "${CIRCLE_BRANCH}" == "master" ]; then
-              ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no wallet-server@wallet.euro2.ee /bin/sh mkdir /opt/wallet-server/builds/"${CIRCLE_BUILD_NUM}"
+              ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no wallet-server@wallet.euro2.ee /bin/mkdir /opt/wallet-server/builds/"${CIRCLE_BUILD_NUM}"
               scp -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -r  build/libs/* wallet-server@wallet.euro2.ee:/opt/wallet-server/builds/"${CIRCLE_BUILD_NUM}"/
               ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no wallet-server@wallet.euro2.ee /bin/sh /opt/wallet-server/wallet-server-deploy.sh
             fi

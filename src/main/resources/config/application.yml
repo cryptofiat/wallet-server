@@ -40,7 +40,7 @@ sponsor:
 contract:
   ethereum:
     address: "0xa10a263D4336E4466502b2889D27D04582a86663"
-    block: 0x241B13
+    block: "0x241B13"
 
 email:
   user: euro20
@@ -64,16 +64,26 @@ firebase:
 fixed:
   gas:
     price:
-      gwei: 1
+      gwei: 3
 
 ---
 spring:
   profiles: dev
+  datasource:
+    url: jdbc:mysql://localhost:33061/wallet_server_db?characterEncoding=UTF-8&useLegacyDatetimeCode=false&serverTimezone=UTC
 server.port: 8082
 fixed:
   gas:
     price:
       gwei: 2
+flyway:
+  user: wallet-service
+  password: q1w2e3r4
+  datasource:
+    url: jdbc:mysql://localhost:33061/wallet_server_db?characterEncoding=UTF-8&useLegacyDatetimeCode=false&serverTimezone=UTC
+    username: wallet-service
+    password: q1w2e3r4
+    driver-class-name: com.mysql.cj.jdbc.Driver
 
 ---
 spring:

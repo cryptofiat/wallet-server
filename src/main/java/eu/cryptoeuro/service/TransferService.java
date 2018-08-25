@@ -208,6 +208,10 @@ public class TransferService extends BaseService {
 
         JsonRpcTransactionLogResponse response = getCallResponseForObject(call, JsonRpcTransactionLogResponse.class);
 
+        if (response.hasError()) {
+            log.error("Error getting Transaction Logs: " + response.getError().getMessage());
+        }
+
         Map<String, Long> fees = new HashMap<>();
 
         log.info(response.getResult().toString());

@@ -84,7 +84,11 @@ public class ContractService extends BaseService {
     }
 
     private boolean isEmptyResponse(JsonRpcStringResponse response) {
-        return response.getResult().substring(2).trim().isEmpty();
+        if (response.getResult() == null) {
+            return true;
+        } else {
+            return response.getResult().substring(2).trim().isEmpty();
+        }
     }
 
     public ContractInfo contractInfo() {

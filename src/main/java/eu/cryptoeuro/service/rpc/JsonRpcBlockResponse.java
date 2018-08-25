@@ -1,10 +1,12 @@
 package eu.cryptoeuro.service.rpc;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import java.util.Date;
 
 @Data
-public class JsonRpcBlockResponse {
+@EqualsAndHashCode(callSuper=false)
+public class JsonRpcBlockResponse extends JsonRpcBaseResponse {
 
     public JsonRpcBlockEntity result;
 

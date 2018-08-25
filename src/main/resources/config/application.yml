@@ -69,15 +69,18 @@ fixed:
 ---
 spring:
   profiles: dev
-ethereum:
-  node:
-    url: http://localhost:8545
-#   url: http://eth.euro2.ee:8545
-#   url: http://big-parity.euro2.ee:8545
+server.port: 8082
 fixed:
   gas:
     price:
       gwei: 2
+
+---
+spring:
+  profiles: local-parity
+ethereum:
+  node:
+    url: http://localhost:8545
 
 ---
 spring:

@@ -40,7 +40,7 @@ sponsor:
 contract:
   ethereum:
     address: "0xa10a263D4336E4466502b2889D27D04582a86663"
-    block: 0x241B13
+    block: "0x241B13"
 
 email:
   user: euro20
@@ -64,7 +64,7 @@ firebase:
 fixed:
   gas:
     price:
-      gwei: 1
+      gwei: 3
 
 ---
 spring:

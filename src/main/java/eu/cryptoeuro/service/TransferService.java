@@ -109,7 +109,7 @@ public class TransferService extends BaseService {
         return result;
     }
 
-    public Transfer delegatedBankTransfer(CreateBankTransferCommand bankTransfer){
+    public Transfer delegatedBankTransfer(CreateBankTransferCommand bankTransfer) {
         log.info("delegatedBankTransfer:");
         log.info("sourceAccount:" + bankTransfer.getSourceAccount());
         log.info("targetBankAccountIBAN:" + bankTransfer.getTargetBankAccountIBAN());
@@ -118,7 +118,7 @@ public class TransferService extends BaseService {
         log.info("nonce:" + bankTransfer.getNonce());
         log.info("signature:" + bankTransfer.getSignature());
 
-	CreateTransferCommand ethTransfer = new CreateTransferCommand();
+        CreateTransferCommand ethTransfer = new CreateTransferCommand();
         ethTransfer.setAmount(bankTransfer.getAmount());
         ethTransfer.setSourceAccount(bankTransfer.getSourceAccount());
         ethTransfer.setFee(bankTransfer.getFee());
@@ -126,93 +126,50 @@ public class TransferService extends BaseService {
         ethTransfer.setSignature(bankTransfer.getSignature());
 
         ethTransfer.setTargetAccount(this.bankProxyAddress);
-	Transfer result = delegatedTransfer(ethTransfer);
+        Transfer result = delegatedTransfer(ethTransfer);
 
-	//TODO: Here should be something that forks the thread and waits async until the transfer has been mined. Or even do this part as job.
+        //TODO: Here should be something that forks the thread and waits async until the transfer has been mined. Or even do this part as job.
 
-	if (result.getId() != null) {
+        if (result.getId() != null) {
 
-		slackService.notifyPayout(bankTransfer, result.getId());
+            slackService.notifyPayout(bankTransfer, result.getId());
 
-		log.info("Sending  email instructions for bank transfer "+result.getId());
+            log.info("Sending  email instructions for bank transfer " + result.getId());
 
-		String emailText = "bank account: "+bankTransfer.getTargetBankAccountIBAN()+
-		"\n amount: "+bankTransfer.getAmount()+
-		"\n reference: "+bankTransfer.getReference()+
-		"\n from: "+bankTransfer.getSourceAccount()+
-		"\n txhash: "+result.getId()+
-		"\n name: "+bankTransfer.getRecipientName();
+            String emailText = "bank account: " + bankTransfer.getTargetBankAccountIBAN() +
+                "\n amount: " + bankTransfer.getAmount() +
+                "\n reference: " + bankTransfer.getReference() +
+                "\n from: " + bankTransfer.getSourceAccount() +
+                "\n txhash: " + result.getId() +
+                "\n name: " + bankTransfer.getRecipientName();
 
-		log.info("Email should go with body: "+emailText);
+            log.info("Email should go with body: " + emailText);
 
 
-		emailService.sendEmail(this.bankProxyInstructionEmail, "Euro2.0 bank payout", emailText );
-	}
+            emailService.sendEmail(this.bankProxyInstructionEmail, "Euro2.0 bank payout", emailText);
+        }
 
-	return result;
+        return result;
     }
-
-    /*
-    public String mintToken(Optional<String> account, Optional<Long> amount) {
-        // DOCS: https://github.com/ethcore/parity/wiki/JSONRPC#eth_sendtransaction
-        Map<String, String> params = new HashMap<>();
-        params.put("from", "0x4FfAaD6B04794a5911E2d4a4f7F5CcCEd0420291"); // erko main account
-        params.put("to", "0xAF8ce136A244dB6f13a97e157AC39169F4E9E445"); // viimane 0.21 contract deploy
-        //params.put("gas", "0x76c0"); // 30400, 21000
-        //params.put("gasPrice", "0x9184e72a000"); // 10000000000000
-        //params.put("value", "");
-
-        String targetArgument = "000000000000000000000000" + account.orElse("0x52C312631d5593D9164A257abcD5c58d14B96600").substring(2); // erko wallet contract aadress
-        // TODO use amount variable
-        String amountArgument = "0000000000000000000000000000000000000000000000000000000000000065"; // 101 raha
-        String data = "0x" + HashUtils.keccak256("mintToken(address,uint256)").substring(0, 8) + targetArgument + amountArgument;
-
-        params.put("data", data);
-        //params.put("nonce", "");
-
-        JsonRpcCallMap call = new JsonRpcCallMap(EthereumRpcMethod.sendTransaction, Arrays.asList(params));
-
-        log.info("JSON:\n"+call.toString());
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON_UTF8);
-        HttpEntity<String> request = new HttpEntity<String>(call.toString(), headers);
-        log.info("Sending request to: " + URL);
-        JsonRpcStringResponse response = restTemplate.postForObject(URL, request, JsonRpcStringResponse.class);
-
-        log.info("Send transaction response: " + response.getResult());
-
-        / *
-        byte[] bytes = DatatypeConverter.parseHexBinary(response.getResult().substring(2));
-        String convertedResult = new String(bytes, StandardCharsets.UTF_8);
-        log.info("Converted to string: " + convertedResult);
-
-        long longResult = Long.parseLong(response.getResult().substring(2), 16);
-        log.info("Converted to long: " + longResult);
-        * /
-
-        return response.getResult();
-    }
-    */
 
     public List<Transfer> getTransfersForAccount(String address) {
-	    TransferHistory transferHistory = TransferHistoryManager.getInstance().getTransferHistory(address);
-	    log.info("Loaded history cache for address "+address+" up to block "+transferHistory.lastBlock);
-	    long latestBlock = getLatestBlock();
-	    transferHistory.transferList = Stream.concat(
-				transferHistory.transferList.stream(),
-				getTransfersForAccount(address,transferHistory.lastBlock+1).stream() // todo: should be to latest block
-				).collect(Collectors.toList());
-	    transferHistory.lastBlock = latestBlock; //get new last block
-	    TransferHistoryManager.getInstance().storeTransferHistory(transferHistory);
-            return transferHistory.transferList;
+        TransferHistory transferHistory = TransferHistoryManager.getInstance().getTransferHistory(address);
+        log.info("Loaded history cache for address " + address + " up to block " + transferHistory.lastBlock);
+        long latestBlock = getLatestBlock();
+        transferHistory.transferList = Stream.concat(
+            transferHistory.transferList.stream(),
+            getTransfersForAccount(address, transferHistory.lastBlock + 1).stream() // todo: should be to latest block
+        ).collect(Collectors.toList());
+        transferHistory.lastBlock = latestBlock; //get new last block
+        TransferHistoryManager.getInstance().storeTransferHistory(transferHistory);
+        return transferHistory.transferList;
     }
 
     public List<Transfer> getTransfersForAccount(String address, long fromBlock) {
         return Stream.concat(
-		getTransfersForAccountFromTo(null, address, fromBlock).stream(),
-		getTransfersForAccountFromTo(address,null, fromBlock).stream()
-	     ).collect(Collectors.toList());
+            getTransfersForAccountFromTo(null, address, fromBlock).stream(),
+            getTransfersForAccountFromTo(address, null, fromBlock).stream()
+        ).collect(Collectors.toList());
     }
 
     public Transfer get(String transactionHash) {
@@ -221,12 +178,12 @@ public class TransferService extends BaseService {
 
         JsonRpcTransactionResponse response = getCallResponseForObject(call, JsonRpcTransactionResponse.class);
 
-        log.info("Is "+transactionHash+" mined yet? " + response.isMined());
+        log.info("Is " + transactionHash + " mined yet? " + response.isMined());
         Transfer transfer = new Transfer();
         transfer.setStatus((response.isMined()) ? TransferStatus.SUCCESSFUL : TransferStatus.PENDING);
         transfer.setId(transactionHash);
         transfer.setBlockHash(response.getBlockHash());
-	return transfer;
+        return transfer;
     }
 
 
@@ -244,7 +201,7 @@ public class TransferService extends BaseService {
 
         Map<String, Object> params = new HashMap<>();
         params.put("address", contractConfig.getAllContracts());
-        params.put("fromBlock", ( Long.decode(CONTRACT_FROM_BLOCK) > fromBlock ) ? CONTRACT_FROM_BLOCK : "0x" + Long.toHexString(fromBlock) );
+        params.put("fromBlock", (Long.decode(CONTRACT_FROM_BLOCK) > fromBlock) ? CONTRACT_FROM_BLOCK : "0x" + Long.toHexString(fromBlock));
         params.put("topics", topicsToFind);
 
         JsonRpcCallMap call = new JsonRpcCallMap(EthereumRpcMethod.getLogs, Arrays.asList(params));
@@ -255,12 +212,12 @@ public class TransferService extends BaseService {
 
         log.info(response.getResult().toString());
         return response.getResult().stream().map(logEntry -> {
-	    String toAddr = new String(HashUtils.unpadAddress(logEntry.getTopics().get(2)));
+            String toAddr = new String(HashUtils.unpadAddress(logEntry.getTopics().get(2)));
 
-	    if (this.feeReceiverAddresses.contains(toAddr)) {
-		fees.put(logEntry.getTransactionHash(),Long.parseLong(logEntry.getData().substring(2), 16));
-	        return null;
-	    }
+            if (this.feeReceiverAddresses.contains(toAddr)) {
+                fees.put(logEntry.getTransactionHash(), Long.parseLong(logEntry.getData().substring(2), 16));
+                return null;
+            }
 
             Transfer transfer = new Transfer();
 
@@ -270,22 +227,22 @@ public class TransferService extends BaseService {
             transfer.setTargetAccount(HashUtils.unpadAddress(logEntry.getTopics().get(2)));
             transfer.setAmount(Long.parseLong(logEntry.getData().substring(2), 16));
 
-            JsonRpcCallMap blockCall = new JsonRpcCallMap(EthereumRpcMethod.getBlockByHash, Arrays.asList(logEntry.getBlockHash(),false));
+            JsonRpcCallMap blockCall = new JsonRpcCallMap(EthereumRpcMethod.getBlockByHash, Arrays.asList(logEntry.getBlockHash(), false));
 
             JsonRpcBlockResponse blockResponse = getCallResponseForObject(blockCall, JsonRpcBlockResponse.class);
             transfer.setTimestamp(blockResponse.getTimestamp());
 
             return transfer;
-        } ).filter(l -> l != null).collect(Collectors.toList()).stream().map( tx -> {
+        }).filter(l -> l != null).collect(Collectors.toList()).stream().map(tx -> {
 
-	    tx.setFee(fees.get(tx.getId()));
-	    return tx;
+            tx.setFee(fees.get(tx.getId()));
+            return tx;
 
-	} ).collect(Collectors.toList());
+        }).collect(Collectors.toList());
     }
 
     private void checkSourceAccountApproved(String account) {
-        if(!accountService.isApproved(account)) {
+        if (!accountService.isApproved(account)) {
             throw new AccountNotApprovedException();
         }
     }

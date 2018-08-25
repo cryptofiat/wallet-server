@@ -1,0 +1,15 @@
+version: '3.1'
+
+services:
+  db:
+    image: mysql:5.7.23
+    ports:
+    - "3306:3306"
+    command: --default-authentication-plugin=mysql_native_password
+    restart: always
+    environment:
+      MYSQL_USER: wallet-service
+      MYSQL_PASSWORD: q1w2e3r4
+      MYSQL_DATABASE: wallet_server_db
+      MYSQL_ROOT_PASSWORD: q1w2e3r4
+

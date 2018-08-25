@@ -78,7 +78,14 @@ fixed:
   gas:
     price:
       gwei: 2
-
+flyway:
+  user: wallet-service
+  password: q1w2e3r4
+  datasource:
+    url: jdbc:mysql://localhost:3306/wallet_server_db?characterEncoding=UTF-8&useLegacyDatetimeCode=false&serverTimezone=UTC
+    username: wallet-service
+    password: q1w2e3r4
+    driver-class-name: com.mysql.cj.jdbc.Driver
 ---
 spring:
   profiles: test

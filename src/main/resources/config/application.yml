@@ -4,11 +4,11 @@ api:
 
 spring:
   datasource:
-    url: jdbc:mysql://localhost:3306/wallet_server_db?characterEncoding=UTF-8&useLegacyDatetimeCode=false&serverTimezone=UTC
-    username: wallet-service
-    password: q1w2e3r4
+    url: jdbc:postgresql://euro2-postgres.cxey7gwcsm2l.eu-west-1.rds.amazonaws.com:5432/wallet_server
+    username: wallet_server
+    password: 
     initialize: true
-    driver-class-name: com.mysql.cj.jdbc.Driver
+    driver-class-name: org.postgresql.Driver
     continue-on-error: false
     test-on-borrow: true
     validation-query: SELECT 1
@@ -18,8 +18,8 @@ flyway:
   password: q1w2e3r4
   datasource:
     url: ${spring.datasource.url}
-    username: ${flyway.user}
-    password: ${flyway.password}
+    username: ${spring.datasource.username}
+    password: ${spring.datasource.password}
     driver-class-name: ${spring.datasource.driver-class-name}
     initialize: false
     continue-on-error: false

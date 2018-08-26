@@ -52,6 +52,6 @@ jobs:
             if [ "${CIRCLE_BRANCH}" == "master" ]; then
               ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no wallet-server@wallet.euro2.ee /bin/mkdir /opt/wallet-server/builds/"${CIRCLE_BUILD_NUM}"
               scp -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -r  build/libs/* wallet-server@wallet.euro2.ee:/opt/wallet-server/builds/"${CIRCLE_BUILD_NUM}"/
-              ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no wallet-server@wallet.euro2.ee cd /opt/wallet-server; /bin/ln -sf builds/"${CIRCLE_BUILD_NUM}"/*.jar wallet-server-latest.jar;
+              echo "cd /opt/wallet-server && /bin/ln -sf builds/"${CIRCLE_BUILD_NUM}"/*.jar wallet-server-latest.jar" | ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no wallet-server@bwallet-server.euro2.ee
               ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no wallet-server@wallet.euro2.ee /bin/systemctl --user restart wallet-server
             fi
